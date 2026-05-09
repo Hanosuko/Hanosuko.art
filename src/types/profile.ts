@@ -99,7 +99,4 @@ export interface Profile {
   cistiers: CistiersSettings
   setup: SetupSettings
   gallery: GallerySettings
-  viewCounter: {
-    fakeValue: number
-  }
 }

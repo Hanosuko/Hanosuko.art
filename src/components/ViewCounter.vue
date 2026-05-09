@@ -1,17 +1,25 @@
 <script setup lang="ts">
+import { computed, onMounted } from 'vue'
 import { Eye } from 'lucide-vue-next'
-import { profile } from '@/config/profile'
+import { useViewCounter } from '@/composables/useViewCounter'
 
-// 👇 Сейчас это просто заглушка с числом из конфига.
-// Чтобы подключить реальный счётчик (например, https://counterapi.dev или
-// свой serverless endpoint) — замени тело компонента и убери fakeValue из конфига.
-const formatted = new Intl.NumberFormat('en-US').format(profile.viewCounter.fakeValue)
+const { total, error, register } = useViewCounter('/api/views')
+
+const formatted = computed(() => {
+  if (total.value === null) return '…'
+  return new Intl.NumberFormat('en-US').format(total.value)
+})
+
+onMounted(() => {
+  void register()
+})
 </script>
 
 <template>
   <div class="view-counter">
     <Eye :size="14" aria-hidden="true" />
-    <span>{{ formatted }} views</span>
+    <span v-if="!error">{{ formatted }} views</span>
+    <span v-else>— views</span>
   </div>
 </template>
 

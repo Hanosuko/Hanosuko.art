@@ -1,5 +1,14 @@
 import type { Profile } from '@/types/profile'
 
+const photoAssets = import.meta.glob('/src/assets/photos/*.{avif,gif,jpeg,jpg,png,webp}', {
+  eager: true,
+  import: 'default',
+  query: '?url',
+}) as Record<string, string>
+
+const photoUrl = (filename: string): string =>
+  photoAssets[`/src/assets/photos/${filename}`] ?? `/photos/${filename}`
+
 export const profile: Profile = {
   // 👇 ОСНОВНАЯ ЛИЧНАЯ ИНФА — ник, аватар, статус
   identity: {
@@ -114,17 +123,11 @@ export const profile: Profile = {
     },
   },
 
-  // 👇 СЧЁТЧИК ПРОСМОТРОВ: сейчас просто заглушка с числом ниже.
-  // Чтобы подключить реальный счётчик — отредактируй src/components/ViewCounter.vue.
-  viewCounter: {
-    fakeValue: 1337,
-  },
-
   // 👇 БЛОК «MY SETUP» СПРАВА: фото сетапа + список комплектующих.
-  // Фото лежит в public/photos/setup.jpg.
+  // Фото можно положить в src/assets/photos/setup.jpg или public/photos/setup.jpg.
   // Добавляй/убирай пункты в specs свободно — верстка подхватит.
   setup: {
-    photoUrl: '/photos/setup.jpg',
+    photoUrl: photoUrl('setup.jpg'),
     title: 'My Setup',
     description: 'My current PC build and peripherals.',
     specs: [
@@ -144,14 +147,14 @@ export const profile: Profile = {
   },
 
   // 👇 ЛЕВАЯ ФОТО-ПАНЕЛЬ: коллаж из 4 фото слева.
-  // Файлы лежат в public/photos/. Подмени пути или сами файлы — обновится автоматически.
+  // Файлы можно положить в src/assets/photos/ или public/photos/.
   gallery: {
     title: 'me :]',
     photos: [
-      '/photos/photo1.jpg',
-      '/photos/photo2.jpg',
-      '/photos/photo3.jpg',
-      '/photos/photo4.jpg',
+      photoUrl('photo1.jpg'),
+      photoUrl('photo2.jpg'),
+      photoUrl('photo3.jpg'),
+      photoUrl('photo4.jpg'),
     ],
   },
 }

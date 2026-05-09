@@ -1,4 +1,4 @@
-import { onMounted, watchEffect } from 'vue'
+import { onMounted } from 'vue'
 import type { ThemeColors } from '@/types/profile'
 
 export function useThemeVars(theme: ThemeColors) {
@@ -12,7 +12,5 @@ export function useThemeVars(theme: ThemeColors) {
     root.style.setProperty('--color-glow', theme.glow)
   }
 
-  onMounted(() => {
-    watchEffect(apply)
-  })
+  onMounted(apply)
 }

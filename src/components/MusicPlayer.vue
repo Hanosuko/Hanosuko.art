@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { Music, Pause, Play, Shuffle, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-vue-next'
 import { profile } from '@/config/profile'
 import { usePlaylist } from '@/composables/usePlaylist'
@@ -16,7 +16,7 @@ const isMuted = ref(false)
 const isShuffle = ref(settings.shuffle)
 const currentTime = ref(0)
 const duration = ref(0)
-const playOrder = ref<number[]>([])
+const playOrder = shallowRef<number[]>([])
 const orderPosition = ref(0)
 const volumeLevel = ref(settings.volume)
 const volumeOpen = ref(false)

@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { Loader2, AlertCircle, Trophy } from 'lucide-vue-next'
 import { profile } from '@/config/profile'
 import { useTiers } from '@/composables/useTiers'
-import TierModal from '@/components/TierModal.vue'
 import type { CistiersCurrentTier } from '@/types/cistiers'
+
+const TierModal = defineAsyncComponent(() => import('@/components/TierModal.vue'))
 
 // 👇 Меняй apiUrl, username, tierDiscordUrl, tierRenders в src/config/profile.ts → cistiers
 const cistiers = profile.cistiers
