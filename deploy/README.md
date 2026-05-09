@@ -1,137 +1,132 @@
-# Hanosuko.art — server setup (one-time, on a fresh Ubuntu/Debian VPS)
+# VPS Deploy Example
 
-> Run all commands as `root` unless noted. Replace `YOUR_PUBKEY_HERE` and `RANDOM_SECRET` with real values.
+This folder contains example files for deploying the site to a fresh Ubuntu/Debian VPS with:
 
-## 0. Lock down SSH first
+- Nginx as the public web server
+- Node.js running the optional API
+- systemd keeping the API alive
+- SQLite storing view counts
+
+Replace every placeholder value before using these commands:
+
+- `example.com`
+- `www.example.com`
+- `deploy`
+- `/var/www/link-profile`
+- `/var/lib/link-profile`
+- `RANDOM_SECRET`
+
+## 1. Create A Deploy User
+
+Run on the VPS as `root`:
 
 ```bash
-# change root password (the one you posted is now public — rotate immediately)
-passwd
+adduser --gecos "" --disabled-password deploy
+usermod -aG sudo deploy
 
-# create deploy user
-adduser --gecos "" --disabled-password hanosuko
-usermod -aG sudo hanosuko
-
-# install your SSH pubkey (run from your Mac):
-#   ssh-copy-id hanosuko@194.93.2.60
-# OR manually on server:
-mkdir -p /home/hanosuko/.ssh
-echo "YOUR_PUBKEY_HERE" >> /home/hanosuko/.ssh/authorized_keys
-chmod 700 /home/hanosuko/.ssh
-chmod 600 /home/hanosuko/.ssh/authorized_keys
-chown -R hanosuko:hanosuko /home/hanosuko/.ssh
-
-# allow passwordless sudo for systemctl restart only (used by deploy.sh)
-echo 'hanosuko ALL=(root) NOPASSWD: /bin/systemctl restart hanosuko-api' > /etc/sudoers.d/hanosuko
-chmod 440 /etc/sudoers.d/hanosuko
-
-# test login as hanosuko in another terminal BEFORE disabling root password
-# then harden sshd:
-sed -i 's/^#*PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
-sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
-systemctl reload ssh
+mkdir -p /home/deploy/.ssh
+echo "YOUR_PUBLIC_SSH_KEY" >> /home/deploy/.ssh/authorized_keys
+chmod 700 /home/deploy/.ssh
+chmod 600 /home/deploy/.ssh/authorized_keys
+chown -R deploy:deploy /home/deploy/.ssh
 ```
 
-## 1. Firewall
+Allow restarting only this service without a password:
 
 ```bash
-apt update && apt install -y ufw
-ufw default deny incoming
-ufw default allow outgoing
-ufw allow OpenSSH
-ufw allow 'Nginx Full'
-ufw --force enable
+echo 'deploy ALL=(root) NOPASSWD: /bin/systemctl restart link-profile-api' > /etc/sudoers.d/link-profile
+chmod 440 /etc/sudoers.d/link-profile
 ```
 
-## 2. Install stack
+## 2. Install Packages
 
 ```bash
+apt update
 apt install -y curl ca-certificates git build-essential nginx
 curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 apt install -y nodejs
 ```
 
-## 3. Prepare app dirs
+## 3. Prepare Directories
 
 ```bash
-mkdir -p /var/www/hanosuko/dist /var/www/hanosuko/server
-chown -R hanosuko:hanosuko /var/www/hanosuko
+mkdir -p /var/www/link-profile/dist /var/www/link-profile/server
+chown -R deploy:deploy /var/www/link-profile
 
-mkdir -p /var/lib/hanosuko
-chown -R hanosuko:hanosuko /var/lib/hanosuko
+mkdir -p /var/lib/link-profile
+chown -R deploy:deploy /var/lib/link-profile
 ```
 
-## 4. Backend env
+## 4. Backend Env
 
-Create `/var/www/hanosuko/server/.env`:
+Create `/var/www/link-profile/server/.env`:
 
 ```bash
-sudo -u hanosuko tee /var/www/hanosuko/server/.env >/dev/null <<EOF
+sudo -u deploy tee /var/www/link-profile/server/.env >/dev/null <<EOF
 PORT=3000
 HOST=127.0.0.1
-DB_PATH=/var/lib/hanosuko/views.sqlite
+DB_PATH=/var/lib/link-profile/views.sqlite
 IP_SALT=RANDOM_SECRET
 EOF
-chmod 600 /var/www/hanosuko/server/.env
-chown hanosuko:hanosuko /var/www/hanosuko/server/.env
+
+chmod 600 /var/www/link-profile/server/.env
+chown deploy:deploy /var/www/link-profile/server/.env
 ```
 
-Generate `RANDOM_SECRET` with: `openssl rand -hex 32`.
-
-## 5. systemd unit
-
-Copy `deploy/systemd/hanosuko-api.service` to `/etc/systemd/system/`:
+Generate a salt:
 
 ```bash
-# from your Mac, after first rsync:
-scp deploy/systemd/hanosuko-api.service hanosuko@194.93.2.60:/tmp/
-ssh root@194.93.2.60 'mv /tmp/hanosuko-api.service /etc/systemd/system/ && systemctl daemon-reload && systemctl enable hanosuko-api'
+openssl rand -hex 32
 ```
 
-## 6. Nginx (HTTP first, then certbot upgrades to HTTPS)
+## 5. systemd
+
+Copy `deploy/systemd/link-profile-api.service` to your server and adapt paths/service names if needed.
+
+Example:
 
 ```bash
-# copy initial HTTP-only conf for the cert challenge:
-cat >/etc/nginx/sites-available/hanosuko.art <<'EOF'
-server {
-    listen 80;
-    server_name hanosuko.art www.hanosuko.art;
-    root /var/www/hanosuko/dist;
-    index index.html;
-    location /api/ { proxy_pass http://127.0.0.1:3000; }
-    location / { try_files $uri $uri/ /index.html; }
-}
-EOF
-ln -sf /etc/nginx/sites-available/hanosuko.art /etc/nginx/sites-enabled/
-rm -f /etc/nginx/sites-enabled/default
-nginx -t && systemctl reload nginx
+cp deploy/systemd/link-profile-api.service /etc/systemd/system/link-profile-api.service
+systemctl daemon-reload
+systemctl enable link-profile-api
 ```
 
-## 7. First deploy (from your Mac)
+## 6. Nginx
+
+Copy and edit `deploy/nginx/link-profile.conf`.
+
+At minimum, change:
+
+- `server_name`
+- `root`
+- certificate paths if you manage TLS manually
+
+Then:
 
 ```bash
-cd "/Users/stepazilin/Desktop/Новая папка 2"
-chmod +x deploy.sh
+nginx -t
+systemctl reload nginx
+```
+
+## 7. Deploy From Your Machine
+
+```bash
+REMOTE_HOST=example.com \
+REMOTE_USER=deploy \
+REMOTE_ROOT=/var/www/link-profile \
+SERVICE_NAME=link-profile-api \
 ./deploy.sh
-sudo systemctl start hanosuko-api  # (run on server first time)
 ```
 
-After that, smoke-test:
+Start the API the first time:
 
 ```bash
-curl -i http://hanosuko.art/api/health
-curl -i -X POST http://hanosuko.art/api/views
+systemctl start link-profile-api
 ```
 
-## 8. TLS (certbot)
+Smoke tests:
 
 ```bash
-apt install -y certbot python3-certbot-nginx
-certbot --nginx -d hanosuko.art -d www.hanosuko.art --redirect --agree-tos -m you@hanosuko.art
+curl -i https://example.com/api/health
+curl -i -X POST https://example.com/api/views
 ```
-
-Then replace `/etc/nginx/sites-available/hanosuko.art` with the full version from `deploy/nginx/hanosuko.art.conf` (certbot's TLS lines stay), and `nginx -t && systemctl reload nginx`.
-
-## 9. Future deploys
-
-Just run `./deploy.sh` from your Mac.

@@ -1,19 +1,19 @@
 [Unit]
-Description=Hanosuko.art API (views + tiers proxy)
+Description=Link Profile API (views + tiers proxy)
 After=network.target
 
 [Service]
 Type=simple
-User=hanosuko
-WorkingDirectory=/var/www/hanosuko/server
-EnvironmentFile=/var/www/hanosuko/server/.env
+User=deploy
+WorkingDirectory=/var/www/link-profile/server
+EnvironmentFile=/var/www/link-profile/server/.env
 ExecStart=/usr/bin/node index.js
 Restart=on-failure
 RestartSec=3
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/var/lib/hanosuko
+ReadWritePaths=/var/lib/link-profile
 PrivateTmp=true
 
 [Install]

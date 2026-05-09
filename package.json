@@ -1,9 +1,9 @@
 {
   "name": "hanosuko-art",
-  "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Hanosuko.art — personal link-in-bio landing page",
+  "description": "Personal link-in-bio site with Vue, Vite, music, CISTiers, and optional backend API",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",

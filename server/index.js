@@ -102,5 +102,5 @@ app.get('/api/health', (_req, res) => {
 })
 
 app.listen(PORT, HOST, () => {
-  console.log(`[hanosuko-api] listening on ${HOST}:${PORT}`)
+  console.log(`[link-profile-api] listening on ${HOST}:${PORT}`)
 })

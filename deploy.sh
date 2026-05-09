@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Local deploy script — builds frontend and rsyncs everything to VPS.
-# Requires: ssh-key auth to root@$REMOTE_HOST (no password prompts).
+# Local deploy script - builds frontend and rsyncs everything to a VPS.
+# Requires SSH key auth to $REMOTE_USER@$REMOTE_HOST.
 
-REMOTE_HOST="${REMOTE_HOST:-194.93.2.60}"
-REMOTE_USER="${REMOTE_USER:-hanosuko}"
-REMOTE_ROOT="${REMOTE_ROOT:-/var/www/hanosuko}"
+: "${REMOTE_HOST:?Set REMOTE_HOST, for example REMOTE_HOST=example.com}"
+REMOTE_USER="${REMOTE_USER:-deploy}"
+REMOTE_ROOT="${REMOTE_ROOT:-/var/www/link-profile}"
+SERVICE_NAME="${SERVICE_NAME:-link-profile-api}"
 
 cd "$(dirname "$0")"
 
@@ -24,6 +25,6 @@ rsync -avz --delete \
   server/ "$REMOTE_USER@$REMOTE_HOST:$REMOTE_ROOT/server/"
 
 echo "==> Installing server deps + restarting api"
-ssh "$REMOTE_USER@$REMOTE_HOST" "cd $REMOTE_ROOT/server && npm ci --omit=dev && sudo systemctl restart hanosuko-api"
+ssh "$REMOTE_USER@$REMOTE_HOST" "cd $REMOTE_ROOT/server && npm ci --omit=dev && sudo systemctl restart $SERVICE_NAME"
 
 echo "==> Done"

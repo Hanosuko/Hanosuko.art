@@ -16,11 +16,11 @@ export const profile: Profile = {
     // 👇 АВАТАР: вставь сюда URL картинки (Discord CDN или любой другой)
     avatarUrl:
       'https://cdn.discordapp.com/avatars/835533218869936168/906b3b525961914f00002aa737631332.webp',
-    // 👇 BIO/СТАТУС: коротко о себе.
+    // 👇 BIO/СТАТУС: био, о себе, для следующей строки используй \n
     bio: 'CISTiers Network Administrator\nCISPractice Owner',
   },
 
-  // 👇 ЦВЕТА ТЕМЫ — все цвета сайта берутся отсюда (CSS-переменные)
+  // 👇 ЦВЕТА ТЕМЫ — все цвета сайта берутся отсюда
   theme: {
     background: '#121212',
     surface: 'rgba(41, 41, 41, 0.55)',
@@ -57,7 +57,7 @@ export const profile: Profile = {
     },
   ],
 
-  // 👇 ФИЧИ-ПЕРЕКЛЮЧАТЕЛИ: true — блок виден, false — скрыт
+  // 👇 ПЕРЕКЛЮЧАТЕЛИ: true — блок виден, false — скрыт
   features: {
     audioPlayer: true,
     viewCounter: true,
@@ -67,7 +67,7 @@ export const profile: Profile = {
   },
 
   // 👇 АУДИО-ПЛЕЕР: треки берутся автоматически из public/music/.
-  // Просто положи туда mp3 — они появятся в плеере. Здесь только настройки поведения.
+  // Просто положи туда песню — они появятся в плеере. Здесь только настройки поведения.
   audio: {
     volume: 0.4,
     shuffle: false,
@@ -77,14 +77,12 @@ export const profile: Profile = {
   // 👇 БЛОК CISTIERS: тиры тянутся через /api/tiers (edge-прокси с кешем 5 мин).
   // Меняй username на свой ник на cistiers.com.
   // tierDiscordUrl — куда ведёт кнопка в модалке кита.
-  // tierRenders — картинки рендеров, пока заглушки из /tier-icons/.
-  // Просто положи свои PNG в public/tier-icons/ с теми же именами — подменятся.
+  // tierRenders — картинки рендеров в public/tier-icons/
   cistiers: {
     apiUrl: '/api/tiers',
     username: 'Hanosuko',
     tierDiscordUrl: 'https://discord.gg/cistiers',
-    // 👇 ДИСКОРД-ССЫЛКИ НА КАЖДЫЙ ТИР — кнопка в модалке ведёт сюда.
-    // Если для кита нет своей ссылки — используется tierDiscordUrl выше.
+    // 👇 ДИСКОРД-ССЫЛКИ НА КАЖДЫЙ тирлист — кнопка в модалке ведёт сюда.
     tierDiscordUrls: {
       vanilla:   'https://discord.gg/rf2SwgNmxf',
       sword:     'https://discord.gg/bTN5mrgDAY',
@@ -107,7 +105,7 @@ export const profile: Profile = {
       mace: '/tier-icons/mace.png',
     },
     // 👇 ЦВЕТА ТИРОВ — здесь меняй цвет и тень каждого тира.
-    // text — цвет букв, shadow — цвет тени (как в Minecraft chat).
+    // text — цвет букв, shadow — цвет тени.
     tierColors: {
       ht1:     { text: '#E8BA3A', shadow: '#392d0e' },
       lt1:     { text: '#D5B355', shadow: '#342b15' },
@@ -124,7 +122,7 @@ export const profile: Profile = {
   },
 
   // 👇 БЛОК «MY SETUP» СПРАВА: фото сетапа + список комплектующих.
-  // Фото можно положить в src/assets/photos/setup.jpg или public/photos/setup.jpg.
+  // Фото класть в src/assets/photos/setup.jpg или public/photos/setup.jpg.
   // Добавляй/убирай пункты в specs свободно — верстка подхватит.
   setup: {
     photoUrl: photoUrl('setup.jpg'),

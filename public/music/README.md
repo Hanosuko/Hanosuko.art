@@ -1,7 +1,16 @@
-Положи сюда mp3/ogg/wav/m4a/flac/opus файлы — они автоматически появятся в плеере на сайте.
+# Music
 
-Имя файла → название трека (подчёркивания и дефисы заменяются на пробелы).
+Put your own audio files here while developing locally.
 
-Vite плагин `hanosuko:music-manifest` (см. `vite-plugins/music-manifest.ts`) сканирует эту папку
-и генерирует `manifest.json` при старте dev-сервера и при `npm run build`.
-В dev режиме добавление/удаление файла триггерит full reload.
+Supported extensions:
+
+- `.mp3`
+- `.ogg`
+- `.wav`
+- `.m4a`
+- `.flac`
+- `.opus`
+
+The Vite plugin `hanosuko:music-manifest` scans this folder and automatically generates `manifest.json` during dev server startup and `npm run build`.
+
+This folder is ignored by Git except for this README, so copyrighted or personal audio files are not published accidentally.
