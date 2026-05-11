@@ -7,10 +7,14 @@ import { dirname } from 'node:path'
 const PORT = Number(process.env.PORT ?? 3000)
 const HOST = process.env.HOST ?? '127.0.0.1'
 const DB_PATH = process.env.DB_PATH ?? './data/views.sqlite'
-const IP_SALT = process.env.IP_SALT ?? 'change-me-in-production'
+const IP_SALT = process.env.IP_SALT
 const TIERS_UPSTREAM = 'https://cistiers.com/api/profile'
 const TIERS_USERNAME_RE = /^[A-Za-z0-9_]{2,32}$/
 const TIERS_CACHE_TTL_MS = 5 * 60 * 1000
+
+if (!IP_SALT) {
+  throw new Error('IP_SALT must be set before starting the API server')
+}
 
 mkdirSync(dirname(DB_PATH), { recursive: true })
 
