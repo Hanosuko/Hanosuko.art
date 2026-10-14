@@ -63,8 +63,15 @@ const gallery = profile.gallery
   grid-template-rows: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr);
   gap: 0.5rem;
   flex: 1 1 auto;
-  /* На телефоне — фиксированные пропорции, на десктопе растягивается до высоты ряда */
+  /* Пропорции задают высоту плитки; если колонка длиннее — коллаж дотягивается до её низа */
   aspect-ratio: 3 / 4;
+}
+
+/* В широкой плитке коллаж квадратный, иначе он выходит длиннее соседней колонки */
+@container (min-width: 30rem) {
+  .photo-grid {
+    aspect-ratio: 1 / 1;
+  }
 }
 
 .photo-cell {

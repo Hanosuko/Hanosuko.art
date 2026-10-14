@@ -28,11 +28,9 @@ const partners = profile.partners
 .partners {
   width: 100%;
   display: grid;
-  /* Две кнопки в ряд, а в узкой плитке — друг под другом */
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  /* Кнопки растягиваются на высоту ряда бенто-сетки */
-  grid-auto-rows: minmax(3rem, 1fr);
-  gap: 0.5rem;
+  /* Короткие плашки в ряд, а если места совсем нет — друг под другом */
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 0.75rem;
 }
 
 .partner {
@@ -42,8 +40,8 @@ const partners = profile.partners
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
-  padding: 0.7rem 0.9rem;
-  border-radius: 0.85rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 1rem;
   color: var(--color-text);
   font-size: 0.85rem;
   font-weight: 600;

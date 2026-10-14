@@ -71,7 +71,8 @@ const setup = profile.setup
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: var(--color-background);
   aspect-ratio: 16 / 10;
-  flex-shrink: 0;
+  /* Если колонка длиннее плитки, растёт фото, а не пустота под списком */
+  flex: 1 0 auto;
   position: relative;
   z-index: 1;
 }

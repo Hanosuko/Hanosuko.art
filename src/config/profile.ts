@@ -130,17 +130,17 @@ export const profile: Profile = {
     websiteUrl: 'https://www.cisprac.xyz/',
   },
 
-  // 👇 ПАРТНЁРЫ — кнопки-плашки рядом с плеером
+  // 👇 ПАРТНЁРЫ — короткие плашки в ряд под карточкой тиров
   partners: [
-    {
-      name: 'mytiers.ru',
-      url: 'https://mytiers.ru',
-      iconUrl: 'https://mytiers.ru/favicon-32x32.png',
-    },
     {
       name: 'cisprac.xyz',
       url: 'https://cisprac.xyz',
       iconUrl: 'https://www.google.com/s2/favicons?domain=cisprac.xyz&sz=64',
+    },
+    {
+      name: 'mytiers.ru',
+      url: 'https://mytiers.ru',
+      iconUrl: 'https://mytiers.ru/favicon-32x32.png',
     },
   ],
 

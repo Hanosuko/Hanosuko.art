@@ -22,24 +22,27 @@ useAnimatedTitle(profile.identity.nickname)
   <AnimatedBackground />
   <main class="page">
     <!--
-      👇 БЕНТО-СЕТКА: 12 колонок на десктопе (lg), 2 равные колонки на планшете (md),
-      одна колонка на телефоне. Ширина плитки задаётся классами col-span-*.
-      Новый блок — просто добавь компонент в конец сетки, например:
-      <MyBlock class="col-span-12 md:col-span-6 lg:col-span-4" />
+      👇 БЕНТО: две независимые колонки — у каждой плитки своя высота, ряды не выравниваются.
+      Низ колонок совпадает за счёт последних плиток (фото и сетап) — они дотягиваются.
+      На телефоне колонки разбираются в одну ленту, порядок — классами order-*.
+      Новый блок — добавь компонент в нужную колонку, например:
+      <MyBlock class="order-9" />
     -->
-    <div class="bento grid grid-cols-12 gap-3 md:gap-4">
-      <!-- На планшете профиль занимает два ряда, а справа под тирами встаёт плеер — колонки равной высоты -->
-      <DiscordProfile class="col-span-12 md:col-span-6 md:row-span-2 lg:col-span-5 lg:row-span-1" />
-      <TiersCard v-if="profile.features.tiers" class="col-span-12 md:col-span-6 lg:col-span-7" />
+    <div class="bento">
+      <div class="bento-col">
+        <DiscordProfile class="order-1" />
+        <MusicPlayer v-if="profile.features.audioPlayer" class="order-4" />
+        <PhotoPanel v-if="profile.features.gallery" class="order-6" />
+      </div>
 
-      <MusicPlayer v-if="profile.features.audioPlayer" class="col-span-12 md:col-span-6 lg:col-span-5" />
-      <ServerStatus v-if="profile.features.serverStatus" class="col-span-12 md:col-span-6 lg:col-span-4" />
-      <PartnerLinks class="col-span-12 md:col-span-6 lg:col-span-3" />
+      <div class="bento-col">
+        <TiersCard v-if="profile.features.tiers" class="order-2" />
+        <PartnerLinks class="order-3" />
+        <ServerStatus v-if="profile.features.serverStatus" class="order-5" />
+        <SetupPanel v-if="profile.features.setup" class="order-7" />
+      </div>
 
-      <PhotoPanel v-if="profile.features.gallery" class="col-span-12 md:col-span-6 lg:col-span-5" />
-      <SetupPanel v-if="profile.features.setup" class="col-span-12 md:col-span-6 lg:col-span-7" />
-
-      <CustomLinks class="col-span-12" />
+      <CustomLinks class="bento-wide order-8" />
     </div>
 
     <ViewCounter v-if="profile.features.viewCounter" class="view-counter" />
@@ -63,14 +66,51 @@ useAnimatedTitle(profile.identity.nickname)
 }
 
 .bento {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
   width: 100%;
   max-width: 72rem;
 }
 
+.bento-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+/* Колонка короче соседней — её последняя плитка вытягивается, низ сетки ровный */
+.bento-col > :deep(:last-child) {
+  flex-grow: 1;
+}
+
+.bento-wide {
+  grid-column: 1 / -1;
+}
+
 /* Каждая плитка — контейнер: блоки подстраиваются под ширину своей ячейки, а не экрана */
-.bento > :deep(*) {
+.bento-col > :deep(*),
+.bento > :deep(.bento-wide) {
   min-width: 0;
   container-type: inline-size;
+}
+
+/* Телефон: одна лента — профиль, тиры, плашки, плеер, сервер, фото, сетап */
+@media (max-width: 767px) {
+  .bento {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .bento-col {
+    display: contents;
+  }
+
+  .bento-col > :deep(:last-child) {
+    flex-grow: 0;
+  }
 }
 
 .view-counter {

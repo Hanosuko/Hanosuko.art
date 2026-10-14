@@ -315,7 +315,6 @@ onBeforeUnmount(() => {
   border-radius: 1.25rem;
   display: flex;
   flex-direction: column;
-  /* Плитка тянется на высоту ряда — содержимое по центру, а не прижато к верху */
   justify-content: center;
   gap: 0.6rem;
 }
