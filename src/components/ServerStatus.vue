@@ -11,16 +11,10 @@ const server = profile.server
 
 const { status } = useServerStatus(server.address)
 
-const isOnline = computed(() => status.value?.online === true)
 const players = computed(() => status.value?.players ?? null)
 const fill = computed(() => {
   const current = players.value
   return current && current.max > 0 ? Math.min((current.online / current.max) * 100, 100) : 0
-})
-
-const statusLabel = computed(() => {
-  if (!status.value) return 'checking…'
-  return isOnline.value ? 'online' : 'offline'
 })
 
 // Наведение на кнопку сайта: глобус перетекает в Землю
@@ -37,13 +31,8 @@ const siteHost = server.websiteUrl ? new URL(server.websiteUrl).host.replace(/^w
     <span v-else class="srv-icon is-empty" aria-hidden="true" />
 
     <div class="srv-main">
-      <div class="srv-head">
-        <h2 class="srv-name">{{ server.name }}</h2>
-        <span class="srv-pill" :class="{ 'is-online': isOnline, 'is-pending': !status }">
-          <span class="srv-dot" aria-hidden="true" />
-          {{ statusLabel }}
-        </span>
-      </div>
+      <h2 class="srv-name">{{ server.name }}</h2>
+      <!-- Выключенный сервер не отдаёт игроков — тогда полоски нет, только название -->
       <div v-if="players" class="srv-players">
         <span class="srv-bar" aria-hidden="true"><span :style="{ width: `${fill}%` }" /></span>
         <span class="srv-count"><b>{{ players.online }}</b> / {{ players.max }}</span>
@@ -103,13 +92,6 @@ const siteHost = server.websiteUrl ? new URL(server.websiteUrl).host.replace(/^w
   flex: 1;
 }
 
-.srv-head {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  min-width: 0;
-}
-
 .srv-name {
   margin: 0;
   font-size: 1rem;
@@ -117,40 +99,6 @@ const siteHost = server.websiteUrl ? new URL(server.websiteUrl).host.replace(/^w
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.srv-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  flex-shrink: 0;
-  padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
-  background: rgba(242, 63, 67, 0.12);
-  color: #f87171;
-  font-size: 0.72rem;
-  font-weight: 700;
-}
-
-.srv-pill.is-online {
-  background: rgba(35, 165, 90, 0.14);
-  color: #4ade80;
-}
-
-.srv-pill.is-pending {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--color-text-muted);
-}
-
-.srv-dot {
-  width: 0.45rem;
-  height: 0.45rem;
-  border-radius: 9999px;
-  background: currentColor;
-}
-
-.srv-pill.is-online .srv-dot {
-  animation: srv-pulse 2s ease-out infinite;
 }
 
 .srv-players {
@@ -236,15 +184,6 @@ const siteHost = server.websiteUrl ? new URL(server.websiteUrl).host.replace(/^w
   .srv-site-host,
   .srv-site-arrow {
     display: none;
-  }
-}
-
-@keyframes srv-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.55);
-  }
-  100% {
-    box-shadow: 0 0 0 6px rgba(74, 222, 128, 0);
   }
 }
 </style>
