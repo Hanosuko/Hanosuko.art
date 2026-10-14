@@ -17,7 +17,7 @@ export const profile: Profile = {
     avatarUrl:
       'https://cdn.discordapp.com/avatars/835533218869936168/906b3b525961914f00002aa737631332.webp',
     // 👇 BIO/СТАТУС: био, о себе, для следующей строки используй \n
-    bio: 'CISPractice Owner',
+    bio: 'CISPractice Owner\nMyTiers OP Manager',
   },
 
   // 👇 ЦВЕТА ТЕМЫ — все цвета сайта берутся отсюда
