@@ -14,9 +14,9 @@ export const profile: Profile = {
   // 👇 НИК, АВАТАР, «ОБО МНЕ» И АДРЕС САЙТА — в src/config/identity.ts
   identity,
 
-  // 👇 DISCORD-ПРОФИЛЬ: аватар, баннер, украшение, значки, клан и интеграции (Steam, TikTok…)
-  // подтягиваются по ID. Статус, игры и Spotify в реальном времени — через Lanyard: зайди один раз на discord.gg/lanyard.
-  // «Обо мне» — это identity.bio, к интеграциям добавляются ссылки из social ниже.
+  // 👇 DISCORD-ПРОФИЛЬ: аватар, баннер, украшение и клан подтягиваются по ID.
+  // Статус, игры и Spotify в реальном времени — через Lanyard: зайди один раз на discord.gg/lanyard.
+  // «Обо мне» — это identity.bio, после интеграций идут ссылки из social ниже.
   discord: {
     userId: '835533218869936168',
     // 👇 ТЕМА ПРОФИЛЯ NITRO — два цвета из Discord → «Тема и баннер». Убери theme — карточка станет тёмной
@@ -24,6 +24,37 @@ export const profile: Profile = {
     pronouns: 'https://hanosuko.art',
     // 👇 НИК: шрифт (из src/style.css) и эффект toon — белые буквы с контуром и тенью
     nameStyle: { font: 'Almendra', effect: 'toon' },
+    // 👇 ЗНАЧКИ в порядке Discord. Иконки: cdn.discordapp.com/badge-icons/<хеш>.png,
+    // хеши ищи на github.com/mezotv/discord-badges. Без этого списка — только HypeSquad и Nitro из API
+    badges: [
+      { label: 'Nitro · Gold', iconUrl: 'https://cdn.discordapp.com/badge-icons/2895086c18d5531d499862e41d1155a6.png' },
+      { label: 'HypeSquad Brilliance', iconUrl: 'https://cdn.discordapp.com/badge-icons/011940fd013da3f7fb926e4a1cd2e618.png' },
+      { label: 'Originally known as hanosuko', iconUrl: 'https://cdn.discordapp.com/badge-icons/6de6d34650760ba5551a79732e98ed60.png' },
+      { label: 'Completed a Quest', iconUrl: 'https://cdn.discordapp.com/badge-icons/7d9ae358c8c5e118768335dbe68b4fb8.png' },
+      { label: 'Level 44 Reached', iconUrl: 'https://cdn.discordapp.com/badge-icons/ca105ad9cfc8580c765101d17bbb2323.png' },
+      { label: 'Collected the Orb Profile Badge', iconUrl: 'https://cdn.discordapp.com/badge-icons/83d8a1eb09a8d64e59233eec5d4d5c2d.png' },
+      { label: 'Gifting Patron', iconUrl: 'https://cdn.discordapp.com/badge-icons/025035e4f4c124c44d29b369936c6843.png' },
+    ],
+    // 👇 ИНТЕГРАЦИИ (Connections) в порядке Discord. Публичного API у Discord для них нет, поэтому вручную.
+    // url не указан — ник без стрелки. Цифры TikTok сверены с tiktok.com/@hanosuko 14.10.2026
+    connections: [
+      { type: 'epicgames', name: 'ZNT Hanosuko' },
+      {
+        type: 'steam',
+        name: 'TeroserPlay',
+        url: 'https://steamcommunity.com/profiles/76561199004517134',
+        metadata: { created_at: '2019-11-23T14:09:01', game_count: 22, item_count_dota2: 353, item_count_tf2: 0 },
+      },
+      {
+        type: 'tiktok',
+        name: 'hanosuko',
+        url: 'https://www.tiktok.com/@hanosuko',
+        metadata: { follower_count: 6763, following_count: 97, likes_count: 463917 },
+      },
+      { type: 'twitch', name: 'ssccally', url: 'https://www.twitch.tv/ssccally' },
+      { type: 'xbox', name: 'Hanosuko' },
+      { type: 'youtube', name: 'Hanosuko', url: 'https://www.youtube.com/channel/UCOOGHlOMbu1w6lRph7bP_Jg' },
+    ],
     // 👇 ЭФФЕКТ ПРОФИЛЯ «Поиграем?» (Let's Play) — анимация поверх карточки, тайминги как в Discord.
     // Файлы лежат в public/effects/. Как достать другой эффект — в README, раздел «Profile Effect»
     profileEffect: {
@@ -53,13 +84,10 @@ export const profile: Profile = {
   },
 
   // 👇 ССЫЛКИ НА СОЦСЕТИ — встают в блок Connections после интеграций Discord. kind определяет иконку,
-  // handle — ник (если не указан, берётся из ссылки). Если такая интеграция уже есть в Discord (tiktok, youtube),
-  // ссылка из этого списка скрывается и показывается, только когда профиль Discord не загрузился.
+  // handle — ник (если не указан, берётся из ссылки). Сервисы, которые уже есть в discord.connections, пропускаются.
   social: [
     { kind: 'telegram', url: 'https://t.me/hanosuko', label: 'Telegram' },
     { kind: 'github', url: 'https://github.com/hanosuko', label: 'GitHub' },
-    { kind: 'tiktok', url: 'https://tiktok.com/@hanosuko', label: 'TikTok' },
-    { kind: 'youtube', url: 'https://youtube.com/@hanosuko', label: 'YouTube' },
     { kind: 'namemc', url: 'https://namemc.com/profile/Hanosuko', label: 'NameMC' },
     { kind: 'modrinth', url: 'https://modrinth.com/user/hanosuko', label: 'Modrinth' },
   ],

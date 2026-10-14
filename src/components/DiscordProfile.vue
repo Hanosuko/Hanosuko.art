@@ -6,13 +6,13 @@ import type { SocialLink } from '@/types/profile'
 import { useDiscordProfile } from '@/composables/useDiscordProfile'
 import { useProgressiveImage } from '@/composables/useProgressiveImage'
 import { profileThemeTokens } from '@/utils/discordTheme'
-import type { ConnectionRow } from '@/utils/discordConnections'
+import { connectionRowOf, type ConnectionRow } from '@/utils/discordConnections'
 import BrandIcon from '@/components/BrandIcon.vue'
 import DiscordActivity from '@/components/DiscordActivity.vue'
 import ProfileEffect from '@/components/ProfileEffect.vue'
 
 // 👇 Всё про карточку — в src/config/profile.ts → discord. «Обо мне» — identity.bio,
-// интеграции — из Discord, к ним добавляются ссылки из social
+// интеграции — discord.connections, после них ссылки из social
 const { identity, discord } = profile
 
 const {
@@ -24,8 +24,6 @@ const {
   bannerColor,
   clan,
   badges,
-  connections,
-  profileSettled,
   createdAt,
   status,
   customStatus,
@@ -56,7 +54,7 @@ const themeStyle = theme
 const nameStyle = discord.nameStyle
 const nameFont = nameStyle ? { fontFamily: `'${nameStyle.font}', serif` } : undefined
 
-// Значки из конфига целиком заменяют те, что пришли из API
+// Значки из конфига целиком заменяют автоматические (API знает только HypeSquad и Nitro)
 const badgeList = computed(() => discord.badges ?? badges.value)
 
 const STATUS_LABELS = { online: 'Online', idle: 'Idle', dnd: 'Do Not Disturb', offline: 'Offline' } as const
@@ -88,15 +86,13 @@ const socialRow = (link: SocialLink): ConnectionRow => ({
   stats: [],
 })
 
-// Сначала интеграции из Discord, потом ссылки из social, которых среди них нет.
-// Ждём ответа профиля, чтобы список не перестраивался на глазах
-const connectionRows = computed<ConnectionRow[]>(() => {
-  if (!profileSettled.value) return []
-  const fromDiscord = connections.value
-  const covered = new Set(fromDiscord.map((row) => row.type))
-  const extra = profile.social.filter((link) => link.url.trim().length > 0 && !covered.has(link.kind)).map(socialRow)
-  return [...fromDiscord, ...extra]
-})
+// Сначала интеграции из Discord, потом ссылки из social на сервисы, которых среди них нет
+const fromDiscord = (discord.connections ?? []).map(connectionRowOf)
+const covered = new Set(fromDiscord.map((row) => row.type))
+const connectionRows: ConnectionRow[] = [
+  ...fromDiscord,
+  ...profile.social.filter((link) => link.url.trim().length > 0 && !covered.has(link.kind)).map(socialRow),
+]
 
 const hideBrokenImage = (event: Event): void => {
   ;(event.target as HTMLImageElement).style.visibility = 'hidden'

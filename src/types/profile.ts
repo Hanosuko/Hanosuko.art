@@ -59,6 +59,17 @@ export interface DiscordBadgeConfig {
   iconUrl: string
 }
 
+// Интеграция из Discord («Connections»). Публичного API у Discord для них нет — список ведётся вручную
+export interface DiscordConnectionConfig {
+  // Сервис, как в Discord: steam, tiktok, twitch, youtube, epicgames, xbox…
+  type: string
+  name: string
+  // Без ссылки ник показывается без стрелки, как у Epic Games и Xbox в Discord
+  url?: string
+  // Цифры под ником, ключи как в Discord: created_at, game_count, item_count_dota2, follower_count…
+  metadata?: Record<string, string | number>
+}
+
 // Слой эффекта профиля — поля как в Discord (collectibles-products → items[].effects[])
 export interface ProfileEffectLayer {
   src: string
@@ -86,8 +97,10 @@ export interface DiscordSettings {
   pronouns?: string
   // Стиль отображаемого имени: шрифт и эффект toon (белая заливка, контур и тень)
   nameStyle?: { font: string; effect: 'toon' | 'none' }
-  // Свои значки вместо тех, что приходят из API
+  // Значки целиком. API отдаёт только HypeSquad и Nitro — остальные (Quest, Orbs и т.д.) только так
   badges?: DiscordBadgeConfig[]
+  // Интеграции (Steam, TikTok…) — встают в блок Connections перед ссылками из social
+  connections?: DiscordConnectionConfig[]
   // Эффект профиля — анимация поверх карточки
   profileEffect?: ProfileEffect
 }

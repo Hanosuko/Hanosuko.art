@@ -2,23 +2,20 @@ import { computed, onBeforeUnmount, onMounted, shallowRef } from 'vue'
 import type {
   DiscordBadge,
   DiscordCustomStatus,
-  DstnProfile,
   JapiResponse,
   JapiUser,
   LanyardActivity,
   LanyardPresence,
   LanyardResponse,
 } from '@/types/discord'
-import { connectionRowOf } from '@/utils/discordConnections'
 
 const CDN = 'https://cdn.discordapp.com'
 const LANYARD_REST = 'https://api.lanyard.rest/v1/users/'
 const LANYARD_SOCKET = 'wss://api.lanyard.rest/socket'
-const DSTN = 'https://dcdn.dstn.to/profile/'
 const JAPI = 'https://japi.rest/discord/v1/user/'
 const DISCORD_EPOCH = 1420070400000n
 
-// Запасные значки, если dstn.to недоступен: битовое поле public_flags (официальная документация Discord) + Nitro от japi.rest
+// Значки из битового поля public_flags (официальная документация Discord) + Nitro от japi.rest
 const FLAG_BADGES: { bit: number; id: string; label: string; icon: string }[] = [
   { bit: 0, id: 'staff', label: 'Discord Staff', icon: '5e74e9b61934fc1f67c65515d1f7e60d' },
   { bit: 1, id: 'partner', label: 'Partnered Server Owner', icon: '3f9748e53446a137a052f3454e2de41e' },
@@ -57,37 +54,15 @@ const createdAtOf = (userId: string): Date => new Date(Number((BigInt(userId) >>
 
 export function useDiscordProfile(userId: string) {
   const user = shallowRef<JapiUser | null>(null)
-  const fullProfile = shallowRef<DstnProfile | null>(null)
-  // Профиль загружен или оба источника ответили ошибкой — можно рисовать то, что зависит от него
-  const profileSettled = shallowRef(false)
   const presence = shallowRef<LanyardPresence | null>(null)
-
-  // dstn.to отдаёт профиль целиком (значки, интеграции); japi.rest — только то, что Discord даёт ботам
-  const loadFullProfile = async (): Promise<boolean> => {
-    try {
-      const response = await fetch(`${DSTN}${userId}`)
-      if (!response.ok) throw new Error(`dstn.to responded ${response.status}`)
-      const payload = (await response.json()) as DstnProfile
-      if (!payload.user) throw new Error('dstn.to returned no user')
-      fullProfile.value = payload
-      user.value = payload.user
-      return true
-    } catch (caught) {
-      console.warn('[discord] full profile fetch failed:', caught instanceof Error ? caught.message : caught)
-      return false
-    }
-  }
 
   const loadUser = async (): Promise<void> => {
     try {
-      if (await loadFullProfile()) return
       const response = await fetch(`${JAPI}${userId}`)
       if (!response.ok) throw new Error(`japi.rest responded ${response.status}`)
       user.value = ((await response.json()) as JapiResponse).data
     } catch (caught) {
       console.warn('[discord] profile fetch failed:', caught instanceof Error ? caught.message : caught)
-    } finally {
-      profileSettled.value = true
     }
   }
 
@@ -149,7 +124,7 @@ export function useDiscordProfile(userId: string) {
     socket?.close()
   })
 
-  // --- Производные данные для карточки: живые данные Lanyard важнее, профиль — запасной вариант ---
+  // --- Производные данные для карточки: живые данные Lanyard важнее, japi.rest — запасной вариант ---
   const liveUser = computed(() => presence.value?.discord_user ?? null)
 
   const displayName = computed(() => liveUser.value?.global_name ?? user.value?.global_name ?? null)
@@ -190,10 +165,6 @@ export function useDiscordProfile(userId: string) {
   })
 
   const badges = computed<DiscordBadge[]>(() => {
-    const listed = fullProfile.value?.badges
-    if (listed?.length) {
-      return listed.map((badge) => ({ id: badge.id, label: badge.description, iconUrl: badgeIconUrl(badge.icon) }))
-    }
     const flags = liveUser.value?.public_flags ?? user.value?.public_flags ?? 0
     const owned = FLAG_BADGES.filter((badge) => (flags & (1 << badge.bit)) !== 0).map(({ id, label, icon }) => ({
       id,
@@ -204,8 +175,6 @@ export function useDiscordProfile(userId: string) {
     if (user.value?.public_flags_array?.includes('NITRO')) owned.push(NITRO_BADGE)
     return owned.map(({ id, label, icon }) => ({ id, label, iconUrl: badgeIconUrl(icon) }))
   })
-
-  const connections = computed(() => (fullProfile.value?.connected_accounts ?? []).map(connectionRowOf))
 
   const createdAt = createdAtOf(userId)
 
@@ -240,8 +209,6 @@ export function useDiscordProfile(userId: string) {
     bannerColor,
     clan,
     badges,
-    connections,
-    profileSettled,
     createdAt,
     status,
     customStatus,

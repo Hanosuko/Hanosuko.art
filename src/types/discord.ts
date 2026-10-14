@@ -1,5 +1,5 @@
 // Discord-профиль собирается из двух источников:
-// dcdn.dstn.to — полный профиль: баннер, клан, значки, интеграции (japi.rest — запасной вариант без значков и интеграций);
+// japi.rest — баннер, значки, клан (то, что отдаёт Discord API ботам);
 // Lanyard — статус и активности в реальном времени (нужно зайти на discord.gg/lanyard).
 
 export type DiscordStatus = 'online' | 'idle' | 'dnd' | 'offline'
@@ -31,28 +31,6 @@ export interface JapiUser {
 
 export interface JapiResponse {
   data: JapiUser
-}
-
-// https://dcdn.dstn.to/profile/:id — то же, что видит клиент Discord в профиле
-export interface DstnConnection {
-  type: string
-  id: string
-  name: string
-  verified: boolean
-  // Значения приходят строками: game_count, follower_count и т.д.
-  metadata?: Record<string, string | boolean>
-}
-
-export interface DstnBadge {
-  id: string
-  description: string
-  icon: string
-}
-
-export interface DstnProfile {
-  user: JapiUser
-  connected_accounts?: DstnConnection[]
-  badges?: DstnBadge[]
 }
 
 export interface LanyardActivity {
