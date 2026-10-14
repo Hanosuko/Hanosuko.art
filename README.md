@@ -2,14 +2,14 @@
 
 Personal link-in-bio site built with Vue 3, TypeScript, Vite, Tailwind CSS, and a small optional Node API.
 
-The page is a responsive bento grid: a Discord-style profile with live status, Minecraft tiers from [MyTiers](https://mytiers.ru) and [CISTiers](https://cistiers.com), a Minecraft server status tile, music, photos, and setup. Everything is configured in two small config files.
+The page is a responsive bento layout: a Discord-style profile with live status, Minecraft tiers from [MyTiers](https://mytiers.ru) and [CISTiers](https://cistiers.com), a Minecraft server status tile, music, photos, and setup. Everything is configured in two small config files.
 
 ## Features
 
-- Bento grid layout: 12 columns on desktop, 2 on tablet, 1 on phones
-- Discord profile card: banner, avatar decoration, badges, server tag, live status, custom status, games and Spotify
+- Bento layout: two independent columns of tiles with their own heights on desktop and tablet, one column on phones
+- Discord profile card: banner, avatar decoration, profile effect, badges, server tag, live status, custom status, activities and Spotify, connections with Steam and TikTok stats
 - Tiers card with MyTiers / CISTiers tabs, hover tooltips in the style of each site
-- Minecraft server status: online players, colored MOTD, copy-IP button
+- Minecraft server status: online players and a website button
 - Link preview (Open Graph) image generated at build time from the config
 - Music player with an auto-generated `public/music/manifest.json`
 - Photo gallery and PC setup tiles
@@ -44,58 +44,78 @@ Two config files:
 
 - `src/config/identity.ts` — nickname, fallback avatar, "About me" text, site URL. It is separate because the build reads it too: the link preview image and meta tags are generated from it.
 - `src/config/profile.ts` — everything else:
-  - Discord user ID
-  - theme colors and background
-  - social links (shown as Connections in the Discord card) and custom links
+  - Discord user ID, profile theme, name style, profile effect
+  - site colors and background
+  - extra social links (added after the Discord connections) and custom links
   - enabled tiles (`features`)
   - MyTiers username and kit colors, CISTiers username
   - Minecraft server address
-  - partner buttons
+  - partner pills
   - setup photo and specs, photo gallery
 
 ## Layout
 
-The grid is defined in `src/App.vue`:
+The layout is defined in `src/App.vue`. It is not a grid with aligned rows: there are two independent columns, and every tile keeps its natural height, so tiles of different sizes sit next to each other.
 
 ```text
-desktop (lg, ≥1024px)               tablet (md, ≥768px)       phone
-┌───────────┬──────────────────┐    ┌──────────┬──────────┐   ┌──────────┐
-│  Discord  │      tiers       │    │ Discord  │  tiers   │   │ Discord  │
-│  profile  │ MyTiers/CISTiers │    │ profile  ├──────────┤   │ tiers    │
-├──────────┬┴─────────┬────────┤    │          │  music   │   │ music    │
-│  music   │  server  │partners│    ├──────────┼──────────┤   │ server   │
-├──────────┴┬─────────┴────────┤    │  server  │ partners │   │ partners │
-│  gallery  │      setup       │    ├──────────┼──────────┤   │ gallery  │
-└───────────┴──────────────────┘    │ gallery  │  setup   │   │ setup    │
-                                    └──────────┴──────────┘   └──────────┘
+desktop and tablet (≥768px)              phone
+┌──────────────┬──────────────┐          ┌──────────┐
+│              │    tiers     │          │ Discord  │
+│   Discord    │              │          │ tiers    │
+│   profile    ├───────┬──────┤          │ pills    │
+│              │cisprac│mytier│          │ music    │
+│              ├───────┴──────┤          │ server   │
+│              │    server    │          │ photos   │
+├──────────────┼──────────────┤          │ setup    │
+│    music     │              │          └──────────┘
+├──────────────┤    setup     │
+│    photos    │              │
+└──────────────┴──────────────┘
 ```
 
-Tile widths are plain Tailwind classes (`col-span-12 md:col-span-6 lg:col-span-7`). To add a new block, create a component whose root is a card (for example `class="glass-card"`) and append it to the end of the grid:
+The bottoms of the columns line up because the last tile of each column (photos on the left, setup on the right) grows to fill the shorter column: the photo collage or the setup photo gets taller instead of leaving empty space.
+
+On phones the columns turn into one stream (`display: contents`), and the order is set with Tailwind `order-*` classes on each tile. To add a new block, create a component whose root is a card (for example `class="glass-card"`), put it into a column above its last tile (the last one is the one that stretches), and give it an `order-*` class for its place in the phone stream, renumbering the others if needed:
 
 ```vue
-<MyBlock class="col-span-12 md:col-span-6 lg:col-span-4" />
+<MyBlock class="order-5" />
 ```
 
-Every tile is a CSS container (`container-type: inline-size`), so components adapt to the width of their own cell with `@container` queries instead of viewport media queries. The same component looks right in a wide desktop cell and in a narrow phone column.
+Every tile is a CSS container (`container-type: inline-size`), so components adapt to the width of their own cell with `@container` queries instead of viewport media queries. The same component looks right in a desktop column and in a narrow phone column.
 
 ## Discord Profile
 
-The profile card is built from the Discord user ID (`profile.discord.userId`) and two public APIs that work straight from the browser:
+The profile card is built from the Discord user ID (`profile.discord.userId`) and public APIs that work straight from the browser:
 
 | Data | Source | Updates |
 | --- | --- | --- |
 | Status, device, custom status, games, Spotify | [Lanyard](https://github.com/Phineas/lanyard) (REST + WebSocket) | live |
-| Avatar, avatar decoration, display name, server tag | Lanyard, with japi.rest as fallback | live |
-| Banner, badges (HypeSquad, Nitro, …) | [japi.rest](https://japi.rest) | on page load |
+| Avatar, avatar decoration, display name, server tag | Lanyard, with the full profile as fallback | live |
+| Banner, all badges, connections (with Steam and TikTok stats) | [dcdn.dstn.to](https://dcdn.dstn.to) full profile, [japi.rest](https://japi.rest) as fallback | on page load |
 | Member since | computed from the ID itself | — |
 | About me | `identity.bio` | manual |
-| Connections | `profile.social` | manual |
+| Profile theme, name style, profile effect | `profile.discord` | manual |
+| Extra links after the connections | `profile.social` | manual |
 
 **Lanyard only tracks users who joined its Discord server.** Join [discord.gg/lanyard](https://discord.gg/lanyard) once — until then the card works, but without status and activities.
 
-Discord does not expose "About me", profile theme colors, profile effects, or connections through any public API, so those come from the config.
+Connections are shown like in Discord: an icon tile, the account name with an arrow when the service has a public page (Epic Games and Xbox have none), and stats from Discord: Steam member date, games and Dota 2 / TF2 items, TikTok followers, following and likes. The numbers are the ones Discord stores for the connection, so they update when Discord refreshes them. Links from `profile.social` are added after the connections; a link whose service is already connected in Discord (for example `tiktok`) is hidden and only shows up if the full profile fails to load. If dstn.to is down, japi.rest still gives the banner, but badges fall back to HypeSquad and Nitro and the connections section shows only `profile.social`.
 
 Animated banners and decorations load after their static versions and are skipped entirely with `prefers-reduced-motion`.
+
+## Profile Effect
+
+The animation over the Discord card (`profile.discord.profileEffect`) is a Discord profile effect, played with Discord's own timings. The current one is "Let's Play" («Поиграем?»): the intro plays once after the "click to me" screen is closed, then a short loop repeats every few seconds.
+
+The effect files are APNG images in `public/effects/`. They are served from the site itself because the player fetches each file once and creates a new blob URL for every run, so the animation restarts from the first frame. With `prefers-reduced-motion` or data saver on, a static frame (`reducedMotionSrc`) is shown instead.
+
+To use a different effect:
+
+1. Open `https://dcdn.dstn.to/profile/<your Discord ID>` and copy `user_profile.profile_effect.sku_id`.
+2. Open `https://discord.com/api/v9/collectibles-products/<sku_id>`. In `items[0]` you get `reducedMotionSrc` and the `effects` list: `src`, `start`, `duration`, `loop`, `loopDelay`, `zIndex` for every layer.
+3. Download every `src` and `reducedMotionSrc` into `public/effects/<name>/` and copy the numbers into `profileEffect.layers`.
+
+Remove `profileEffect` to turn the effect off.
 
 ## Tiers: MyTiers and CISTiers
 
@@ -126,7 +146,9 @@ Hovering a tile shows a tooltip in the style of the current tab's site: MyTiers 
 
 ## Minecraft Server Status
 
-The server tile (`profile.server`) shows online/max players, the version, and the server MOTD with Minecraft color codes (including hex colors), plus a copy-IP button and a website link. Data comes from [api.mcsrvstat.us](https://api.mcsrvstat.us) in the browser and refreshes every 2.5 minutes. Turn it off with `features.serverStatus`.
+The server tile (`profile.server`) is a short row: the server icon, online status, online/max players with a bar, and a button to `websiteUrl` (in a narrow tile only the globe icon is left). Data comes from [api.mcsrvstat.us](https://api.mcsrvstat.us) in the browser and refreshes every 2.5 minutes. Turn it off with `features.serverStatus`.
+
+The partner pills (`profile.partners`) sit under the tiers card in one row.
 
 ## Link Preview
 
