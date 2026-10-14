@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { profile } from '@/config/profile'
+import SocialLinks from '@/components/SocialLinks.vue'
 
 // 👇 Чтобы поменять ник / аватар / bio — открой src/config/profile.ts → identity
 const identity = profile.identity
@@ -19,20 +20,28 @@ const identity = profile.identity
     </div>
     <h1 class="nickname">{{ identity.nickname }}</h1>
     <p class="bio">{{ identity.bio }}</p>
+    <SocialLinks class="profile-social" />
   </section>
 </template>
 
 <style scoped>
 .profile-card {
+  /* Поверх соседних плиток, чтобы подсказки соцсетей не перекрывались */
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
-  padding: 2.25rem 2rem 1.75rem;
+  padding: 2.25rem 1.5rem 1.75rem;
   border-radius: 1.5rem;
   text-align: center;
   width: 100%;
-  max-width: 28rem;
+}
+
+.profile-social {
+  margin-top: 0.75rem;
 }
 
 .avatar-wrap {
@@ -109,6 +118,7 @@ const identity = profile.identity
 
 .bio {
   margin: 0;
+  white-space: pre-line;
   color: var(--color-text-muted);
   font-size: 0.95rem;
   letter-spacing: 0.02em;

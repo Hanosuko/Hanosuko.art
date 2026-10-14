@@ -311,7 +311,6 @@ onBeforeUnmount(() => {
 <style scoped>
 .player {
   width: 100%;
-  max-width: 28rem;
   padding: 1rem 1.25rem 1.25rem;
   border-radius: 1.25rem;
   display: flex;

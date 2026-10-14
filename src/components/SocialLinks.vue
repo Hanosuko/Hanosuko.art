@@ -35,7 +35,7 @@ const brandPaths: Record<SocialKind, string> = {
 </script>
 
 <template>
-  <section v-if="links.length" class="social-grid">
+  <section v-if="links.length" class="social-grid" :style="{ '--count': links.length }">
     <a
       v-for="(link, index) in links"
       :key="link.kind"
@@ -64,14 +64,16 @@ const brandPaths: Record<SocialKind, string> = {
 
 <style scoped>
 .social-grid {
+  --gap: 0.6rem;
+  /* Все иконки в один ряд: размер подстраивается под ширину плитки профиля */
+  --size: clamp(2.25rem, (100cqi - (var(--count) - 1) * var(--gap)) / var(--count), 3.25rem);
   position: relative;
   z-index: 30;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.75rem;
+  gap: var(--gap);
   width: 100%;
-  max-width: 28rem;
 }
 
 .social-button {
@@ -79,9 +81,9 @@ const brandPaths: Record<SocialKind, string> = {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 3.25rem;
-  height: 3.25rem;
-  border-radius: 1rem;
+  width: var(--size);
+  height: var(--size);
+  border-radius: calc(var(--size) * 0.3);
   background: var(--color-surface);
   border: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(16px);
@@ -140,18 +142,18 @@ const brandPaths: Record<SocialKind, string> = {
 }
 
 .social-icon {
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 46%;
+  height: 46%;
   transition: transform 0.25s ease;
 }
 
 .social-letter {
   font-family: 'Minecraftia', 'Monocraft', monospace;
-  font-size: 1.6rem;
+  font-size: calc(var(--size) * 0.5);
   font-weight: 700;
   line-height: 1;
   color: currentColor;
-  margin: 0.7rem 0 0 0.15rem;
+  margin: calc(var(--size) * 0.22) 0 0 0.15rem;
   transition: transform 0.25s ease;
   transform-origin: center;
 }

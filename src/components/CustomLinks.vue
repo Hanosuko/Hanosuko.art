@@ -37,11 +37,10 @@ const sanitize = (url: string): string => {
 
 <style scoped>
 .custom-links {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
   gap: 0.5rem;
   width: 100%;
-  max-width: 28rem;
 }
 
 .custom-link {

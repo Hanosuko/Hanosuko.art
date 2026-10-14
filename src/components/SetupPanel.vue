@@ -5,50 +5,32 @@ const setup = profile.setup
 </script>
 
 <template>
-  <aside class="setup-panel" aria-label="My setup">
-    <section class="glass-card neon-ring setup-card">
-      <header class="setup-header">
-        <h2 class="setup-title">{{ setup.title }}</h2>
-        <p v-if="setup.description" class="setup-description">{{ setup.description }}</p>
-      </header>
+  <section class="glass-card neon-ring setup-card" aria-label="My setup">
+    <header class="setup-header">
+      <h2 class="setup-title">{{ setup.title }}</h2>
+      <p v-if="setup.description" class="setup-description">{{ setup.description }}</p>
+    </header>
 
-      <figure class="setup-photo-wrap">
-        <img
-          class="setup-photo"
-          :src="setup.photoUrl"
-          :alt="setup.title"
-          loading="lazy"
-          decoding="async"
-        />
-      </figure>
+    <figure class="setup-photo-wrap">
+      <img
+        class="setup-photo"
+        :src="setup.photoUrl"
+        :alt="setup.title"
+        loading="lazy"
+        decoding="async"
+      />
+    </figure>
 
-      <ul class="setup-specs">
-        <li v-for="item in setup.specs" :key="item.label" class="setup-spec">
-          <span class="spec-label">{{ item.label }}</span>
-          <span class="spec-value">{{ item.value }}</span>
-        </li>
-      </ul>
-    </section>
-  </aside>
+    <ul class="setup-specs">
+      <li v-for="item in setup.specs" :key="item.label" class="setup-spec">
+        <span class="spec-label">{{ item.label }}</span>
+        <span class="spec-value">{{ item.value }}</span>
+      </li>
+    </ul>
+  </section>
 </template>
 
 <style scoped>
-.setup-panel {
-  position: fixed;
-  top: 1.5rem;
-  bottom: 1.5rem;
-  right: clamp(0.2rem, 4vw, 4rem);
-  width: clamp(4rem, 24vw, 26rem);
-  z-index: 20;
-  pointer-events: auto;
-}
-
-@media (max-width: 900px) {
-  .setup-panel {
-    display: none;
-  }
-}
-
 .setup-card {
   display: flex;
   flex-direction: column;
@@ -56,8 +38,6 @@ const setup = profile.setup
   padding: 1.25rem 1.25rem 1.4rem;
   border-radius: 1.5rem;
   width: 100%;
-  height: 100%;
-  overflow: visible;
 }
 
 .setup-header {
@@ -105,42 +85,26 @@ const setup = profile.setup
 
 .setup-specs {
   list-style: none;
-  margin: -0.75rem -1rem;
-  padding: 0.75rem 1rem;
-  display: flex;
-  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.45rem;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
-.setup-specs::-webkit-scrollbar {
-  width: 6px;
-}
-
-.setup-specs::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.setup-specs::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: 3px;
-}
-
-.setup-specs::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.32);
+/* Плитка широкая — характеристики в две колонки */
+@container (min-width: 34rem) {
+  .setup-specs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .setup-spec {
   position: relative;
   z-index: 2;
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.75rem;
+  flex-direction: column;
+  gap: 0.2rem;
   padding: 0.55rem 0.85rem;
   border-radius: 0.7rem;
   background: var(--color-surface);
@@ -161,7 +125,6 @@ const setup = profile.setup
 }
 
 .spec-label {
-  flex: 0 0 auto;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -170,12 +133,8 @@ const setup = profile.setup
 }
 
 .spec-value {
-  flex: 1 1 auto;
-  text-align: right;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: var(--color-text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 </style>

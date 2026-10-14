@@ -4,7 +4,6 @@ import { useThemeVars } from '@/composables/useThemeVars'
 import { useAnimatedTitle } from '@/composables/useAnimatedTitle'
 import AnimatedBackground from '@/components/AnimatedBackground.vue'
 import ProfileCard from '@/components/ProfileCard.vue'
-import SocialLinks from '@/components/SocialLinks.vue'
 import CustomLinks from '@/components/CustomLinks.vue'
 import PartnerLinks from '@/components/PartnerLinks.vue'
 import MyTiersCard from '@/components/MyTiersCard.vue'
@@ -20,18 +19,29 @@ useAnimatedTitle(profile.identity.nickname)
 
 <template>
   <AnimatedBackground />
-  <SetupPanel v-if="profile.features.setup" />
-  <PhotoPanel v-if="profile.features.gallery" />
   <main class="page">
-    <div class="stack">
-      <ProfileCard />
-      <SocialLinks />
-      <MyTiersCard v-if="profile.features.tiers" />
-      <PartnerLinks />
-      <MusicPlayer v-if="profile.features.audioPlayer" />
-      <CustomLinks />
-      <ViewCounter v-if="profile.features.viewCounter" class="view-counter-shift" />
+    <!--
+      👇 БЕНТО-СЕТКА: 12 колонок на десктопе (lg), 2 равные колонки на планшете (md),
+      одна колонка на телефоне. Ширина плитки задаётся классами col-span-*.
+      Новый блок — просто добавь компонент в конец сетки, например:
+      <MyBlock class="col-span-12 md:col-span-6 lg:col-span-4" />
+    -->
+    <div class="bento grid grid-cols-12 gap-3 md:gap-4">
+      <div class="bento-stack col-span-12 md:col-span-6 lg:col-span-5">
+        <ProfileCard class="flex-1" />
+        <MusicPlayer v-if="profile.features.audioPlayer" />
+        <PartnerLinks />
+      </div>
+
+      <MyTiersCard v-if="profile.features.tiers" class="col-span-12 md:col-span-6 lg:col-span-7" />
+
+      <PhotoPanel v-if="profile.features.gallery" class="col-span-12 md:col-span-6 lg:col-span-5" />
+      <SetupPanel v-if="profile.features.setup" class="col-span-12 md:col-span-6 lg:col-span-7" />
+
+      <CustomLinks class="col-span-12" />
     </div>
+
+    <ViewCounter v-if="profile.features.viewCounter" class="view-counter" />
   </main>
   <IntroOverlay />
 </template>
@@ -42,26 +52,36 @@ useAnimatedTitle(profile.identity.nickname)
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding: 3.5rem 1.25rem 2rem;
-  gap: 1.25rem;
+  gap: 2rem;
+  padding: 3rem 1.25rem 2rem;
 }
 
-.stack {
+.bento {
+  width: 100%;
+  max-width: 72rem;
+}
+
+.bento-stack {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-  width: 100%;
+  gap: inherit;
+  min-width: 0;
 }
 
-.view-counter-shift {
-  margin-top: 2em;
+/* Каждая плитка — контейнер: блоки подстраиваются под ширину своей ячейки, а не экрана */
+.bento > :deep(*),
+.bento-stack > :deep(*) {
+  min-width: 0;
+  container-type: inline-size;
 }
 
-@media (max-width: 480px) {
+.view-counter {
+  margin-top: auto;
+}
+
+@media (max-width: 767px) {
   .page {
-    padding-top: 2rem;
+    padding-top: 1.25rem;
   }
 }
 </style>

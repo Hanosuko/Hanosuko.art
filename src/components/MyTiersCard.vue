@@ -170,7 +170,6 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 28rem;
   border-radius: 1.5rem;
   overflow: hidden;
   isolation: isolate;
@@ -371,7 +370,7 @@ onMounted(() => {
   position: absolute;
   inset: auto 0 9%;
   text-align: center;
-  font-size: clamp(0.95rem, 2vw, 1.4rem);
+  font-size: clamp(0.95rem, 3.6cqi, 1.5rem);
   font-weight: 700;
   line-height: 1;
   color: color-mix(in srgb, var(--kit) 78%, #fff);
@@ -451,7 +450,8 @@ onMounted(() => {
 .mt-actions {
   display: flex;
   gap: 0.5rem;
-  margin-top: 1rem;
+  margin-top: auto;
+  padding-top: 1rem;
 }
 
 .mt-action {

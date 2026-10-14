@@ -27,7 +27,6 @@ const partners = profile.partners
 <style scoped>
 .partners {
   width: 100%;
-  max-width: 28rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
