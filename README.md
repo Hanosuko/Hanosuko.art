@@ -8,6 +8,7 @@ The page is a responsive bento layout: a Discord-style profile with live status,
 
 - Bento layout: two independent columns of tiles with their own heights on desktop and tablet, one column on phones
 - Discord profile card: banner, avatar decoration, profile effect, badges, server tag, live status, custom status, activities and Spotify, connections with Steam and TikTok stats
+- Animated icons ([morphicons](https://www.morphicons.com)): play/pause, mute, copy, hover effects
 - Tiers card with MyTiers / CISTiers tabs, hover tooltips in the style of each site
 - Minecraft server status: online players and a website button
 - Link preview (Open Graph) image generated at build time from the config
@@ -44,7 +45,7 @@ Two config files:
 
 - `src/config/identity.ts` — nickname, fallback avatar, "About me" text, site URL. It is separate because the build reads it too: the link preview image and meta tags are generated from it.
 - `src/config/profile.ts` — everything else:
-  - Discord user ID, profile theme, name style, profile effect
+  - Discord user ID, profile theme, name style, badges, connections, profile effect
   - site colors and background
   - extra social links (added after the Discord connections) and custom links
   - enabled tiles (`features`)
@@ -91,7 +92,8 @@ The profile card is built from the Discord user ID (`profile.discord.userId`) an
 | --- | --- | --- |
 | Status, device, custom status, games, Spotify | [Lanyard](https://github.com/Phineas/lanyard) (REST + WebSocket) | live |
 | Avatar, avatar decoration, display name, server tag | Lanyard, with the full profile as fallback | live |
-| Banner, all badges, connections (with Steam and TikTok stats) | [dcdn.dstn.to](https://dcdn.dstn.to) full profile, [japi.rest](https://japi.rest) as fallback | on page load |
+| Banner, HypeSquad and Nitro badges | [japi.rest](https://japi.rest) | on page load |
+| Full badge list, connections (with Steam and TikTok stats) | `profile.discord.badges`, `profile.discord.connections` | manual |
 | Member since | computed from the ID itself | — |
 | About me | `identity.bio` | manual |
 | Profile theme, name style, profile effect | `profile.discord` | manual |
@@ -99,7 +101,7 @@ The profile card is built from the Discord user ID (`profile.discord.userId`) an
 
 **Lanyard only tracks users who joined its Discord server.** Join [discord.gg/lanyard](https://discord.gg/lanyard) once — until then the card works, but without status and activities.
 
-Connections are shown like in Discord: an icon tile, the account name with an arrow when the service has a public page (Epic Games and Xbox have none), and stats from Discord: Steam member date, games and Dota 2 / TF2 items, TikTok followers, following and likes. The numbers are the ones Discord stores for the connection, so they update when Discord refreshes them. Links from `profile.social` are added after the connections; a link whose service is already connected in Discord (for example `tiktok`) is hidden and only shows up if the full profile fails to load. If dstn.to is down, japi.rest still gives the banner, but badges fall back to HypeSquad and Nitro and the connections section shows only `profile.social`.
+Discord has no public API for connections or for the full badge list (the API gives only HypeSquad and Nitro), so both are listed in the config. Connections are shown like in Discord: an icon tile, the account name with an arrow when there is a `url` (Discord shows Epic Games and Xbox without one), and stats under the name. The `metadata` keys are the same as in Discord: `created_at`, `game_count`, `item_count_dota2`, `item_count_tf2` for Steam, `follower_count`, `following_count`, `likes_count` for TikTok. The numbers are updated by hand. TikTok blocks requests from servers with an anti-bot page, so they can't be fetched automatically; the official way is the [TikTok Display API](https://developers.tiktok.com/doc/tiktok-api-v2-get-user-info), which needs a TikTok developer app authorized by the account owner. Links from `profile.social` are added after the connections, except for services that are already in `connections`.
 
 Animated banners and decorations load after their static versions and are skipped entirely with `prefers-reduced-motion`.
 
@@ -111,7 +113,7 @@ The effect files are APNG images in `public/effects/`. They are served from the 
 
 To use a different effect:
 
-1. Open `https://dcdn.dstn.to/profile/<your Discord ID>` and copy `user_profile.profile_effect.sku_id`.
+1. Find the effect in the Discord Shop and copy its SKU from the item link (`…/shop#itemSkuId=<sku_id>`).
 2. Open `https://discord.com/api/v9/collectibles-products/<sku_id>`. In `items[0]` you get `reducedMotionSrc` and the `effects` list: `src`, `start`, `duration`, `loop`, `loopDelay`, `zIndex` for every layer.
 3. Download every `src` and `reducedMotionSrc` into `public/effects/<name>/` and copy the numbers into `profileEffect.layers`.
 
@@ -143,6 +145,23 @@ CISTIERS_USER_AGENT="MySite/1.0 (+https://example.com; contact@example.com)"
 ```
 
 Hovering a tile shows a tooltip in the style of the current tab's site: MyTiers — tier name and points above the tile (with a Peak note when the peak was higher), CISTiers — kit icon, name, and points following the cursor.
+
+## Animated Icons
+
+Icons that change state morph into each other with a spring instead of jumping ([morphicons](https://www.morphicons.com)): play ↔ pause and volume ↔ mute in the player, a music note that turns into an audio wave while a track plays, copy ↔ check in the tiers card, the connection arrow turning right on hover, the server website globe turning into the Earth on hover, and a blinking eye next to the view counter. With `prefers-reduced-motion` the icons swap instantly and the eye does not blink.
+
+morphicons takes icon data, not components: static icons come from `lucide-vue-next`, morphing ones from the `lucide` data package. Keep both at the same version so the icons match:
+
+```vue
+<script setup lang="ts">
+import { Check, Copy } from 'lucide'
+import { MorphIcon } from 'morphicons/vue'
+</script>
+
+<template>
+  <MorphIcon :icon="copied ? Check : Copy" :size="16" spring="bouncy" reduced-motion="user" />
+</template>
+```
 
 ## Minecraft Server Status
 
