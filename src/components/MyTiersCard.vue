@@ -164,7 +164,8 @@ onMounted(() => {
 
 <style scoped>
 .mytiers {
-  --mt-card: #141416;
+  /* Цвет карточки под стеклом — им же закрашено кольцо вокруг скина, как «вырез» */
+  --mt-card: #1a1a1a;
   --mt-tile: #18181b;
   position: relative;
   display: flex;
@@ -240,10 +241,13 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
+/* Рендер скина обрезается кругом, как на mytiers.ru */
 .mt-avatar {
   width: 6rem;
   height: 6rem;
-  object-fit: contain;
+  border-radius: 9999px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .mt-panel {
