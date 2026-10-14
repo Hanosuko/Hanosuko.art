@@ -87,11 +87,11 @@ watch(
   z-index: 1000;
   pointer-events: none;
   white-space: nowrap;
-  font-family: inherit;
 }
 
-/* MyTiers: тёмно-синяя плашка над плиткой со стрелкой вниз */
+/* MyTiers: тёмно-синяя плашка над плиткой со стрелкой вниз, шрифт Geist */
 .tier-tip.is-mytiers {
+  font-family: 'Geist', ui-sans-serif, system-ui, sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -141,8 +141,9 @@ watch(
   color: #8b92b8;
 }
 
-/* CISTiers: плашка в строку, едет за курсором */
+/* CISTiers: плашка в строку, едет за курсором, шрифт Open Sans */
 .tier-tip.is-cistiers {
+  font-family: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
   display: flex;
   align-items: center;
   gap: 10px;

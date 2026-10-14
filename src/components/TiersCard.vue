@@ -117,7 +117,7 @@ const hideBrokenImage = (event: Event): void => {
 </script>
 
 <template>
-  <section class="mytiers glass-card" aria-label="Minecraft tiers">
+  <section class="mytiers glass-card" :class="`is-${activeId}`" aria-label="Minecraft tiers">
     <div class="mt-banner" aria-hidden="true">
       <img class="mt-banner-img" :src="skinUrl" alt="" @error="hideBrokenImage" />
     </div>
@@ -239,6 +239,8 @@ const hideBrokenImage = (event: Event): void => {
   /* Цвет карточки под стеклом — им же закрашено кольцо вокруг скина, как «вырез» */
   --mt-card: #1a1a1a;
   --mt-tile: #18181b;
+  --mt-font-mytiers: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --mt-font-cistiers: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -246,6 +248,15 @@ const hideBrokenImage = (event: Event): void => {
   border-radius: 1.5rem;
   overflow: hidden;
   isolation: isolate;
+}
+
+/* Шрифт как на сайте открытой вкладки: MyTiers — Geist, CISTiers — Open Sans */
+.mytiers.is-mytiers {
+  font-family: var(--mt-font-mytiers);
+}
+
+.mytiers.is-cistiers {
+  font-family: var(--mt-font-cistiers);
 }
 
 /* Баннер: размытый рендер скина, как на mytiers.ru */
@@ -291,9 +302,9 @@ const hideBrokenImage = (event: Event): void => {
   border-radius: 9999px;
   background: transparent;
   color: var(--color-text-muted);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   cursor: pointer;
   transition:
     color 0.2s ease,
@@ -303,6 +314,15 @@ const hideBrokenImage = (event: Event): void => {
 .mt-tab.is-active {
   background: rgba(255, 255, 255, 0.1);
   color: var(--color-text);
+}
+
+/* Название вкладки всегда своим шрифтом — переключатель не меняет ширину */
+.mt-tab[data-tab='mytiers'] {
+  font-family: var(--mt-font-mytiers);
+}
+
+.mt-tab[data-tab='cistiers'] {
+  font-family: var(--mt-font-cistiers);
 }
 
 .mt-tab:focus-visible {
