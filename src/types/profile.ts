@@ -48,6 +48,12 @@ export interface MyTiersSettings {
   kitColors: Record<string, string>
 }
 
+export interface CistiersSettings {
+  username: string
+  apiUrl: string
+  siteUrl: string
+}
+
 export interface PartnerLink {
   name: string
   url: string
@@ -92,6 +98,7 @@ export interface Profile {
   features: FeatureFlags
   audio: AudioSettings
   mytiers: MyTiersSettings
+  cistiers?: CistiersSettings
   partners: PartnerLink[]
   setup: SetupSettings
   gallery: GallerySettings

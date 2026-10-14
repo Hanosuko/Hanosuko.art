@@ -22,24 +22,3 @@ export interface MyTiersPlayer {
   discordId: string | null
   [field: `${string}Tiers`]: string[] | undefined
 }
-
-export type TierPosition = 'HT' | 'LT'
-
-export interface KitTier {
-  slug: string
-  name: string
-  iconUrl: string
-  discordUrl: string | null
-  color: string
-  tier: number
-  pos: TierPosition
-  retired: boolean
-  peak: string | null
-  points: number
-}
-
-export interface UnrankedKit {
-  slug: string
-  name: string
-  iconUrl: string
-}

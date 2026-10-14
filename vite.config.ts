@@ -2,9 +2,10 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'node:url'
 import { musicManifestPlugin } from './vite-plugins/music-manifest'
+import { cistiersDevApiPlugin } from './vite-plugins/cistiers-dev-api'
 
 export default defineConfig({
-  plugins: [vue(), musicManifestPlugin()],
+  plugins: [vue(), musicManifestPlugin(), cistiersDevApiPlugin()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

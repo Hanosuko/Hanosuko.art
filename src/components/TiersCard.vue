@@ -1,26 +1,71 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { AlertCircle, Check, Copy, ExternalLink, RotateCw } from 'lucide-vue-next'
 import { profile } from '@/config/profile'
 import { useMyTiers } from '@/composables/useMyTiers'
+import { useCistiers } from '@/composables/useCistiers'
+import type { TierSource, TierSourceState } from '@/types/tiers'
 
-// 👇 Ник, сайт и цвета китов — в src/config/profile.ts → mytiers
-const settings = profile.mytiers
+// 👇 Ники, сайты и цвета китов — в src/config/profile.ts → mytiers и cistiers
+const { mytiers, cistiers } = profile
 
-const { player, kits, isLoading, error, fetchProfile, avatarUrl, profileUrl } = useMyTiers(
-  settings.siteUrl,
-  settings.username,
-  settings.kitColors,
+interface TierTab extends TierSourceState {
+  id: TierSource
+  label: string
+  iconUrl: string
+}
+
+const tabs: TierTab[] = [
+  {
+    id: 'mytiers',
+    label: 'MyTiers',
+    iconUrl: new URL('/tier_icons/overall.svg', mytiers.siteUrl).href,
+    ...useMyTiers(mytiers),
+  },
+]
+if (cistiers) {
+  tabs.push({ id: 'cistiers', label: 'CISTiers', iconUrl: '/brands/cistiers.png', ...useCistiers(cistiers) })
+}
+
+const activeId = ref<TierSource>(tabs[0].id)
+const active = computed(() => tabs.find((tab) => tab.id === activeId.value) ?? tabs[0])
+
+// Шаблон разворачивает только ref верхнего уровня — поэтому отдельные computed
+const tierProfile = computed(() => active.value.profile.value)
+const isLoading = computed(() => active.value.isLoading.value)
+const error = computed(() => active.value.error.value)
+
+// Вкладка грузится при первом открытии
+watch(
+  active,
+  (tab) => {
+    if (!tab.profile.value && !tab.isLoading.value) void tab.load()
+  },
+  { immediate: true },
 )
+
+const selectTab = (id: TierSource): void => {
+  activeId.value = id
+}
+
+// Стрелки влево/вправо переключают вкладки, как в обычном tablist
+const onTabsKeydown = (event: KeyboardEvent): void => {
+  if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+  const index = tabs.findIndex((tab) => tab.id === activeId.value)
+  const step = event.key === 'ArrowRight' ? 1 : -1
+  const next = tabs[(index + step + tabs.length) % tabs.length]
+  selectTab(next.id)
+  ;(event.currentTarget as HTMLElement).querySelector<HTMLElement>(`[data-tab="${next.id}"]`)?.focus()
+}
 
 const SKELETON_SLOTS = 10
 
-const nickname = computed(() => player.value?.nickname ?? settings.username)
-const brandLabel = computed(() => new URL(settings.siteUrl).host.toUpperCase())
-const brandIconUrl = computed(() => new URL('/tier_icons/overall.svg', settings.siteUrl).href)
+const nickname = computed(() => tierProfile.value?.nickname ?? mytiers.username)
+// Рендер скина по нику — один и тот же для обеих вкладок
+const skinUrl = new URL(`/api/avatar/${encodeURIComponent(mytiers.username)}?s=256`, mytiers.siteUrl).href
 const nameMcUrl = computed(() => `https://namemc.com/profile/${encodeURIComponent(nickname.value)}`)
 
-const score = computed(() => player.value?.overallScore ?? 0)
+const score = computed(() => tierProfile.value?.points ?? 0)
 const pointsWord = computed(() => (score.value === 1 ? 'point' : 'points'))
 
 const copied = ref(false)
@@ -40,62 +85,66 @@ const copyNickname = async (): Promise<void> => {
 const hideBrokenImage = (event: Event): void => {
   ;(event.target as HTMLImageElement).style.visibility = 'hidden'
 }
-
-onMounted(() => {
-  void fetchProfile()
-})
 </script>
 
 <template>
-  <section class="mytiers glass-card" aria-label="MyTiers profile">
+  <section class="mytiers glass-card" aria-label="Minecraft tiers">
     <div class="mt-banner" aria-hidden="true">
-      <img class="mt-banner-img" :src="avatarUrl" alt="" @error="hideBrokenImage" />
+      <img class="mt-banner-img" :src="skinUrl" alt="" @error="hideBrokenImage" />
     </div>
 
-    <a
-      class="mt-brand"
-      :href="profileUrl"
-      target="_blank"
-      rel="noopener noreferrer"
-      :aria-label="`Open ${nickname} on ${brandLabel}`"
-    >
-      <img class="mt-brand-icon" :src="brandIconUrl" alt="" @error="hideBrokenImage" />
-      <span>{{ brandLabel }}</span>
-    </a>
+    <div class="mt-tabs" role="tablist" aria-label="Tier list" @keydown="onTabsKeydown">
+      <button
+        v-for="tab in tabs"
+        :key="tab.id"
+        type="button"
+        role="tab"
+        class="mt-tab"
+        :class="{ 'is-active': tab.id === activeId }"
+        :data-tab="tab.id"
+        :aria-selected="tab.id === activeId"
+        :tabindex="tab.id === activeId ? 0 : -1"
+        aria-controls="mt-tabpanel"
+        @click="selectTab(tab.id)"
+      >
+        <img class="mt-tab-icon" :src="tab.iconUrl" alt="" @error="hideBrokenImage" />
+        <span>{{ tab.label }}</span>
+      </button>
+    </div>
 
     <div class="mt-avatar-wrap">
-      <img class="mt-avatar" :src="avatarUrl" :alt="nickname" decoding="async" @error="hideBrokenImage" />
+      <img class="mt-avatar" :src="skinUrl" :alt="nickname" decoding="async" @error="hideBrokenImage" />
     </div>
 
-    <div class="mt-panel">
+    <div id="mt-tabpanel" class="mt-panel" role="tabpanel" :aria-label="active.label">
       <div class="mt-head">
         <h2 class="mt-name">{{ nickname }}</h2>
-        <div v-if="player" class="mt-stats">
-          <span><b>#{{ player.rank > 0 ? player.rank : '—' }}</b> overall</span>
+        <div v-if="tierProfile" class="mt-stats">
+          <span><b>#{{ tierProfile.rank ?? '—' }}</b> overall</span>
           <span><b>{{ score }}</b> {{ pointsWord }}</span>
         </div>
       </div>
 
       <div class="mt-divider" />
 
-      <div v-if="error && !player" class="mt-state">
+      <div v-if="error && !tierProfile" class="mt-state">
         <AlertCircle :size="16" aria-hidden="true" />
-        <span>MyTiers is unavailable</span>
-        <button type="button" class="mt-retry" @click="fetchProfile">
+        <span>{{ active.label }} is unavailable</span>
+        <button type="button" class="mt-retry" @click="active.load">
           <RotateCw :size="14" aria-hidden="true" />
           retry
         </button>
       </div>
 
       <ul v-else class="mt-grid">
-        <template v-if="isLoading || !player">
+        <template v-if="isLoading || !tierProfile">
           <li v-for="n in SKELETON_SLOTS" :key="`skeleton-${n}`" class="mt-slot is-skeleton" />
         </template>
 
         <template v-else>
           <li
-            v-for="(kit, index) in kits.ranked"
-            :key="kit.slug"
+            v-for="(kit, index) in tierProfile.ranked"
+            :key="`${activeId}-${kit.slug}`"
             class="mt-cell"
             :style="{ '--kit': kit.color, '--delay': `${index * 40}ms` }"
           >
@@ -120,10 +169,10 @@ onMounted(() => {
           </li>
 
           <li
-            v-for="(kit, index) in kits.unranked"
-            :key="kit.slug"
+            v-for="(kit, index) in tierProfile.unranked"
+            :key="`${activeId}-${kit.slug}`"
             class="mt-cell"
-            :style="{ '--delay': `${(kits.ranked.length + index) * 40}ms` }"
+            :style="{ '--delay': `${(tierProfile.ranked.length + index) * 40}ms` }"
           >
             <span class="mt-slot" :aria-label="`${kit.name}: not tested`">
               <img class="mt-kit-icon is-muted" :src="kit.iconUrl" alt="" draggable="false" @error="hideBrokenImage" />
@@ -153,9 +202,9 @@ onMounted(() => {
           aria-label="Open on NameMC"
           title="NameMC"
         >n</a>
-        <a class="mt-action is-wide" :href="profileUrl" target="_blank" rel="noopener noreferrer">
+        <a class="mt-action is-wide" :href="active.profileUrl" target="_blank" rel="noopener noreferrer">
           <ExternalLink :size="16" aria-hidden="true" />
-          <span>Open on MyTiers</span>
+          <span>Open on {{ active.label }}</span>
         </a>
       </div>
     </div>
@@ -196,37 +245,62 @@ onMounted(() => {
   transform: scale(1.8);
 }
 
-.mt-brand {
+/* Переключатель MyTiers / CISTiers в правом верхнем углу */
+.mt-tabs {
   position: absolute;
   top: 1rem;
   right: 1rem;
   display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  height: 2.5rem;
-  padding: 0 1.1rem;
+  gap: 0.2rem;
+  padding: 0.25rem;
   border-radius: 9999px;
   background: rgba(10, 10, 12, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  color: var(--color-text);
-  font-size: 0.8rem;
+}
+
+.mt-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 2rem;
+  padding: 0 0.85rem;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.06em;
+  cursor: pointer;
   transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    color 0.2s ease,
+    background 0.2s ease;
 }
 
-.mt-brand:hover,
-.mt-brand:focus-visible {
-  border-color: #ffe453;
-  box-shadow: 0 0 18px rgba(255, 228, 83, 0.25);
-  outline: none;
+.mt-tab.is-active {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text);
 }
 
-.mt-brand-icon {
-  width: 1.1rem;
-  height: 1.1rem;
+.mt-tab:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 1px;
+}
+
+@media (hover: hover) {
+  .mt-tab:not(.is-active):hover {
+    color: var(--color-text);
+  }
+}
+
+.mt-tab-icon {
+  width: 1rem;
+  height: 1rem;
+  object-fit: contain;
+}
+
+.mt-tab:not(.is-active) .mt-tab-icon {
+  opacity: 0.6;
 }
 
 .mt-avatar-wrap {
@@ -534,13 +608,15 @@ onMounted(() => {
     height: 7.5rem;
   }
 
-  .mt-brand {
+  .mt-tabs {
     top: 0.75rem;
     right: 0.75rem;
-    height: 2.25rem;
-    padding: 0 0.9rem;
-    font-size: 0.72rem;
-    letter-spacing: 0.14em;
+  }
+
+  .mt-tab {
+    height: 1.85rem;
+    padding: 0 0.65rem;
+    font-size: 0.7rem;
   }
 
   .mt-avatar-wrap {

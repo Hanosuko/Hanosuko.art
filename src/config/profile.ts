@@ -95,6 +95,15 @@ export const profile: Profile = {
     },
   },
 
+  // 👇 ВКЛАДКА CISTIERS в карточке тиров. Тиры берутся из публичного API cistiers.com
+  // через наш сервер (/api/cistiers): у CISTiers нет CORS, напрямую из браузера нельзя.
+  // В dev отвечает сам Vite. Удали этот блок — останется только MyTiers.
+  cistiers: {
+    username: 'Hanosuko',
+    apiUrl: '/api/cistiers',
+    siteUrl: 'https://cistiers.com',
+  },
+
   // 👇 ПАРТНЁРЫ — кнопки-плашки под профилем
   partners: [
     {

@@ -6,7 +6,7 @@ import AnimatedBackground from '@/components/AnimatedBackground.vue'
 import ProfileCard from '@/components/ProfileCard.vue'
 import CustomLinks from '@/components/CustomLinks.vue'
 import PartnerLinks from '@/components/PartnerLinks.vue'
-import MyTiersCard from '@/components/MyTiersCard.vue'
+import TiersCard from '@/components/TiersCard.vue'
 import MusicPlayer from '@/components/MusicPlayer.vue'
 import ViewCounter from '@/components/ViewCounter.vue'
 import SetupPanel from '@/components/SetupPanel.vue'
@@ -33,7 +33,7 @@ useAnimatedTitle(profile.identity.nickname)
         <PartnerLinks />
       </div>
 
-      <MyTiersCard v-if="profile.features.tiers" class="col-span-12 md:col-span-6 lg:col-span-7" />
+      <TiersCard v-if="profile.features.tiers" class="col-span-12 md:col-span-6 lg:col-span-7" />
 
       <PhotoPanel v-if="profile.features.gallery" class="col-span-12 md:col-span-6 lg:col-span-5" />
       <SetupPanel v-if="profile.features.setup" class="col-span-12 md:col-span-6 lg:col-span-7" />

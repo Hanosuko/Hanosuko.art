@@ -7,11 +7,12 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "strict": true,
+    "allowJs": true,
     "composite": true,
     "noEmit": false,
     "emitDeclarationOnly": true,
     "outDir": "./dist-tsc",
     "types": ["node"]
   },
-  "include": ["vite.config.ts", "vite-plugins/**/*.ts"]
+  "include": ["vite.config.ts", "vite-plugins/**/*.ts", "server/cistiers.js"]
 }

@@ -3,6 +3,7 @@ import Database from 'better-sqlite3'
 import { createHash } from 'node:crypto'
 import { mkdirSync } from 'node:fs'
 import { dirname } from 'node:path'
+import { createCistiersClient } from './cistiers.js'
 
 const PORT = Number(process.env.PORT ?? 3000)
 const HOST = process.env.HOST ?? '127.0.0.1'
@@ -42,6 +43,8 @@ const hashIp = (ip) => createHash('sha256').update(`${IP_SALT}:${ip}`).digest('h
 
 const today = () => new Date().toISOString().slice(0, 10)
 
+const cistiers = createCistiersClient({ userAgent: process.env.CISTIERS_USER_AGENT || undefined })
+
 const app = express()
 app.disable('x-powered-by')
 app.set('trust proxy', 'loopback')
@@ -59,10 +62,19 @@ app.post('/api/views', (req, res) => {
   res.json({ total: getTotal() })
 })
 
+app.get('/api/cistiers', async (req, res) => {
+  const { status, body } = await cistiers.handle(req.query.username)
+  res
+    .status(status)
+    .set('cache-control', status === 200 ? 'public, max-age=300' : 'no-store')
+    .json(body)
+})
+
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true })
 })
 
 app.listen(PORT, HOST, () => {
   console.log(`[link-profile-api] listening on ${HOST}:${PORT}`)
+  void cistiers.warmUp()
 })
