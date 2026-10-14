@@ -57,7 +57,7 @@ export const profile: Profile = {
     },
   ],
 
-  // 👇 ПЕРЕКЛЮЧАТЕЛИ: true — блок виден, false — скрыт
+  // 👇 ПЕРЕКЛЮЧАТЕЛИ: true — блок виден, false — скрыт (tiers — карточка MyTiers)
   features: {
     audioPlayer: true,
     viewCounter: true,
@@ -109,7 +109,8 @@ export const profile: Profile = {
     },
   ],
 
-  // 👇 БЛОК «MY SETUP» СПРАВА: фото сетапа + список комплектующих.
+  // 👇 БЛОК «MY SETUP»: плитка с фото сетапа и списком комплектующих.
+  // Место и ширина плитки в бенто-сетке — в src/App.vue.
   // Фото класть в src/assets/photos/setup.jpg или public/photos/setup.jpg.
   // Добавляй/убирай пункты в specs свободно — верстка подхватит.
   setup: {
@@ -132,7 +133,8 @@ export const profile: Profile = {
     ],
   },
 
-  // 👇 ЛЕВАЯ ФОТО-ПАНЕЛЬ: коллаж из 4 фото слева.
+  // 👇 ГАЛЕРЕЯ: плитка-коллаж из 4 фото.
+  // Место и ширина плитки в бенто-сетке — в src/App.vue.
   // Файлы можно положить в src/assets/photos/ или public/photos/.
   gallery: {
     title: 'me :]',
