@@ -28,7 +28,8 @@ const partners = profile.partners
 .partners {
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* Две кнопки в ряд, а в узкой плитке — друг под другом */
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
   /* Кнопки растягиваются на высоту ряда бенто-сетки */
   grid-auto-rows: minmax(3rem, 1fr);
   gap: 0.5rem;

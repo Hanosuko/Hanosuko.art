@@ -72,6 +72,7 @@ export const profile: Profile = {
     tiers: true,
     setup: true,
     gallery: true,
+    serverStatus: true,
   },
 
   // 👇 АУДИО-ПЛЕЕР: треки берутся автоматически из public/music/.
@@ -112,7 +113,15 @@ export const profile: Profile = {
     siteUrl: 'https://cistiers.com',
   },
 
-  // 👇 ПАРТНЁРЫ — кнопки-плашки под профилем
+  // 👇 СТАТУС MINECRAFT-СЕРВЕРА: онлайн, MOTD и кнопка «скопировать IP».
+  // Данные — с api.mcsrvstat.us (обновляются раз в 2,5 минуты). Выключить — features.serverStatus.
+  server: {
+    name: 'CISPractice',
+    address: 'cisprac.xyz',
+    websiteUrl: 'https://cisprac.xyz',
+  },
+
+  // 👇 ПАРТНЁРЫ — кнопки-плашки рядом с плеером
   partners: [
     {
       name: 'mytiers.ru',

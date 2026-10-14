@@ -11,6 +11,7 @@ import MusicPlayer from '@/components/MusicPlayer.vue'
 import ViewCounter from '@/components/ViewCounter.vue'
 import SetupPanel from '@/components/SetupPanel.vue'
 import PhotoPanel from '@/components/PhotoPanel.vue'
+import ServerStatus from '@/components/ServerStatus.vue'
 import IntroOverlay from '@/components/IntroOverlay.vue'
 
 useThemeVars(profile.theme)
@@ -30,8 +31,9 @@ useAnimatedTitle(profile.identity.nickname)
       <DiscordProfile class="col-span-12 md:col-span-6 lg:col-span-5" />
       <TiersCard v-if="profile.features.tiers" class="col-span-12 md:col-span-6 lg:col-span-7" />
 
-      <MusicPlayer v-if="profile.features.audioPlayer" class="col-span-12 md:col-span-6 lg:col-span-7" />
-      <PartnerLinks class="col-span-12 md:col-span-6 lg:col-span-5" />
+      <MusicPlayer v-if="profile.features.audioPlayer" class="col-span-12 md:col-span-6 lg:col-span-5" />
+      <ServerStatus v-if="profile.features.serverStatus" class="col-span-12 md:col-span-6 lg:col-span-4" />
+      <PartnerLinks class="col-span-12 lg:col-span-3" />
 
       <PhotoPanel v-if="profile.features.gallery" class="col-span-12 md:col-span-6 lg:col-span-5" />
       <SetupPanel v-if="profile.features.setup" class="col-span-12 md:col-span-6 lg:col-span-7" />

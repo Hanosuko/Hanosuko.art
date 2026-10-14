@@ -54,6 +54,12 @@ export interface DiscordSettings {
   userId: string
 }
 
+export interface ServerSettings {
+  name: string
+  address: string
+  websiteUrl?: string
+}
+
 export interface CistiersSettings {
   username: string
   apiUrl: string
@@ -72,6 +78,7 @@ export interface FeatureFlags {
   tiers: boolean
   setup: boolean
   gallery: boolean
+  serverStatus: boolean
 }
 
 export interface GallerySettings {
@@ -107,6 +114,7 @@ export interface Profile {
   mytiers: MyTiersSettings
   cistiers?: CistiersSettings
   partners: PartnerLink[]
+  server: ServerSettings
   setup: SetupSettings
   gallery: GallerySettings
 }
