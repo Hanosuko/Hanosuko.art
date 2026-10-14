@@ -411,9 +411,11 @@ const hideBrokenImage = (event: Event): void => {
   background: rgba(255, 255, 255, 0.07);
 }
 
+/* Если соседняя плитка выше, лишнее место делится поровну над и под сеткой,
+   а не остаётся пустой полосой над кнопками */
 .mt-grid {
   list-style: none;
-  margin: 0;
+  margin: auto 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -516,6 +518,7 @@ const hideBrokenImage = (event: Event): void => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin: auto 0;
   padding: 1.5rem 0;
   font-size: 0.85rem;
   color: var(--color-text-muted);
@@ -538,7 +541,6 @@ const hideBrokenImage = (event: Event): void => {
 .mt-actions {
   display: flex;
   gap: 0.5rem;
-  margin-top: auto;
   padding-top: 1rem;
 }
 

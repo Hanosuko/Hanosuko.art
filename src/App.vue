@@ -28,12 +28,13 @@ useAnimatedTitle(profile.identity.nickname)
       <MyBlock class="col-span-12 md:col-span-6 lg:col-span-4" />
     -->
     <div class="bento grid grid-cols-12 gap-3 md:gap-4">
-      <DiscordProfile class="col-span-12 md:col-span-6 lg:col-span-5" />
+      <!-- На планшете профиль занимает два ряда, а справа под тирами встаёт плеер — колонки равной высоты -->
+      <DiscordProfile class="col-span-12 md:col-span-6 md:row-span-2 lg:col-span-5 lg:row-span-1" />
       <TiersCard v-if="profile.features.tiers" class="col-span-12 md:col-span-6 lg:col-span-7" />
 
       <MusicPlayer v-if="profile.features.audioPlayer" class="col-span-12 md:col-span-6 lg:col-span-5" />
       <ServerStatus v-if="profile.features.serverStatus" class="col-span-12 md:col-span-6 lg:col-span-4" />
-      <PartnerLinks class="col-span-12 lg:col-span-3" />
+      <PartnerLinks class="col-span-12 md:col-span-6 lg:col-span-3" />
 
       <PhotoPanel v-if="profile.features.gallery" class="col-span-12 md:col-span-6 lg:col-span-5" />
       <SetupPanel v-if="profile.features.setup" class="col-span-12 md:col-span-6 lg:col-span-7" />
