@@ -2,7 +2,7 @@
   "name": "hanosuko-art",
   "version": "0.1.0",
   "type": "module",
-  "description": "Personal link-in-bio site with Vue, Vite, music, CISTiers, and optional backend API",
+  "description": "Personal link-in-bio site with Vue, Vite, music, MyTiers, and optional backend API",
   "license": "MIT",
   "scripts": {
     "dev": "vite",

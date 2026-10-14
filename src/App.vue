@@ -7,7 +7,7 @@ import ProfileCard from '@/components/ProfileCard.vue'
 import SocialLinks from '@/components/SocialLinks.vue'
 import CustomLinks from '@/components/CustomLinks.vue'
 import PartnerLinks from '@/components/PartnerLinks.vue'
-import CistiersProfile from '@/components/CistiersProfile.vue'
+import MyTiersCard from '@/components/MyTiersCard.vue'
 import MusicPlayer from '@/components/MusicPlayer.vue'
 import ViewCounter from '@/components/ViewCounter.vue'
 import SetupPanel from '@/components/SetupPanel.vue'
@@ -26,7 +26,7 @@ useAnimatedTitle(profile.identity.nickname)
     <div class="stack">
       <ProfileCard />
       <SocialLinks />
-      <CistiersProfile v-if="profile.features.tiers" />
+      <MyTiersCard v-if="profile.features.tiers" />
       <PartnerLinks />
       <MusicPlayer v-if="profile.features.audioPlayer" />
       <CustomLinks />

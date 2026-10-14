@@ -42,21 +42,16 @@ export interface AudioSettings {
   autoplay: boolean
 }
 
-export interface TierColor {
-  text: string
-  shadow: string
+export interface MyTiersSettings {
+  username: string
+  siteUrl: string
+  kitColors: Record<string, string>
 }
 
-export type TierColors = Record<string, TierColor>
-
-export interface CistiersSettings {
-  apiUrl: string
-  username: string
-  tierDiscordUrl: string
-  tierDiscordUrls: Record<string, string>
-  tierTableBaseUrl: string
-  tierRenders: Record<string, string>
-  tierColors: TierColors
+export interface PartnerLink {
+  name: string
+  url: string
+  iconUrl: string
 }
 
 export interface FeatureFlags {
@@ -96,7 +91,8 @@ export interface Profile {
   customLinks: CustomLink[]
   features: FeatureFlags
   audio: AudioSettings
-  cistiers: CistiersSettings
+  mytiers: MyTiersSettings
+  partners: PartnerLink[]
   setup: SetupSettings
   gallery: GallerySettings
 }

@@ -17,7 +17,7 @@ export const profile: Profile = {
     avatarUrl:
       'https://cdn.discordapp.com/avatars/835533218869936168/906b3b525961914f00002aa737631332.webp',
     // 👇 BIO/СТАТУС: био, о себе, для следующей строки используй \n
-    bio: 'CISTiers Network Administrator\nCISPractice Owner',
+    bio: 'CISPractice Owner',
   },
 
   // 👇 ЦВЕТА ТЕМЫ — все цвета сайта берутся отсюда
@@ -74,52 +74,40 @@ export const profile: Profile = {
     autoplay: true,
   },
 
-  // 👇 БЛОК CISTIERS: тиры тянутся через /api/tiers (edge-прокси с кешем 5 мин).
-  // Меняй username на свой ник на cistiers.com.
-  // tierDiscordUrl — куда ведёт кнопка в модалке кита.
-  // tierRenders — картинки рендеров в public/tier-icons/
-  cistiers: {
-    apiUrl: '/api/tiers',
+  // 👇 БЛОК MYTIERS: тиры, ранг и скин тянутся напрямую из https://mytiers.ru/api.
+  // Меняй username на свой ник на mytiers.ru. Список китов и их иконки берутся с сайта.
+  mytiers: {
     username: 'Hanosuko',
-    tierDiscordUrl: 'https://discord.gg/cistiers',
-    // 👇 ДИСКОРД-ССЫЛКИ НА КАЖДЫЙ тирлист — кнопка в модалке ведёт сюда.
-    tierDiscordUrls: {
-      vanilla:   'https://discord.gg/rf2SwgNmxf',
-      sword:     'https://discord.gg/bTN5mrgDAY',
-      netherite: 'https://discord.gg/brW5taABUV',
-      dpot:      'https://discord.gg/vnbk7PrR3x',
-      uhc:       'https://discord.gg/rYYXjmHcXP',
-      smp:       'https://discord.gg/sXjXEmeVUr',
-      op:        'https://discord.gg/v9J7aPHhvb',
-      mace:      'https://discord.gg/nK3WgBkJ9K',
-    },
-    tierTableBaseUrl: 'https://cistiers.com/table/',
-    tierRenders: {
-      vanilla: '/tier-icons/vanilla.png',
-      sword: '/tier-icons/sword.png',
-      netherite: '/tier-icons/netherite.png',
-      dpot: '/tier-icons/dpot.png',
-      uhc: '/tier-icons/uhc.png',
-      smp: '/tier-icons/smp.png',
-      op: '/tier-icons/op.png',
-      mace: '/tier-icons/mace.png',
-    },
-    // 👇 ЦВЕТА ТИРОВ — здесь меняй цвет и тень каждого тира.
-    // text — цвет букв, shadow — цвет тени.
-    tierColors: {
-      ht1:     { text: '#E8BA3A', shadow: '#392d0e' },
-      lt1:     { text: '#D5B355', shadow: '#342b15' },
-      ht2:     { text: '#C4D3E7', shadow: '#303338' },
-      lt2:     { text: '#A0A7B2', shadow: '#27282b' },
-      ht3:     { text: '#F89F5A', shadow: '#3d2716' },
-      lt3:     { text: '#C67B42', shadow: '#301e10' },
-      ht4:     { text: '#81749A', shadow: '#201d26' },
-      lt4:     { text: '#655B79', shadow: '#19161e' },
-      ht5:     { text: '#8F82A8', shadow: '#232029' },
-      lt5:     { text: '#655B79', shadow: '#19161e' },
-      retired: { text: '#A2D6FF', shadow: '#27343e' },
+    siteUrl: 'https://mytiers.ru',
+    // 👇 ЦВЕТ ПЛИТКИ КАЖДОГО КИТА (ключ — slug кита из mytiers.ru/api/guilds).
+    // Если кита нет в списке — плитка красится в цвет тира.
+    kitColors: {
+      sword: '#539eff',
+      op: '#4fd1b0',
+      netherpot: '#b753ff',
+      dpot: '#ff5050',
+      crystal: '#a96bff',
+      uhc: '#e93a3d',
+      mace: '#7c7c96',
+      diaop: '#5375ff',
+      axe: '#5cceff',
+      smp: '#8d8da3',
     },
   },
+
+  // 👇 ПАРТНЁРЫ — кнопки-плашки под профилем
+  partners: [
+    {
+      name: 'mytiers.ru',
+      url: 'https://mytiers.ru',
+      iconUrl: 'https://mytiers.ru/favicon-32x32.png',
+    },
+    {
+      name: 'cisprac.xyz',
+      url: 'https://cisprac.xyz',
+      iconUrl: 'https://www.google.com/s2/favicons?domain=cisprac.xyz&sz=64',
+    },
+  ],
 
   // 👇 БЛОК «MY SETUP» СПРАВА: фото сетапа + список комплектующих.
   // Фото класть в src/assets/photos/setup.jpg или public/photos/setup.jpg.

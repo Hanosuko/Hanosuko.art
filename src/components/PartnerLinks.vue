@@ -1,22 +1,8 @@
 <script setup lang="ts">
-interface PartnerLink {
-  name: string
-  url: string
-  iconUrl: string
-}
+import { profile } from '@/config/profile'
 
-const partners: PartnerLink[] = [
-  {
-    name: 'cistiers.com',
-    url: 'https://cistiers.com',
-    iconUrl: 'https://www.google.com/s2/favicons?domain=cistiers.com&sz=64',
-  },
-  {
-    name: 'cisprac.xyz',
-    url: 'https://cisprac.xyz',
-    iconUrl: 'https://www.google.com/s2/favicons?domain=cisprac.xyz&sz=64',
-  },
-]
+// 👇 Партнёры редактируются в src/config/profile.ts → partners
+const partners = profile.partners
 </script>
 
 <template>

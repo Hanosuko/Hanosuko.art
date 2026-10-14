@@ -8,9 +8,6 @@ const PORT = Number(process.env.PORT ?? 3000)
 const HOST = process.env.HOST ?? '127.0.0.1'
 const DB_PATH = process.env.DB_PATH ?? './data/views.sqlite'
 const IP_SALT = process.env.IP_SALT
-const TIERS_UPSTREAM = 'https://cistiers.com/api/profile'
-const TIERS_USERNAME_RE = /^[A-Za-z0-9_]{2,32}$/
-const TIERS_CACHE_TTL_MS = 5 * 60 * 1000
 
 if (!IP_SALT) {
   throw new Error('IP_SALT must be set before starting the API server')
@@ -45,24 +42,6 @@ const hashIp = (ip) => createHash('sha256').update(`${IP_SALT}:${ip}`).digest('h
 
 const today = () => new Date().toISOString().slice(0, 10)
 
-const tiersCache = new Map()
-
-const fetchTiers = async (username) => {
-  const cached = tiersCache.get(username)
-  if (cached && Date.now() - cached.fetchedAt < TIERS_CACHE_TTL_MS) {
-    return { payload: cached.payload, status: 200, cache: 'HIT' }
-  }
-  const upstream = await fetch(`${TIERS_UPSTREAM}/${encodeURIComponent(username)}`, {
-    headers: { accept: 'application/json' },
-  })
-  if (!upstream.ok) {
-    return { payload: { error: 'upstream_failed', status: upstream.status }, status: 502, cache: 'MISS' }
-  }
-  const payload = await upstream.json()
-  tiersCache.set(username, { payload, fetchedAt: Date.now() })
-  return { payload, status: 200, cache: 'MISS' }
-}
-
 const app = express()
 app.disable('x-powered-by')
 app.set('trust proxy', 'loopback')
@@ -78,27 +57,6 @@ app.post('/api/views', (req, res) => {
   insertView.run(hashIp(ip), today())
   res.set('cache-control', 'no-store')
   res.json({ total: getTotal() })
-})
-
-app.get('/api/tiers', async (req, res) => {
-  const username = String(req.query.username ?? '').trim()
-  if (!TIERS_USERNAME_RE.test(username)) {
-    res.status(400).set('cache-control', 'no-store').json({ error: 'invalid_username' })
-    return
-  }
-  try {
-    const { payload, status, cache } = await fetchTiers(username)
-    res.status(status)
-    res.set('x-cache', cache)
-    if (status === 200) {
-      res.set('cache-control', 'public, max-age=60, stale-while-revalidate=600')
-    } else {
-      res.set('cache-control', 'no-store')
-    }
-    res.json(payload)
-  } catch {
-    res.status(502).set('cache-control', 'no-store').json({ error: 'fetch_failed' })
-  }
 })
 
 app.get('/api/health', (_req, res) => {
