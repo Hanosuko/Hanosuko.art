@@ -67,6 +67,7 @@ PORT=3000
 HOST=127.0.0.1
 DB_PATH=/var/lib/link-profile/views.sqlite
 IP_SALT=RANDOM_SECRET
+CISTIERS_USER_AGENT="MySite/1.0 (+https://example.com; contact@example.com)"
 EOF
 
 chmod 600 /var/www/link-profile/server/.env
@@ -129,4 +130,6 @@ Smoke tests:
 ```bash
 curl -i https://example.com/api/health
 curl -i -X POST https://example.com/api/views
+curl -i "https://example.com/api/cistiers?username=YourNick"
+curl -I https://example.com/og.png
 ```
