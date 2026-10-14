@@ -48,8 +48,7 @@ export function useMyTiers(settings: MyTiersSettings): TierSourceState {
       nickname: current.nickname,
       rank: current.rank > 0 ? current.rank : null,
       points: current.overallScore,
-      ranked: sortByPoints(ranked),
-      unranked,
+      kits: [...sortByPoints(ranked), ...unranked],
     }
   })
 

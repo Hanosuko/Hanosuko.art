@@ -2,7 +2,7 @@ import { computed, ref, shallowRef } from 'vue'
 import type { CistiersProfileResponse } from '@/types/cistiers'
 import type { CistiersSettings } from '@/types/profile'
 import type { KitTier, TierProfile, TierSourceState, UnrankedKit } from '@/types/tiers'
-import { localKitIcon, parseTier, sortByPoints, tierColor } from '@/utils/tiers'
+import { localKitIcon, parseTier, tierColor } from '@/utils/tiers'
 
 // CISTiers не отдаёт CORS, поэтому данные идут через наш прокси /api/cistiers (server/cistiers.js)
 export function useCistiers(settings: CistiersSettings): TierSourceState {
@@ -14,16 +14,12 @@ export function useCistiers(settings: CistiersSettings): TierSourceState {
     const current = data.value
     if (!current) return null
 
-    const ranked: KitTier[] = []
-    const unranked: UnrankedKit[] = []
-    for (const kit of current.kits) {
+    // Как на cistiers.com: киты в порядке сайта, непройденные стоят на своих местах
+    const kits = current.kits.map((kit): KitTier | UnrankedKit => {
       const iconUrl = localKitIcon('cistiers', kit.slug) ?? kit.iconUrl ?? ''
       const parsed = parseTier(kit.tier)
-      if (!parsed) {
-        unranked.push({ slug: kit.slug, name: kit.name, iconUrl })
-        continue
-      }
-      ranked.push({
+      if (!parsed) return { slug: kit.slug, name: kit.name, iconUrl }
+      return {
         slug: kit.slug,
         name: kit.name,
         iconUrl,
@@ -31,16 +27,10 @@ export function useCistiers(settings: CistiersSettings): TierSourceState {
         ...parsed,
         peak: null,
         points: kit.points,
-      })
-    }
+      }
+    })
 
-    return {
-      nickname: current.nickname,
-      rank: current.rank,
-      points: current.points,
-      ranked: sortByPoints(ranked),
-      unranked,
-    }
+    return { nickname: current.nickname, rank: current.rank, points: current.points, kits }
   })
 
   const load = async (): Promise<void> => {

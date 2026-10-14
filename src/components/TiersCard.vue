@@ -7,6 +7,7 @@ import { profile } from '@/config/profile'
 import { useMyTiers } from '@/composables/useMyTiers'
 import { useCistiers } from '@/composables/useCistiers'
 import type { KitTier, TierSource, TierSourceState, UnrankedKit } from '@/types/tiers'
+import { isRanked } from '@/utils/tiers'
 import TierTooltip from '@/components/TierTooltip.vue'
 import mytiersLogo from '@/assets/tiers/mytiers-logo.svg'
 import cistiersLogo from '@/assets/tiers/cistiers-logo.png'
@@ -172,33 +173,27 @@ const hideBrokenImage = (event: Event): void => {
 
         <template v-else>
           <li
-            v-for="(kit, index) in tierProfile.ranked"
+            v-for="(kit, index) in tierProfile.kits"
             :key="`${activeId}-${kit.slug}`"
             class="mt-cell"
-            :style="{ '--kit': kit.color, '--delay': `${index * 40}ms` }"
+            :style="{ '--kit': isRanked(kit) ? kit.color : undefined, '--delay': `${index * 40}ms` }"
             @mouseenter="onTileMouse(kit, $event)"
             @mousemove="activeId === 'cistiers' && onTileMouse(kit, $event)"
             @mouseleave="hideTip"
           >
-            <span class="mt-tile" :aria-label="`${kit.name}: ${kit.retired ? 'retired ' : ''}${kit.pos}${kit.tier}`">
+            <span
+              v-if="isRanked(kit)"
+              class="mt-tile"
+              :aria-label="`${kit.name}: ${kit.retired ? 'retired ' : ''}${kit.pos}${kit.tier}`"
+            >
               <img class="mt-kit-icon" :src="kit.iconUrl" alt="" draggable="false" @error="hideBrokenImage" />
               <strong class="mt-tier">
                 <span v-if="kit.retired" class="mt-retired">R</span>{{ kit.pos }}{{ kit.tier }}
               </strong>
             </span>
-          </li>
-
-          <li
-            v-for="(kit, index) in tierProfile.unranked"
-            :key="`${activeId}-${kit.slug}`"
-            class="mt-cell"
-            :style="{ '--delay': `${(tierProfile.ranked.length + index) * 40}ms` }"
-            @mouseenter="onTileMouse(kit, $event)"
-            @mousemove="activeId === 'cistiers' && onTileMouse(kit, $event)"
-            @mouseleave="hideTip"
-          >
-            <span class="mt-slot" :aria-label="`${kit.name}: not tested`">
+            <span v-else class="mt-slot" :aria-label="`${kit.name}: not tested`">
               <img class="mt-kit-icon is-muted" :src="kit.iconUrl" alt="" draggable="false" @error="hideBrokenImage" />
+              <strong v-if="activeId === 'cistiers'" class="mt-tier" aria-hidden="true">—</strong>
             </span>
           </li>
         </template>
@@ -502,6 +497,54 @@ const hideBrokenImage = (event: Event): void => {
 
 .mt-retired {
   opacity: 0.6;
+}
+
+/* CISTiers — плитки как на cistiers.com: цвет кита поверх тёмного градиента, иконка прямо над тиром,
+   без наклона; непройденный кит — полупрозрачная плитка с прочерком.
+   Плитка — контейнер, поэтому размеры в cqi считаются от её ширины и пропорции как на сайте */
+.is-cistiers .mt-cell {
+  container-type: inline-size;
+}
+
+.is-cistiers .mt-tile,
+.is-cistiers .mt-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8cqi;
+  border: 0;
+  border-radius: 21cqi;
+  background:
+    linear-gradient(color-mix(in srgb, var(--kit) 28%, transparent), color-mix(in srgb, var(--kit) 15%, transparent)),
+    linear-gradient(#252525, #1e1e1e);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.035);
+}
+
+.is-cistiers .mt-slot {
+  background: linear-gradient(#252525, #1e1e1e);
+  opacity: 0.5;
+}
+
+.is-cistiers .mt-kit-icon,
+.is-cistiers .mt-kit-icon.is-muted {
+  position: static;
+  width: 54cqi;
+  height: 54cqi;
+  transform: none;
+  opacity: 1;
+  filter: none;
+}
+
+.is-cistiers .mt-tier {
+  position: static;
+  font-size: 32cqi;
+  line-height: 1.25;
+  color: #fff;
+}
+
+.is-cistiers .mt-slot .mt-tier {
+  color: #808080;
 }
 
 

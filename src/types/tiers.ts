@@ -28,8 +28,8 @@ export interface TierProfile {
   nickname: string
   rank: number | null
   points: number
-  ranked: KitTier[]
-  unranked: UnrankedKit[]
+  // Плитки по порядку: MyTiers — сначала тиры по очкам, CISTiers — как на их сайте
+  kits: Array<KitTier | UnrankedKit>
 }
 
 export interface TierSourceState {

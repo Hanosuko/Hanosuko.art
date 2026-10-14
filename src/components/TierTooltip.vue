@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import type { KitTier, TierSource, UnrankedKit } from '@/types/tiers'
-import { parseTier, tierPoints } from '@/utils/tiers'
+import { isRanked, parseTier, tierPoints } from '@/utils/tiers'
 
 // Подсказка над плиткой тира, в стиле сайта-источника:
 // mytiers — над плиткой со стрелкой: «High Tier 3», очки, Peak, если пик выше;
@@ -12,8 +12,6 @@ const props = defineProps<{
   x: number
   y: number
 }>()
-
-const isRanked = (kit: KitTier | UnrankedKit): kit is KitTier => 'tier' in kit
 
 const pointsText = (points: number): string => `${points} ${points === 1 ? 'point' : 'points'}`
 const tierName = (pos: string, tier: number): string => `${pos === 'HT' ? 'High' : 'Low'} Tier ${tier}`

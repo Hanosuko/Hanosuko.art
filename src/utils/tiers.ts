@@ -1,4 +1,4 @@
-import type { KitTier, TierPosition, TierSource } from '@/types/tiers'
+import type { KitTier, TierPosition, TierSource, UnrankedKit } from '@/types/tiers'
 
 // Иконки китов лежат в проекте: src/assets/tiers/<mytiers|cistiers>/<slug кита>.svg|png|webp
 const kitIconFiles = import.meta.glob('/src/assets/tiers/*/*.{svg,png,webp}', {
@@ -64,6 +64,8 @@ export const tierPoints = (parsed: ParsedTier): number => TIER_POINTS[parsed.tie
 
 export const tierColor = (parsed: ParsedTier): string =>
   TIER_FALLBACK_COLORS[tierLabel(parsed)] ?? '#b1c0cc'
+
+export const isRanked = (kit: KitTier | UnrankedKit): kit is KitTier => 'tier' in kit
 
 // Сначала самые дорогие тиры; sort стабильный, поэтому при равенстве сохраняется порядок китов
 export const sortByPoints = (kits: KitTier[]): KitTier[] => kits.sort((a, b) => b.points - a.points)
