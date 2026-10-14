@@ -10,7 +10,6 @@ export interface KitTier {
   slug: string
   name: string
   iconUrl: string
-  discordUrl: string | null
   color: string
   tier: number
   pos: TierPosition

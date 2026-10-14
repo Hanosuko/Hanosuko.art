@@ -65,7 +65,7 @@ const onTabsKeydown = (event: KeyboardEvent): void => {
 
 const SKELETON_SLOTS = 10
 
-// --- Подсказка при наведении на тир (только для мыши: на тач-экранах плитка — просто ссылка) ---
+// --- Подсказка при наведении на тир (только для мыши) ---
 const canHover = window.matchMedia('(hover: hover)').matches
 const tip = ref<{ kit: KitTier | UnrankedKit; x: number; y: number } | null>(null)
 
@@ -73,25 +73,15 @@ const hideTip = (): void => {
   tip.value = null
 }
 
-// MyTiers — над центром плитки, CISTiers — на 45px ниже курсора (или под плиткой при фокусе с клавиатуры)
-const showTipAt = (kit: KitTier | UnrankedKit, target: Element, pointer?: MouseEvent): void => {
-  if (!canHover && pointer) return
-  const rect = target.getBoundingClientRect()
-  if (activeId.value === 'mytiers') {
-    tip.value = { kit, x: rect.left + rect.width / 2, y: rect.top - 12 }
-  } else if (pointer) {
-    tip.value = { kit, x: pointer.clientX, y: pointer.clientY + 45 }
-  } else {
-    tip.value = { kit, x: rect.left + rect.width / 2, y: rect.bottom + 8 }
-  }
-}
-
+// MyTiers — над центром плитки, CISTiers — на 45px ниже курсора
 const onTileMouse = (kit: KitTier | UnrankedKit, event: MouseEvent): void => {
-  showTipAt(kit, event.currentTarget as Element, event)
-}
-
-const onTileFocus = (kit: KitTier | UnrankedKit, event: FocusEvent): void => {
-  showTipAt(kit, event.currentTarget as Element)
+  if (!canHover) return
+  if (activeId.value === 'mytiers') {
+    const rect = (event.currentTarget as Element).getBoundingClientRect()
+    tip.value = { kit, x: rect.left + rect.width / 2, y: rect.top - 12 }
+  } else {
+    tip.value = { kit, x: event.clientX, y: event.clientY + 45 }
+  }
 }
 
 // Подсказка привязана к экрану (position: fixed) — при прокрутке и смене вкладки прячем
@@ -189,22 +179,13 @@ const hideBrokenImage = (event: Event): void => {
             @mouseenter="onTileMouse(kit, $event)"
             @mousemove="activeId === 'cistiers' && onTileMouse(kit, $event)"
             @mouseleave="hideTip"
-            @focusin="onTileFocus(kit, $event)"
-            @focusout="hideTip"
           >
-            <component
-              :is="kit.discordUrl ? 'a' : 'span'"
-              class="mt-tile"
-              :href="kit.discordUrl ?? undefined"
-              :target="kit.discordUrl ? '_blank' : undefined"
-              :rel="kit.discordUrl ? 'noopener noreferrer' : undefined"
-              :aria-label="`${kit.name}: ${kit.retired ? 'retired ' : ''}${kit.pos}${kit.tier}`"
-            >
+            <span class="mt-tile" :aria-label="`${kit.name}: ${kit.retired ? 'retired ' : ''}${kit.pos}${kit.tier}`">
               <img class="mt-kit-icon" :src="kit.iconUrl" alt="" draggable="false" @error="hideBrokenImage" />
               <strong class="mt-tier">
                 <span v-if="kit.retired" class="mt-retired">R</span>{{ kit.pos }}{{ kit.tier }}
               </strong>
-            </component>
+            </span>
           </li>
 
           <li
@@ -512,9 +493,10 @@ const hideBrokenImage = (event: Event): void => {
   }
 }
 
-.mt-tile:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--kit) 70%, #fff);
-  outline-offset: 2px;
+/* Плитка никуда не ведёт: клик только «нажимает» её */
+.mt-cell:active .mt-tile {
+  transform: translateY(-1px) scale(0.96);
+  transition-duration: 0.08s;
 }
 
 .mt-state {

@@ -5,7 +5,6 @@ export interface CistiersKit {
   name: string
   iconUrl: string | null
   color: string | null
-  discordUrl: string | null
   tier: string | null
   points: number
 }

@@ -37,7 +37,6 @@ export function useMyTiers(settings: MyTiersSettings): TierSourceState {
         slug: guild.slug,
         name: guild.name,
         iconUrl: iconUrlFor(guild),
-        discordUrl: guild.discord_url,
         color: settings.kitColors[guild.slug] ?? tierColor(parsed),
         ...parsed,
         peak: peak ? tierLabel(peak) : null,

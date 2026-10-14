@@ -27,7 +27,6 @@ export function useCistiers(settings: CistiersSettings): TierSourceState {
         slug: kit.slug,
         name: kit.name,
         iconUrl,
-        discordUrl: kit.discordUrl,
         color: kit.color ?? tierColor(parsed),
         ...parsed,
         peak: null,

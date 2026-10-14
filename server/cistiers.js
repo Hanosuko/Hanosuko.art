@@ -111,7 +111,6 @@ export const createCistiersClient = ({ userAgent = DEFAULT_USER_AGENT } = {}) =>
             name: list.display_name,
             iconUrl: list.icon || null,
             color: list.color || null,
-            discordUrl: list.discord_url || null,
             tier,
             points: tier ? (snap.tierPoints[tier] ?? 0) : 0,
           }
