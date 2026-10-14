@@ -1,0 +1,10 @@
+.git
+node_modules
+dist
+dist-tsc
+server/node_modules
+server/data
+server/.env
+.env
+*.local
+.DS_Store

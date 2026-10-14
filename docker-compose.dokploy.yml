@@ -1,0 +1,81 @@
+# Стек для Dokploy (Compose → composePath: ./docker-compose.dokploy.yml).
+# Маршрутизация через traefik-лейблы ниже: hanosuko.art → frontend:80, hanosuko.art/api → backend:3000.
+# Переменная IP_SALT (и при желании CISTIERS_USER_AGENT) задаётся в Dokploy → Environment.
+name: hanosuko-art
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: deploy/docker/backend.Dockerfile
+    image: hanosuko-art-backend:latest
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      DB_PATH: /data/views.sqlite
+      IP_SALT: ${IP_SALT}
+      CISTIERS_USER_AGENT: ${CISTIERS_USER_AGENT:-Hanosuko.art/1.0 (+https://hanosuko.art)}
+    volumes:
+      - hanosuko-art-data:/data
+    networks:
+      - dokploy-network
+      - default
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    labels:
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.hanosuko-art-negdhl-5-web.rule=Host(`hanosuko.art`) && PathPrefix(`/api`)
+      - traefik.http.routers.hanosuko-art-negdhl-5-web.entrypoints=web
+      - traefik.http.services.hanosuko-art-negdhl-5-web.loadbalancer.server.port=3000
+      - traefik.http.routers.hanosuko-art-negdhl-5-web.service=hanosuko-art-negdhl-5-web
+      - traefik.http.routers.hanosuko-art-negdhl-5-web.middlewares=redirect-to-https@file
+      - traefik.http.routers.hanosuko-art-negdhl-5-websecure.rule=Host(`hanosuko.art`) && PathPrefix(`/api`)
+      - traefik.http.routers.hanosuko-art-negdhl-5-websecure.entrypoints=websecure
+      - traefik.http.services.hanosuko-art-negdhl-5-websecure.loadbalancer.server.port=3000
+      - traefik.http.routers.hanosuko-art-negdhl-5-websecure.service=hanosuko-art-negdhl-5-websecure
+      - traefik.http.routers.hanosuko-art-negdhl-5-websecure.tls.certresolver=letsencrypt
+      - traefik.enable=true
+
+  frontend:
+    build:
+      context: .
+      dockerfile: deploy/docker/frontend.Dockerfile
+    image: hanosuko-art-frontend:latest
+    restart: unless-stopped
+    networks:
+      - dokploy-network
+      - default
+    expose:
+      - "80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    labels:
+      - traefik.docker.network=dokploy-network
+      - traefik.http.routers.hanosuko-art-negdhl-6-web.rule=Host(`hanosuko.art`)
+      - traefik.http.routers.hanosuko-art-negdhl-6-web.entrypoints=web
+      - traefik.http.services.hanosuko-art-negdhl-6-web.loadbalancer.server.port=80
+      - traefik.http.routers.hanosuko-art-negdhl-6-web.service=hanosuko-art-negdhl-6-web
+      - traefik.http.routers.hanosuko-art-negdhl-6-web.middlewares=redirect-to-https@file
+      - traefik.http.routers.hanosuko-art-negdhl-6-websecure.rule=Host(`hanosuko.art`)
+      - traefik.http.routers.hanosuko-art-negdhl-6-websecure.entrypoints=websecure
+      - traefik.http.services.hanosuko-art-negdhl-6-websecure.loadbalancer.server.port=80
+      - traefik.http.routers.hanosuko-art-negdhl-6-websecure.service=hanosuko-art-negdhl-6-websecure
+      - traefik.http.routers.hanosuko-art-negdhl-6-websecure.tls.certresolver=letsencrypt
+      - traefik.enable=true
+
+volumes:
+  hanosuko-art-data:
+
+networks:
+  dokploy-network:
+    external: true
