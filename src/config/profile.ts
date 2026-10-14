@@ -38,21 +38,12 @@ export const profile: Profile = {
     // 👇 ИНТЕГРАЦИИ (Connections) в порядке Discord. Публичного API у Discord для них нет, поэтому вручную.
     // url не указан — ник без стрелки. Цифры TikTok сверены с tiktok.com/@hanosuko 14.10.2026
     connections: [
-      { type: 'epicgames', name: 'ZNT Hanosuko' },
-      {
-        type: 'steam',
-        name: 'TeroserPlay',
-        url: 'https://steamcommunity.com/profiles/76561199004517134',
-        metadata: { created_at: '2019-11-23T14:09:01', game_count: 22, item_count_dota2: 353, item_count_tf2: 0 },
-      },
       {
         type: 'tiktok',
         name: 'hanosuko',
         url: 'https://www.tiktok.com/@hanosuko',
         metadata: { follower_count: 6763, following_count: 97, likes_count: 463917 },
       },
-      { type: 'twitch', name: 'ssccally', url: 'https://www.twitch.tv/ssccally' },
-      { type: 'xbox', name: 'Hanosuko' },
       { type: 'youtube', name: 'Hanosuko', url: 'https://www.youtube.com/channel/UCOOGHlOMbu1w6lRph7bP_Jg' },
     ],
     // 👇 ЭФФЕКТ ПРОФИЛЯ «Поиграем?» (Let's Play) — анимация поверх карточки, тайминги как в Discord.
@@ -89,7 +80,6 @@ export const profile: Profile = {
     { kind: 'telegram', url: 'https://t.me/hanosuko', label: 'Telegram' },
     { kind: 'github', url: 'https://github.com/hanosuko', label: 'GitHub' },
     { kind: 'namemc', url: 'https://namemc.com/profile/Hanosuko', label: 'NameMC' },
-    { kind: 'modrinth', url: 'https://modrinth.com/user/hanosuko', label: 'Modrinth' },
   ],
 
   // 👇 КАСТОМНЫЕ ССЫЛКИ — любые произвольные. enabled: false скрывает ссылку.
