@@ -8,6 +8,8 @@ import { useMyTiers } from '@/composables/useMyTiers'
 import { useCistiers } from '@/composables/useCistiers'
 import type { KitTier, TierSource, TierSourceState, UnrankedKit } from '@/types/tiers'
 import TierTooltip from '@/components/TierTooltip.vue'
+import mytiersLogo from '@/assets/tiers/mytiers-logo.svg'
+import cistiersLogo from '@/assets/tiers/cistiers-logo.png'
 
 // 👇 Ники, сайты и цвета китов — в src/config/profile.ts → mytiers и cistiers
 const { mytiers, cistiers } = profile
@@ -22,12 +24,12 @@ const tabs: TierTab[] = [
   {
     id: 'mytiers',
     label: 'MyTiers',
-    iconUrl: new URL('/tier_icons/overall.svg', mytiers.siteUrl).href,
+    iconUrl: mytiersLogo,
     ...useMyTiers(mytiers),
   },
 ]
 if (cistiers) {
-  tabs.push({ id: 'cistiers', label: 'CISTiers', iconUrl: '/brands/cistiers.png', ...useCistiers(cistiers) })
+  tabs.push({ id: 'cistiers', label: 'CISTiers', iconUrl: cistiersLogo, ...useCistiers(cistiers) })
 }
 
 const activeId = ref<TierSource>(tabs[0].id)

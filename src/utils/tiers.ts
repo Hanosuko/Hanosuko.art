@@ -1,4 +1,20 @@
-import type { KitTier, TierPosition } from '@/types/tiers'
+import type { KitTier, TierPosition, TierSource } from '@/types/tiers'
+
+// Иконки китов лежат в проекте: src/assets/tiers/<mytiers|cistiers>/<slug кита>.svg|png|webp
+const kitIconFiles = import.meta.glob('/src/assets/tiers/*/*.{svg,png,webp}', {
+  eager: true,
+  import: 'default',
+  query: '?url',
+}) as Record<string, string>
+
+// /src/assets/tiers/mytiers/sword.svg → mytiers/sword
+const kitIcons = new Map(
+  Object.entries(kitIconFiles).map(([path, url]) => [path.replace(/^.*\/tiers\/|\.\w+$/g, '').toLowerCase(), url]),
+)
+
+// Нет файла (на сайте появился новый кит) — undefined, тогда берётся иконка с сайта тир-листа
+export const localKitIcon = (source: TierSource, slug: string): string | undefined =>
+  kitIcons.get(`${source}/${slug.toLowerCase()}`)
 
 // Очки за тир — одинаковые на MyTiers и CISTiers
 const TIER_POINTS: Record<number, Record<TierPosition, number>> = {

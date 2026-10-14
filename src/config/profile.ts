@@ -121,7 +121,8 @@ export const profile: Profile = {
   },
 
   // 👇 БЛОК MYTIERS: тиры, ранг и скин тянутся напрямую из https://mytiers.ru/api.
-  // Меняй username на свой ник на mytiers.ru. Список китов и их иконки берутся с сайта.
+  // Меняй username на свой ник на mytiers.ru. Список китов берётся с сайта, а иконки лежат в проекте:
+  // src/assets/tiers/mytiers/<slug кита>.svg (новый кит без файла получит иконку с сайта)
   mytiers: {
     username: 'Hanosuko',
     siteUrl: 'https://mytiers.ru',
@@ -144,6 +145,7 @@ export const profile: Profile = {
   // 👇 ВКЛАДКА CISTIERS в карточке тиров. Тиры берутся из публичного API cistiers.com
   // через наш сервер (/api/cistiers): у CISTiers нет CORS, напрямую из браузера нельзя.
   // В dev отвечает сам Vite. Удали этот блок — останется только MyTiers.
+  // Иконки китов — src/assets/tiers/cistiers/<slug кита>.webp, логотипы вкладок — src/assets/tiers/
   cistiers: {
     username: 'Hanosuko',
     apiUrl: '/api/cistiers',

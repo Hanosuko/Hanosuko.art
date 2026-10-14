@@ -2,7 +2,7 @@ import { computed, ref, shallowRef } from 'vue'
 import type { MyTiersGuild, MyTiersGuildsResponse, MyTiersPlayer } from '@/types/mytiers'
 import type { MyTiersSettings } from '@/types/profile'
 import type { KitTier, TierProfile, TierSourceState, UnrankedKit } from '@/types/tiers'
-import { parseTier, sortByPoints, tierColor, tierLabel, tierPoints } from '@/utils/tiers'
+import { localKitIcon, parseTier, sortByPoints, tierColor, tierLabel, tierPoints } from '@/utils/tiers'
 
 const getJson = async <T>(url: string): Promise<T> => {
   const response = await fetch(url, { headers: { accept: 'application/json' } })
@@ -18,7 +18,7 @@ export function useMyTiers(settings: MyTiersSettings): TierSourceState {
   const error = ref<string | null>(null)
 
   const iconUrlFor = (guild: MyTiersGuild): string =>
-    new URL(guild.logo_url ?? '/tier_icons/overall.svg', settings.siteUrl).href
+    localKitIcon('mytiers', guild.slug) ?? new URL(guild.logo_url ?? '/tier_icons/overall.svg', settings.siteUrl).href
 
   const profile = computed<TierProfile | null>(() => {
     const current = player.value
