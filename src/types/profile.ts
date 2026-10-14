@@ -109,6 +109,8 @@ export interface ServerSettings {
   name: string
   address: string
   websiteUrl?: string
+  // Логотип плитки; без него — иконка сервера из майнкрафта (с mcsrvstat.us)
+  logoUrl?: string
 }
 
 export interface CistiersSettings {

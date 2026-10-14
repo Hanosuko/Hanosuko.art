@@ -154,10 +154,12 @@ export const profile: Profile = {
 
   // 👇 СТАТУС MINECRAFT-СЕРВЕРА: короткая плитка с онлайном и кнопкой сайта.
   // Данные — с api.mcsrvstat.us (обновляются раз в 2,5 минуты). Выключить — features.serverStatus.
+  // Логотип — фавикон www.cisprac.xyz, лежит в public/brands/
   server: {
     name: 'CISPractice',
     address: 'cisprac.xyz',
     websiteUrl: 'https://www.cisprac.xyz/',
+    logoUrl: '/brands/cispractice.webp',
   },
 
   // 👇 ПАРТНЁРЫ — короткие плашки в ряд под карточкой тиров

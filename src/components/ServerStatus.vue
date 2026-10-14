@@ -32,7 +32,8 @@ const siteHost = server.websiteUrl ? new URL(server.websiteUrl).host.replace(/^w
 <template>
   <!-- Короткая плитка: иконка, онлайн и ссылка на сайт -->
   <section class="srv glass-card" :aria-label="`${server.name} server status`">
-    <img v-if="status?.icon" class="srv-icon" :src="status.icon" alt="" />
+    <img v-if="server.logoUrl" class="srv-icon is-logo" :src="server.logoUrl" alt="" />
+    <img v-else-if="status?.icon" class="srv-icon" :src="status.icon" alt="" />
     <span v-else class="srv-icon is-empty" aria-hidden="true" />
 
     <div class="srv-main">
@@ -85,6 +86,13 @@ const siteHost = server.websiteUrl ? new URL(server.websiteUrl).host.replace(/^w
   border-radius: 0.6rem;
   image-rendering: pixelated;
   background: rgba(255, 255, 255, 0.06);
+}
+
+/* Логотип с сайта гладкий, а не пиксельный, и не прилипает к краям плашки */
+.srv-icon.is-logo {
+  padding: 0.45rem;
+  object-fit: contain;
+  image-rendering: auto;
 }
 
 .srv-main {
