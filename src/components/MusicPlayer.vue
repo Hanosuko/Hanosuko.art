@@ -486,8 +486,8 @@ onBeforeUnmount(() => {
 .volume-popover {
   position: absolute;
   bottom: calc(100% + 0.5rem);
-  left: 50%;
-  transform: translateX(-50%);
+  /* Кнопка стоит у правого края плитки — поповер раскрывается влево, внутрь карточки */
+  right: -0.35rem;
   padding: 0.65rem 0.55rem;
   background: rgba(15, 15, 20, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -502,8 +502,8 @@ onBeforeUnmount(() => {
   content: '';
   position: absolute;
   top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  /* Хвостик — над центром кнопки (1rem — половина её ширины) */
+  right: calc(0.35rem + 1rem - 5px);
   border: 5px solid transparent;
   border-top-color: rgba(15, 15, 20, 0.92);
 }
@@ -555,7 +555,7 @@ onBeforeUnmount(() => {
 .volume-pop-enter-from,
 .volume-pop-leave-to {
   opacity: 0;
-  transform: translateX(-50%) translateY(4px) scale(0.95);
+  transform: translateY(4px) scale(0.95);
 }
 
 /* Тач-экраны: громкость регулируется кнопками телефона, оставляем только mute */

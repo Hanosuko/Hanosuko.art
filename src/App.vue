@@ -99,8 +99,15 @@ useAnimatedTitle(profile.identity.nickname)
 /* Каждая плитка — контейнер: блоки подстраиваются под ширину своей ячейки, а не экрана */
 .bento-col > :deep(*),
 .bento > :deep(.bento-wide) {
+  position: relative;
   min-width: 0;
   container-type: inline-size;
+}
+
+/* Подсказки и поповеры плитки под курсором не прячутся под соседними плитками */
+.bento-col > :deep(*:hover),
+.bento-col > :deep(*:focus-within) {
+  z-index: 2;
 }
 
 /* Телефон: одна лента — профиль, тиры, плашки, плеер, сервер, фото, сетап */
