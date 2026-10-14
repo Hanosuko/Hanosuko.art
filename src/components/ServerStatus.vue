@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { ArrowUpRight, Globe } from 'lucide-vue-next'
+import { computed, ref } from 'vue'
+import { ArrowUpRight } from 'lucide-vue-next'
+import { Earth, Globe } from 'lucide'
+import { MorphIcon } from 'morphicons/vue'
 import { profile } from '@/config/profile'
 import { useServerStatus } from '@/composables/useServerStatus'
 
@@ -20,6 +22,9 @@ const statusLabel = computed(() => {
   if (!status.value) return 'checking…'
   return isOnline.value ? 'online' : 'offline'
 })
+
+// Наведение на кнопку сайта: глобус перетекает в Землю
+const siteHover = ref(false)
 
 const siteHost = server.websiteUrl ? new URL(server.websiteUrl).host.replace(/^www\./, '') : null
 </script>
@@ -51,8 +56,12 @@ const siteHost = server.websiteUrl ? new URL(server.websiteUrl).host.replace(/^w
       target="_blank"
       rel="noopener noreferrer"
       :aria-label="`${server.name} website`"
+      @pointerenter="siteHover = true"
+      @pointerleave="siteHover = false"
+      @focus="siteHover = true"
+      @blur="siteHover = false"
     >
-      <Globe :size="16" aria-hidden="true" />
+      <MorphIcon :icon="siteHover ? Earth : Globe" :size="16" spring="smooth" reduced-motion="user" />
       <span class="srv-site-host">{{ siteHost }}</span>
       <ArrowUpRight :size="14" class="srv-site-arrow" aria-hidden="true" />
     </a>

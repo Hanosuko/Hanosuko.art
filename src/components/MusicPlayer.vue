@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
-import { Music, Pause, Play, Shuffle, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-vue-next'
+import { Shuffle, SkipBack, SkipForward } from 'lucide-vue-next'
+// Данные иконок для morphicons: иконки не меняются скачком, а перетекают одна в другую
+import { AudioLines, Music, Pause, Play, Volume2, VolumeX } from 'lucide'
+import { MorphIcon } from 'morphicons/vue'
 import { profile } from '@/config/profile'
 import { usePlaylist } from '@/composables/usePlaylist'
 
@@ -231,7 +234,7 @@ onBeforeUnmount(() => {
     />
 
     <header class="player-head">
-      <Music :size="16" class="player-music" :class="{ spinning: isPlaying }" aria-hidden="true" />
+      <MorphIcon :icon="isPlaying ? AudioLines : Music" :size="16" spring="bouncy" reduced-motion="user" class="player-music" />
       <span class="player-title">{{ currentTrack?.title ?? 'No track' }}</span>
       <span class="equalizer" :class="{ active: isPlaying }" aria-hidden="true">
         <span class="eq-bar" />
@@ -262,8 +265,7 @@ onBeforeUnmount(() => {
         <SkipBack :size="16" aria-hidden="true" />
       </button>
       <button type="button" class="player-button primary" :aria-label="isPlaying ? 'Pause' : 'Play'" @click="togglePlay">
-        <Pause v-if="isPlaying" :size="18" aria-hidden="true" />
-        <Play v-else :size="18" aria-hidden="true" />
+        <MorphIcon :icon="isPlaying ? Pause : Play" :size="18" spring="snappy" reduced-motion="user" />
       </button>
       <button type="button" class="player-button" aria-label="Next track" @click="next">
         <SkipForward :size="16" aria-hidden="true" />
@@ -280,8 +282,7 @@ onBeforeUnmount(() => {
           :aria-label="isMuted ? 'Unmute' : 'Mute'"
           @click="toggleMute"
         >
-          <VolumeX v-if="isMuted || volumeLevel === 0" :size="16" aria-hidden="true" />
-          <Volume2 v-else :size="16" aria-hidden="true" />
+          <MorphIcon :icon="isMuted || volumeLevel === 0 ? VolumeX : Volume2" :size="16" spring="snappy" reduced-motion="user" />
         </button>
         <Transition name="volume-pop">
           <div v-if="volumeOpen" class="volume-popover" @click.stop>
@@ -303,7 +304,7 @@ onBeforeUnmount(() => {
   </section>
 
   <section v-else-if="manifestError" class="player glass-card error">
-    <Music :size="14" aria-hidden="true" />
+    <MorphIcon :icon="Music" :size="14" />
     <span>music unavailable</span>
   </section>
 </template>
@@ -338,17 +339,6 @@ onBeforeUnmount(() => {
 .player-music {
   color: var(--color-accent);
   flex-shrink: 0;
-  transition: transform 0.4s ease;
-}
-
-.player-music.spinning {
-  animation: music-spin 4s linear infinite;
-}
-
-@keyframes music-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .equalizer {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import { Eye } from 'lucide-vue-next'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { Eye, EyeClosed } from 'lucide'
+import { MorphIcon } from 'morphicons/vue'
 import { useViewCounter } from '@/composables/useViewCounter'
 
 const { total, error, register } = useViewCounter('/api/views')
@@ -10,14 +11,31 @@ const formatted = computed(() => {
   return new Intl.NumberFormat('en-US').format(total.value)
 })
 
+// Глаз изредка моргает: открытый → закрытый → открытый
+const blinking = ref(false)
+let blinkTimer: number | undefined
+
+const scheduleBlink = (): void => {
+  blinkTimer = window.setTimeout(() => {
+    blinking.value = true
+    blinkTimer = window.setTimeout(() => {
+      blinking.value = false
+      scheduleBlink()
+    }, 180)
+  }, 3500 + Math.random() * 3000)
+}
+
 onMounted(() => {
   void register()
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) scheduleBlink()
 })
+
+onBeforeUnmount(() => window.clearTimeout(blinkTimer))
 </script>
 
 <template>
   <div class="view-counter">
-    <Eye :size="14" aria-hidden="true" />
+    <MorphIcon :icon="blinking ? EyeClosed : Eye" :size="14" spring="snappy" />
     <span v-if="!error">{{ formatted }} views</span>
     <span v-else>— views</span>
   </div>

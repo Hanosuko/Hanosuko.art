@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { AlertCircle, Check, Copy, ExternalLink, RotateCw } from 'lucide-vue-next'
+import { AlertCircle, ExternalLink, RotateCw } from 'lucide-vue-next'
+import { Check, Copy } from 'lucide'
+import { MorphIcon } from 'morphicons/vue'
 import { profile } from '@/config/profile'
 import { useMyTiers } from '@/composables/useMyTiers'
 import { useCistiers } from '@/composables/useCistiers'
@@ -230,8 +232,7 @@ const hideBrokenImage = (event: Event): void => {
           :title="copied ? 'Copied' : 'Copy nickname'"
           @click="copyNickname"
         >
-          <Check v-if="copied" :size="16" aria-hidden="true" />
-          <Copy v-else :size="16" aria-hidden="true" />
+          <MorphIcon :icon="copied ? Check : Copy" :size="16" spring="bouncy" reduced-motion="user" />
         </button>
         <a
           class="mt-action is-square mt-namemc"

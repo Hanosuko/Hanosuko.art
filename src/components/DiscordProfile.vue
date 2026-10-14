@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { ArrowUpRight, Link2 } from 'lucide-vue-next'
+import { computed, ref } from 'vue'
+import { Link2 } from 'lucide-vue-next'
+import { ArrowRight, ArrowUpRight } from 'lucide'
+import { MorphIcon } from 'morphicons/vue'
 import { profile } from '@/config/profile'
 import type { SocialLink } from '@/types/profile'
 import { useDiscordProfile } from '@/composables/useDiscordProfile'
@@ -94,6 +96,9 @@ const connectionRows: ConnectionRow[] = [
   ...profile.social.filter((link) => link.url.trim().length > 0 && !covered.has(link.kind)).map(socialRow),
 ]
 
+// Ссылка интеграции под курсором: её стрелка поворачивается вправо
+const hoveredConnection = ref<string | null>(null)
+
 const hideBrokenImage = (event: Event): void => {
   ;(event.target as HTMLImageElement).style.visibility = 'hidden'
 }
@@ -183,9 +188,25 @@ const hideBrokenImage = (event: Event): void => {
               <Link2 v-else :size="18" aria-hidden="true" />
             </span>
             <div class="dc-connection-body">
-              <a v-if="row.url" class="dc-connection-name" :href="row.url" target="_blank" rel="noopener noreferrer">
+              <a
+                v-if="row.url"
+                class="dc-connection-name"
+                :href="row.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                @pointerenter="hoveredConnection = row.key"
+                @pointerleave="hoveredConnection = null"
+                @focus="hoveredConnection = row.key"
+                @blur="hoveredConnection = null"
+              >
                 <span>{{ row.name }}</span>
-                <ArrowUpRight :size="18" :stroke-width="2.4" aria-hidden="true" />
+                <MorphIcon
+                  :icon="hoveredConnection === row.key ? ArrowRight : ArrowUpRight"
+                  :size="16"
+                  :stroke-width="2.4"
+                  spring="snappy"
+                  reduced-motion="user"
+                />
               </a>
               <span v-else class="dc-connection-name">{{ row.name }}</span>
               <p v-if="row.since" class="dc-connection-line">Member since {{ dateFormat.format(row.since) }}</p>
