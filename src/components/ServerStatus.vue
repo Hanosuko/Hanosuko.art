@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { ArrowUpRight } from 'lucide-vue-next'
-import { Earth, Globe } from 'lucide'
+import { computed, onBeforeUnmount, ref } from 'vue'
+import { Check, Copy } from 'lucide'
 import { MorphIcon } from 'morphicons/vue'
 import { profile } from '@/config/profile'
 import { useServerStatus } from '@/composables/useServerStatus'
 
-// 👇 Адрес сервера и сайт — в src/config/profile.ts → server
+// 👇 Адрес сервера и логотип — в src/config/profile.ts → server
 const server = profile.server
 
 const { status } = useServerStatus(server.address)
@@ -17,14 +16,30 @@ const fill = computed(() => {
   return current && current.max > 0 ? Math.min((current.online / current.max) * 100, 100) : 0
 })
 
-// Наведение на кнопку сайта: глобус перетекает в Землю
-const siteHover = ref(false)
+// Кнопка копирует IP: иконка перетекает в галочку, адрес уезжает вверх, снизу въезжает «IP copied!»
+const COPIED_TEXT = 'IP copied!'
+const copied = ref(false)
+let copiedTimer: number | undefined
 
-const siteHost = server.websiteUrl ? new URL(server.websiteUrl).host.replace(/^www\./, '') : null
+const copyIp = async (): Promise<void> => {
+  try {
+    await navigator.clipboard.writeText(server.address)
+  } catch {
+    return
+  }
+  copied.value = true
+  window.clearTimeout(copiedTimer)
+  copiedTimer = window.setTimeout(() => (copied.value = false), 1800)
+}
+
+onBeforeUnmount(() => window.clearTimeout(copiedTimer))
+
+// Невидимая подложка с текстом подлиннее держит ширину кнопки, пока надписи сменяют друг друга
+const sizerText = server.address.length >= COPIED_TEXT.length ? server.address : COPIED_TEXT
 </script>
 
 <template>
-  <!-- Короткая плитка: иконка, онлайн и ссылка на сайт -->
+  <!-- Короткая плитка: логотип, онлайн и кнопка «скопировать IP» -->
   <section class="srv glass-card" :aria-label="`${server.name} server status`">
     <img v-if="server.logoUrl" class="srv-icon is-logo" :src="server.logoUrl" alt="" />
     <img v-else-if="status?.icon" class="srv-icon" :src="status.icon" alt="" />
@@ -39,22 +54,22 @@ const siteHost = server.websiteUrl ? new URL(server.websiteUrl).host.replace(/^w
       </div>
     </div>
 
-    <a
-      v-if="server.websiteUrl"
-      class="srv-site"
-      :href="server.websiteUrl"
-      target="_blank"
-      rel="noopener noreferrer"
-      :aria-label="`${server.name} website`"
-      @pointerenter="siteHover = true"
-      @pointerleave="siteHover = false"
-      @focus="siteHover = true"
-      @blur="siteHover = false"
+    <button
+      type="button"
+      class="srv-copy"
+      :class="{ 'is-copied': copied }"
+      :title="copied ? COPIED_TEXT : `Copy server IP: ${server.address}`"
+      @click="copyIp"
     >
-      <MorphIcon :icon="siteHover ? Earth : Globe" :size="16" spring="smooth" reduced-motion="user" />
-      <span class="srv-site-host">{{ siteHost }}</span>
-      <ArrowUpRight :size="14" class="srv-site-arrow" aria-hidden="true" />
-    </a>
+      <MorphIcon :icon="copied ? Check : Copy" :size="16" spring="bouncy" reduced-motion="user" />
+      <span class="srv-copy-text">
+        <span class="srv-copy-sizer" aria-hidden="true">{{ sizerText }}</span>
+        <Transition name="srv-swap">
+          <span :key="copied ? 'copied' : 'ip'" class="srv-copy-label">{{ copied ? COPIED_TEXT : server.address }}</span>
+        </Transition>
+      </span>
+    </button>
+    <span class="sr-only" aria-live="polite">{{ copied ? COPIED_TEXT : '' }}</span>
   </section>
 </template>
 
@@ -134,7 +149,7 @@ const siteHost = server.websiteUrl ? new URL(server.websiteUrl).host.replace(/^w
   color: var(--color-text);
 }
 
-.srv-site {
+.srv-copy {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -146,43 +161,115 @@ const siteHost = server.websiteUrl ? new URL(server.websiteUrl).host.replace(/^w
   border: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(255, 255, 255, 0.05);
   color: var(--color-text);
+  font: inherit;
   font-size: 0.8rem;
   font-weight: 700;
+  cursor: pointer;
   transition:
     background 0.2s ease,
-    border-color 0.2s ease;
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease;
 }
 
-.srv-site-arrow {
-  color: var(--color-text-muted);
+.srv-copy:active {
+  transform: scale(0.95);
 }
 
-.srv-site:focus-visible {
+.srv-copy:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.5);
   outline-offset: 1px;
 }
 
 @media (hover: hover) {
-  .srv-site:hover {
+  .srv-copy:hover {
     background: rgba(255, 255, 255, 0.09);
     border-color: rgba(255, 255, 255, 0.14);
   }
 }
 
-/* Узкая плитка — от кнопки сайта остаётся только глобус, чтобы влезло название */
+/* Скопировано — кнопка подсвечивается зелёным и коротко «подпрыгивает» */
+.srv-copy.is-copied {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+  border-color: rgba(74, 222, 128, 0.35);
+  animation: srv-copied 0.35s ease;
+}
+
+/* Надписи лежат в одной клетке сетки и сменяют друг друга, ширину держит подложка */
+.srv-copy-text {
+  display: grid;
+  overflow: hidden;
+}
+
+.srv-copy-text > * {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+}
+
+.srv-copy-sizer {
+  visibility: hidden;
+}
+
+.srv-swap-enter-active,
+.srv-swap-leave-active {
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease;
+}
+
+.srv-swap-enter-from {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.srv-swap-leave-to {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+@keyframes srv-copied {
+  40% {
+    transform: scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .srv-copy.is-copied {
+    animation: none;
+  }
+
+  .srv-swap-enter-active,
+  .srv-swap-leave-active {
+    transition: opacity 0.15s ease;
+  }
+
+  .srv-swap-enter-from,
+  .srv-swap-leave-to {
+    transform: none;
+  }
+}
+
+/* Узкая плитка — плотнее отступы, чтобы влезли название, полоска и адрес */
 @container (max-width: 28rem) {
   .srv {
     gap: 0.7rem;
     padding: 0.8rem 0.85rem;
   }
 
-  .srv-site {
+  .srv-copy {
+    padding: 0 0.7rem;
+  }
+}
+
+/* Совсем узко — остаётся одна иконка, а «скопировано» показывает галочка и зелёный цвет */
+@container (max-width: 20rem) {
+  .srv-copy {
     width: 2.6rem;
     padding: 0;
   }
 
-  .srv-site-host,
-  .srv-site-arrow {
+  .srv-copy-text {
     display: none;
   }
 }

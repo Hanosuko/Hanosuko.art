@@ -152,13 +152,12 @@ export const profile: Profile = {
     siteUrl: 'https://cistiers.com',
   },
 
-  // 👇 СТАТУС MINECRAFT-СЕРВЕРА: короткая плитка с онлайном и кнопкой сайта.
+  // 👇 СТАТУС MINECRAFT-СЕРВЕРА: короткая плитка с онлайном и кнопкой «скопировать IP» (копирует address).
   // Данные — с api.mcsrvstat.us (обновляются раз в 2,5 минуты). Выключить — features.serverStatus.
   // Логотип — фавикон www.cisprac.xyz, лежит в public/brands/
   server: {
     name: 'CISPractice',
     address: 'cisprac.xyz',
-    websiteUrl: 'https://www.cisprac.xyz/',
     logoUrl: '/brands/cispractice.webp',
   },
 

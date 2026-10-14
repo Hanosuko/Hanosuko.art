@@ -107,8 +107,8 @@ export interface DiscordSettings {
 
 export interface ServerSettings {
   name: string
+  // IP для игроков: по нему проверяется онлайн, его копирует кнопка на плитке
   address: string
-  websiteUrl?: string
   // Логотип плитки; без него — иконка сервера из майнкрафта (с mcsrvstat.us)
   logoUrl?: string
 }
