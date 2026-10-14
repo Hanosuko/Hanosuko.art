@@ -1,4 +1,5 @@
 import type { Profile } from '@/types/profile'
+import { identity } from './identity'
 
 const photoAssets = import.meta.glob('/src/assets/photos/*.{avif,gif,jpeg,jpg,png,webp}', {
   eager: true,
@@ -10,15 +11,8 @@ const photoUrl = (filename: string): string =>
   photoAssets[`/src/assets/photos/${filename}`] ?? `/photos/${filename}`
 
 export const profile: Profile = {
-  // 👇 ОСНОВНАЯ ЛИЧНАЯ ИНФА — ник, аватар, статус
-  identity: {
-    nickname: 'Hanosuko',
-    // 👇 АВАТАР: вставь сюда URL картинки (Discord CDN или любой другой)
-    avatarUrl:
-      'https://cdn.discordapp.com/avatars/835533218869936168/906b3b525961914f00002aa737631332.webp',
-    // 👇 BIO/СТАТУС: био, о себе, для следующей строки используй \n
-    bio: 'CISPractice Owner\nMyTiers OP Manager',
-  },
+  // 👇 НИК, АВАТАР, «ОБО МНЕ» И АДРЕС САЙТА — в src/config/identity.ts
+  identity,
 
   // 👇 DISCORD-ПРОФИЛЬ: аватар, баннер, украшение, значки и клан подтягиваются по ID.
   // Статус, игры и Spotify в реальном времени — через Lanyard: зайди один раз на discord.gg/lanyard.

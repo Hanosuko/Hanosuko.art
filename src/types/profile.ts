@@ -98,12 +98,15 @@ export interface SetupSettings {
   specs: SetupSpecItem[]
 }
 
+export interface Identity {
+  nickname: string
+  avatarUrl: string
+  bio: string
+  siteUrl: string
+}
+
 export interface Profile {
-  identity: {
-    nickname: string
-    avatarUrl: string
-    bio: string
-  }
+  identity: Identity
   discord: DiscordSettings
   theme: ThemeColors
   background: BackgroundSettings
