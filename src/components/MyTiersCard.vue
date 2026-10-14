@@ -411,17 +411,26 @@ onMounted(() => {
   font-size: 0.8rem;
 }
 
-.mt-cell:hover .mt-tip,
+@media (hover: hover) {
+  .mt-cell:hover .mt-tip {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  .mt-cell:hover .mt-tile {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 22px color-mix(in srgb, var(--kit) 25%, transparent);
+  }
+}
+
 .mt-cell:focus-within .mt-tip {
   opacity: 1;
   transform: translate(-50%, 0);
 }
 
-.mt-cell:hover .mt-tile,
 .mt-tile:focus-visible {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--kit) 25%, transparent);
-  outline: none;
+  outline: 2px solid color-mix(in srgb, var(--kit) 70%, #fff);
+  outline-offset: 2px;
 }
 
 .mt-state {
@@ -466,6 +475,7 @@ onMounted(() => {
   color: var(--color-text-muted);
   font-size: 0.85rem;
   font-weight: 700;
+  white-space: nowrap;
   cursor: pointer;
   transition:
     color 0.2s ease,
@@ -511,6 +521,60 @@ onMounted(() => {
 @keyframes mt-pulse {
   50% {
     opacity: 0.45;
+  }
+}
+
+/* Узкая плитка (телефон, планшет) */
+@container (max-width: 26rem) {
+  .mt-banner {
+    height: 7.5rem;
+  }
+
+  .mt-brand {
+    top: 0.75rem;
+    right: 0.75rem;
+    height: 2.25rem;
+    padding: 0 0.9rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+  }
+
+  .mt-avatar-wrap {
+    width: 5.5rem;
+    height: 5.5rem;
+    margin: 3.5rem 0 0 1rem;
+  }
+
+  .mt-avatar {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .mt-panel {
+    margin: 0.5rem;
+    padding: 0.9rem 0.75rem 1rem;
+  }
+
+  .mt-name {
+    font-size: 1.4rem;
+  }
+
+  .mt-stats {
+    font-size: 0.75rem;
+  }
+
+  .mt-grid {
+    gap: 0.4rem;
+  }
+
+  .mt-tile,
+  .mt-slot {
+    border-radius: 0.75rem;
+  }
+
+  .mt-action {
+    height: 2.75rem;
+    font-size: 0.75rem;
   }
 }
 </style>

@@ -71,8 +71,10 @@ const partners = profile.partners
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.partner:hover .partner-icon-wrap {
-  transform: rotate(-12deg) scale(1.1);
+@media (hover: hover) {
+  .partner:hover .partner-icon-wrap {
+    transform: rotate(-12deg) scale(1.1);
+  }
 }
 
 .partner-icon {
@@ -108,7 +110,20 @@ const partners = profile.partners
   pointer-events: none;
 }
 
-.partner:hover .partner-shine {
-  left: 130%;
+@media (hover: hover) {
+  .partner:hover .partner-shine {
+    left: 130%;
+  }
+}
+
+@container (max-width: 24rem) {
+  .partner {
+    gap: 0.4rem;
+    padding: 0.65rem 0.5rem;
+  }
+
+  .partner-name {
+    font-size: 0.8rem;
+  }
 }
 </style>

@@ -556,4 +556,11 @@ onBeforeUnmount(() => {
   opacity: 0;
   transform: translateX(-50%) translateY(4px) scale(0.95);
 }
+
+/* Тач-экраны: громкость регулируется кнопками телефона, оставляем только mute */
+@media (hover: none) {
+  .volume-popover {
+    display: none;
+  }
+}
 </style>

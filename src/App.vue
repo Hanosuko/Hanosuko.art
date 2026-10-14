@@ -53,7 +53,12 @@ useAnimatedTitle(profile.identity.nickname)
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-  padding: 3rem 1.25rem 2rem;
+  /* env(safe-area-inset-*) — отступы под вырез и скругления экрана телефона */
+  padding:
+    max(3rem, env(safe-area-inset-top))
+    max(1.25rem, env(safe-area-inset-right))
+    max(2rem, env(safe-area-inset-bottom))
+    max(1.25rem, env(safe-area-inset-left));
 }
 
 .bento {
@@ -81,7 +86,9 @@ useAnimatedTitle(profile.identity.nickname)
 
 @media (max-width: 767px) {
   .page {
-    padding-top: 1.25rem;
+    gap: 1.5rem;
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+    padding-inline: max(0.75rem, env(safe-area-inset-left)) max(0.75rem, env(safe-area-inset-right));
   }
 }
 </style>

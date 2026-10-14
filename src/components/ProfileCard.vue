@@ -56,8 +56,10 @@ const identity = profile.identity
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.avatar-wrap:hover {
-  transform: scale(1.04) rotate(-2deg);
+@media (hover: hover) {
+  .avatar-wrap:hover {
+    transform: scale(1.04) rotate(-2deg);
+  }
 }
 
 .avatar-orbit {
@@ -122,5 +124,26 @@ const identity = profile.identity
   color: var(--color-text-muted);
   font-size: 0.95rem;
   letter-spacing: 0.02em;
+}
+
+@container (max-width: 24rem) {
+  .profile-card {
+    padding: 1.75rem 1rem 1.5rem;
+  }
+
+  .avatar-wrap {
+    width: 6rem;
+    height: 6rem;
+  }
+
+  .nickname {
+    font-size: 1.5rem;
+  }
+}
+
+@container (max-width: 19rem) {
+  .profile-card {
+    padding-inline: 0.75rem;
+  }
 }
 </style>

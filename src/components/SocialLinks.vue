@@ -66,7 +66,7 @@ const brandPaths: Record<SocialKind, string> = {
 .social-grid {
   --gap: 0.6rem;
   /* Все иконки в один ряд: размер подстраивается под ширину плитки профиля */
-  --size: clamp(2.25rem, (100cqi - (var(--count) - 1) * var(--gap)) / var(--count), 3.25rem);
+  --size: clamp(2rem, (100cqi - (var(--count) - 1) * var(--gap)) / var(--count), 3.25rem);
   position: relative;
   z-index: 30;
   display: flex;
@@ -158,12 +158,16 @@ const brandPaths: Record<SocialKind, string> = {
   transform-origin: center;
 }
 
-.social-button:hover .social-icon {
-  animation: social-jiggle 0.6s ease;
+@media (hover: hover) {
+  .social-button:hover .social-icon {
+    animation: social-jiggle 0.6s ease;
+  }
 }
 
-.social-button:hover .social-letter {
-  animation: social-jiggle 0.6s ease;
+@media (hover: hover) {
+  .social-button:hover .social-letter {
+    animation: social-jiggle 0.6s ease;
+  }
 }
 
 @keyframes social-pop {
@@ -188,6 +192,19 @@ const brandPaths: Record<SocialKind, string> = {
   }
   100% {
     transform: rotate(0deg) scale(1.1);
+  }
+}
+
+/* Тач-экраны: подсказки не нужны и залипают после тапа */
+@media (hover: none) {
+  .social-tooltip {
+    display: none;
+  }
+}
+
+@container (max-width: 20rem) {
+  .social-grid {
+    --gap: 0.45rem;
   }
 }
 </style>

@@ -92,19 +92,14 @@ const setup = profile.setup
   gap: 0.45rem;
 }
 
-/* Плитка широкая — характеристики в две колонки */
-@container (min-width: 34rem) {
-  .setup-specs {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 .setup-spec {
   position: relative;
   z-index: 2;
   display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.15rem 0.75rem;
   padding: 0.55rem 0.85rem;
   border-radius: 0.7rem;
   background: var(--color-surface);
@@ -117,11 +112,13 @@ const setup = profile.setup
     transform 0.25s ease;
 }
 
-.setup-spec:hover {
-  z-index: 5;
-  border-color: var(--color-accent);
-  box-shadow: 0 0 18px var(--color-glow);
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .setup-spec:hover {
+    z-index: 5;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 18px var(--color-glow);
+    transform: translateY(-1px);
+  }
 }
 
 .spec-label {
@@ -133,8 +130,29 @@ const setup = profile.setup
 }
 
 .spec-value {
+  margin-left: auto;
+  text-align: right;
   font-size: 0.8rem;
   color: var(--color-text);
   overflow-wrap: anywhere;
+}
+
+/* Плитка широкая — характеристики в две колонки, название над значением */
+@container (min-width: 34rem) {
+  .setup-specs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .setup-spec {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 0.2rem;
+  }
+
+  .spec-value {
+    margin-left: 0;
+    text-align: left;
+  }
 }
 </style>

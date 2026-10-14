@@ -80,10 +80,12 @@ const gallery = profile.gallery
     transform 0.25s ease;
 }
 
-.photo-cell:hover {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 18px var(--color-glow);
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .photo-cell:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 18px var(--color-glow);
+    transform: translateY(-1px);
+  }
 }
 
 .photo-cell-1 {
