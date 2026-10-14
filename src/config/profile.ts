@@ -20,6 +20,13 @@ export const profile: Profile = {
     bio: 'CISPractice Owner\nMyTiers OP Manager',
   },
 
+  // 👇 DISCORD-ПРОФИЛЬ: аватар, баннер, украшение, значки и клан подтягиваются по ID.
+  // Статус, игры и Spotify в реальном времени — через Lanyard: зайди один раз на discord.gg/lanyard.
+  // «Обо мне» — это identity.bio, «Connections» — список social ниже.
+  discord: {
+    userId: '835533218869936168',
+  },
+
   // 👇 ЦВЕТА ТЕМЫ — все цвета сайта берутся отсюда
   theme: {
     background: '#121212',
@@ -36,10 +43,11 @@ export const profile: Profile = {
     // imageUrl: 'https://...', // опционально, для статичного фона-картинки
   },
 
-  // 👇 ССЫЛКИ НА СОЦСЕТИ — добавляй/удаляй элементы свободно. kind определяет иконку.
+  // 👇 ССЫЛКИ НА СОЦСЕТИ (блок Connections) — добавляй/удаляй свободно. kind определяет иконку,
+  // handle — ник под названием (если не указан, берётся из ссылки).
   social: [
     { kind: 'telegram', url: 'https://t.me/hanosuko', label: 'Telegram' },
-    { kind: 'discord', url: 'https://discord.com/users/835533218869936168', label: 'Discord' },
+    { kind: 'discord', url: 'https://discord.com/users/835533218869936168', label: 'Discord', handle: 'hanosuko' },
     { kind: 'github', url: 'https://github.com/hanosuko', label: 'GitHub' },
     { kind: 'tiktok', url: 'https://tiktok.com/@hanosuko', label: 'TikTok' },
     { kind: 'youtube', url: 'https://youtube.com/@hanosuko', label: 'YouTube' },

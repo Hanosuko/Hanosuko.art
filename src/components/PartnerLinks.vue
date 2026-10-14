@@ -29,6 +29,8 @@ const partners = profile.partners
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  /* Кнопки растягиваются на высоту ряда бенто-сетки */
+  grid-auto-rows: minmax(3rem, 1fr);
   gap: 0.5rem;
 }
 

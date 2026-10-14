@@ -12,6 +12,8 @@ export interface SocialLink {
   kind: SocialKind
   url: string
   label?: string
+  // Ник в карточке; по умолчанию берётся из последней части ссылки
+  handle?: string
 }
 
 export interface CustomLink {
@@ -46,6 +48,10 @@ export interface MyTiersSettings {
   username: string
   siteUrl: string
   kitColors: Record<string, string>
+}
+
+export interface DiscordSettings {
+  userId: string
 }
 
 export interface CistiersSettings {
@@ -91,6 +97,7 @@ export interface Profile {
     avatarUrl: string
     bio: string
   }
+  discord: DiscordSettings
   theme: ThemeColors
   background: BackgroundSettings
   social: SocialLink[]
