@@ -3,9 +3,11 @@ import type { SocialKind } from '@/types/profile'
 
 defineProps<{ kind: SocialKind }>()
 
-// Самолётик Telegram нарисован мелко в центре холста 24×24 — кадрируем его, чтобы он был размером с остальные
+// Самолётик Telegram нарисован мелко в центре холста 24×24 — кадрируем его, чтобы он был размером с остальные.
+// NameMC — буква n шрифта Minecraft на сетке 5×5 пикселей, с полями, ровно по центру
 const viewBoxes: Partial<Record<SocialKind, string>> = {
   telegram: '3.1 6.5 15 15',
+  namemc: '-0.5 -0.5 6 6',
 }
 
 const brandPaths: Record<SocialKind, string> = {
@@ -21,8 +23,7 @@ const brandPaths: Record<SocialKind, string> = {
     'M23.5 6.51a3 3 0 0 0-2.12-2.12C19.51 4 12 4 12 4s-7.51 0-9.38.39A3 3 0 0 0 .5 6.51 31.43 31.43 0 0 0 .1 12a31.43 31.43 0 0 0 .4 5.49 3 3 0 0 0 2.12 2.12C4.49 20 12 20 12 20s7.51 0 9.38-.39a3 3 0 0 0 2.12-2.12A31.43 31.43 0 0 0 23.9 12a31.43 31.43 0 0 0-.4-5.49ZM9.75 15.57V8.43L15.82 12l-6.07 3.57Z',
   minecraft:
     'M3 3h6v6H3V3Zm12 0h6v6h-6V3ZM3 15h6v6H3v-6Zm12 0h6v6h-6v-6ZM9 9h6v6H9V9Z',
-  namemc:
-    'M4 4h16v4H4V4Zm0 4h4v12H4V8Zm12 0h4v12h-4V8Z',
+  namemc: 'M0 0h4v1H0zM0 1h1v4H0zM4 1h1v4H4z',
   // steam, epicgames, twitch, xbox — simple-icons (CC0)
   steam:
     'M11.979 0C5.678 0 .511 4.86.022 11.037l6.432 2.658c.545-.371 1.203-.59 1.912-.59.063 0 .125.004.188.006l2.861-4.142V8.91c0-2.495 2.028-4.524 4.524-4.524 2.494 0 4.524 2.031 4.524 4.527s-2.03 4.525-4.524 4.525h-.105l-4.076 2.911c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z',
@@ -38,9 +39,7 @@ const brandPaths: Record<SocialKind, string> = {
 </script>
 
 <template>
-  <!-- У NameMC нет нормального SVG-логотипа — рисуем фирменную букву n -->
-  <span v-if="kind === 'namemc'" class="brand-letter" aria-hidden="true">n</span>
-  <svg v-else class="brand-icon" :viewBox="viewBoxes[kind] ?? '0 0 24 24'" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+  <svg class="brand-icon" :viewBox="viewBoxes[kind] ?? '0 0 24 24'" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
     <path :d="brandPaths[kind]" fill="currentColor" />
   </svg>
 </template>
@@ -49,18 +48,6 @@ const brandPaths: Record<SocialKind, string> = {
 .brand-icon {
   width: 1em;
   height: 1em;
-  flex-shrink: 0;
-}
-
-.brand-letter {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  font-family: 'Minecraftia', 'Monocraft', monospace;
-  font-size: 1.15em;
-  font-weight: 700;
-  line-height: 1.25;
-  text-align: center;
   flex-shrink: 0;
 }
 </style>
