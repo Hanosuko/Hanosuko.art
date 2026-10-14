@@ -61,14 +61,13 @@ The grid is defined in `src/App.vue`:
 desktop (lg, ≥1024px)               tablet (md, ≥768px)       phone
 ┌───────────┬──────────────────┐    ┌──────────┬──────────┐   ┌──────────┐
 │  Discord  │      tiers       │    │ Discord  │  tiers   │   │ Discord  │
-│  profile  │ MyTiers/CISTiers │    │          │          │   │ tiers    │
-├──────────┬┴─────────┬────────┤    ├──────────┼──────────┤   │ music    │
-│  music   │  server  │partners│    │  music   │  server  │   │ server   │
-├──────────┴┬─────────┴────────┤    ├──────────┴──────────┤   │ partners │
-│  gallery  │      setup       │    │      partners       │   │ gallery  │
-└───────────┴──────────────────┘    ├──────────┬──────────┤   │ setup    │
-                                    │ gallery  │  setup   │   └──────────┘
-                                    └──────────┴──────────┘
+│  profile  │ MyTiers/CISTiers │    │ profile  ├──────────┤   │ tiers    │
+├──────────┬┴─────────┬────────┤    │          │  music   │   │ music    │
+│  music   │  server  │partners│    ├──────────┼──────────┤   │ server   │
+├──────────┴┬─────────┴────────┤    │  server  │ partners │   │ partners │
+│  gallery  │      setup       │    ├──────────┼──────────┤   │ gallery  │
+└───────────┴──────────────────┘    │ gallery  │  setup   │   │ setup    │
+                                    └──────────┴──────────┘   └──────────┘
 ```
 
 Tile widths are plain Tailwind classes (`col-span-12 md:col-span-6 lg:col-span-7`). To add a new block, create a component whose root is a card (for example `class="glass-card"`) and append it to the end of the grid:
