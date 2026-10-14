@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { AlertCircle, Check, Copy, ExternalLink, RotateCw } from 'lucide-vue-next'
 import { profile } from '@/config/profile'
 import { useMyTiers } from '@/composables/useMyTiers'
 import { useCistiers } from '@/composables/useCistiers'
-import type { TierSource, TierSourceState } from '@/types/tiers'
+import type { KitTier, TierSource, TierSourceState, UnrankedKit } from '@/types/tiers'
+import TierTooltip from '@/components/TierTooltip.vue'
 
 // 👇 Ники, сайты и цвета китов — в src/config/profile.ts → mytiers и cistiers
 const { mytiers, cistiers } = profile
@@ -59,6 +60,40 @@ const onTabsKeydown = (event: KeyboardEvent): void => {
 }
 
 const SKELETON_SLOTS = 10
+
+// --- Подсказка при наведении на тир (только для мыши: на тач-экранах плитка — просто ссылка) ---
+const canHover = window.matchMedia('(hover: hover)').matches
+const tip = ref<{ kit: KitTier | UnrankedKit; x: number; y: number } | null>(null)
+
+const hideTip = (): void => {
+  tip.value = null
+}
+
+// MyTiers — над центром плитки, CISTiers — на 45px ниже курсора (или под плиткой при фокусе с клавиатуры)
+const showTipAt = (kit: KitTier | UnrankedKit, target: Element, pointer?: MouseEvent): void => {
+  if (!canHover && pointer) return
+  const rect = target.getBoundingClientRect()
+  if (activeId.value === 'mytiers') {
+    tip.value = { kit, x: rect.left + rect.width / 2, y: rect.top - 12 }
+  } else if (pointer) {
+    tip.value = { kit, x: pointer.clientX, y: pointer.clientY + 45 }
+  } else {
+    tip.value = { kit, x: rect.left + rect.width / 2, y: rect.bottom + 8 }
+  }
+}
+
+const onTileMouse = (kit: KitTier | UnrankedKit, event: MouseEvent): void => {
+  showTipAt(kit, event.currentTarget as Element, event)
+}
+
+const onTileFocus = (kit: KitTier | UnrankedKit, event: FocusEvent): void => {
+  showTipAt(kit, event.currentTarget as Element)
+}
+
+// Подсказка привязана к экрану (position: fixed) — при прокрутке и смене вкладки прячем
+watch(activeId, hideTip)
+window.addEventListener('scroll', hideTip, { capture: true, passive: true })
+onBeforeUnmount(() => window.removeEventListener('scroll', hideTip, { capture: true }))
 
 const nickname = computed(() => tierProfile.value?.nickname ?? mytiers.username)
 // Рендер скина по нику — один и тот же для обеих вкладок
@@ -147,6 +182,11 @@ const hideBrokenImage = (event: Event): void => {
             :key="`${activeId}-${kit.slug}`"
             class="mt-cell"
             :style="{ '--kit': kit.color, '--delay': `${index * 40}ms` }"
+            @mouseenter="onTileMouse(kit, $event)"
+            @mousemove="activeId === 'cistiers' && onTileMouse(kit, $event)"
+            @mouseleave="hideTip"
+            @focusin="onTileFocus(kit, $event)"
+            @focusout="hideTip"
           >
             <component
               :is="kit.discordUrl ? 'a' : 'span'"
@@ -161,11 +201,6 @@ const hideBrokenImage = (event: Event): void => {
                 <span v-if="kit.retired" class="mt-retired">R</span>{{ kit.pos }}{{ kit.tier }}
               </strong>
             </component>
-            <span class="mt-tip" aria-hidden="true">
-              <b>{{ kit.name }}</b>
-              <span v-if="kit.peak && kit.peak !== `${kit.pos}${kit.tier}`">peak {{ kit.peak }}</span>
-              <span v-if="kit.retired">retired</span>
-            </span>
           </li>
 
           <li
@@ -173,14 +208,18 @@ const hideBrokenImage = (event: Event): void => {
             :key="`${activeId}-${kit.slug}`"
             class="mt-cell"
             :style="{ '--delay': `${(tierProfile.ranked.length + index) * 40}ms` }"
+            @mouseenter="onTileMouse(kit, $event)"
+            @mousemove="activeId === 'cistiers' && onTileMouse(kit, $event)"
+            @mouseleave="hideTip"
           >
             <span class="mt-slot" :aria-label="`${kit.name}: not tested`">
               <img class="mt-kit-icon is-muted" :src="kit.iconUrl" alt="" draggable="false" @error="hideBrokenImage" />
             </span>
-            <span class="mt-tip" aria-hidden="true"><b>{{ kit.name }}</b><span>not tested</span></span>
           </li>
         </template>
       </ul>
+
+      <TierTooltip v-if="tip" :variant="activeId" :kit="tip.kit" :x="tip.x" :y="tip.y" />
 
       <div class="mt-actions">
         <button
@@ -459,51 +498,13 @@ const hideBrokenImage = (event: Event): void => {
   opacity: 0.6;
 }
 
-.mt-tip {
-  position: absolute;
-  bottom: calc(100% + 0.4rem);
-  left: 50%;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.15rem;
-  padding: 0.45rem 0.75rem;
-  border-radius: 0.6rem;
-  background: #111113;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
-  font-size: 0.7rem;
-  color: var(--color-text-muted);
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transform: translate(-50%, 4px);
-  transition:
-    opacity 0.15s ease,
-    transform 0.15s ease;
-}
 
-.mt-tip b {
-  color: var(--color-text);
-  font-size: 0.8rem;
-}
 
 @media (hover: hover) {
-  .mt-cell:hover .mt-tip {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-
   .mt-cell:hover .mt-tile {
     transform: translateY(-4px);
     box-shadow: 0 8px 22px color-mix(in srgb, var(--kit) 25%, transparent);
   }
-}
-
-.mt-cell:focus-within .mt-tip {
-  opacity: 1;
-  transform: translate(-50%, 0);
 }
 
 .mt-tile:focus-visible {
