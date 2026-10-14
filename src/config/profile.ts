@@ -122,12 +122,12 @@ export const profile: Profile = {
     siteUrl: 'https://cistiers.com',
   },
 
-  // 👇 СТАТУС MINECRAFT-СЕРВЕРА: онлайн, MOTD и кнопка «скопировать IP».
+  // 👇 СТАТУС MINECRAFT-СЕРВЕРА: короткая плитка с онлайном и кнопкой сайта.
   // Данные — с api.mcsrvstat.us (обновляются раз в 2,5 минуты). Выключить — features.serverStatus.
   server: {
     name: 'CISPractice',
     address: 'cisprac.xyz',
-    websiteUrl: 'https://cisprac.xyz',
+    websiteUrl: 'https://www.cisprac.xyz/',
   },
 
   // 👇 ПАРТНЁРЫ — кнопки-плашки рядом с плеером

@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { Check, Copy, Globe, Users } from 'lucide-vue-next'
+import { computed } from 'vue'
+import { ArrowUpRight, Globe } from 'lucide-vue-next'
 import { profile } from '@/config/profile'
 import { useServerStatus } from '@/composables/useServerStatus'
-import { parseMotdLine } from '@/utils/motd'
 
 // 👇 Адрес сервера и сайт — в src/config/profile.ts → server
 const server = profile.server
@@ -16,102 +15,58 @@ const fill = computed(() => {
   const current = players.value
   return current && current.max > 0 ? Math.min((current.online / current.max) * 100, 100) : 0
 })
-const version = computed(() => status.value?.protocol?.name ?? status.value?.version ?? null)
-const motd = computed(() => (status.value?.motd?.raw ?? []).map(parseMotdLine).filter((line) => line.length > 0))
 
 const statusLabel = computed(() => {
   if (!status.value) return 'checking…'
   return isOnline.value ? 'online' : 'offline'
 })
 
-const copied = ref(false)
-let copiedTimer: number | undefined
-
-const copyAddress = async (): Promise<void> => {
-  try {
-    await navigator.clipboard.writeText(server.address)
-    copied.value = true
-    window.clearTimeout(copiedTimer)
-    copiedTimer = window.setTimeout(() => (copied.value = false), 1400)
-  } catch {
-    copied.value = false
-  }
-}
+const siteHost = server.websiteUrl ? new URL(server.websiteUrl).host.replace(/^www\./, '') : null
 </script>
 
 <template>
+  <!-- Короткая плитка: иконка, онлайн и ссылка на сайт -->
   <section class="srv glass-card" :aria-label="`${server.name} server status`">
-    <header class="srv-head">
-      <img v-if="status?.icon" class="srv-icon" :src="status.icon" alt="" />
-      <span v-else class="srv-icon is-empty" aria-hidden="true" />
-      <div class="srv-title">
+    <img v-if="status?.icon" class="srv-icon" :src="status.icon" alt="" />
+    <span v-else class="srv-icon is-empty" aria-hidden="true" />
+
+    <div class="srv-main">
+      <div class="srv-head">
         <h2 class="srv-name">{{ server.name }}</h2>
-        <span class="srv-meta">{{ server.address }}<template v-if="version"> · {{ version }}</template></span>
+        <span class="srv-pill" :class="{ 'is-online': isOnline, 'is-pending': !status }">
+          <span class="srv-dot" aria-hidden="true" />
+          {{ statusLabel }}
+        </span>
       </div>
-      <span class="srv-pill" :class="{ 'is-online': isOnline, 'is-pending': !status }">
-        <span class="srv-dot" aria-hidden="true" />
-        {{ statusLabel }}
-      </span>
-    </header>
-
-    <!-- MOTD как в списке серверов Minecraft -->
-    <div v-if="motd.length" class="srv-motd">
-      <p v-for="(line, lineIndex) in motd" :key="lineIndex">
-        <span
-          v-for="(segment, index) in line"
-          :key="index"
-          :style="{
-            color: segment.color ?? undefined,
-            fontWeight: segment.bold ? 700 : undefined,
-            fontStyle: segment.italic ? 'italic' : undefined,
-            textDecoration: [segment.underline && 'underline', segment.strike && 'line-through'].filter(Boolean).join(' ') || undefined,
-          }"
-        >{{ segment.text }}</span>
-      </p>
+      <div v-if="players" class="srv-players">
+        <span class="srv-bar" aria-hidden="true"><span :style="{ width: `${fill}%` }" /></span>
+        <span class="srv-count"><b>{{ players.online }}</b> / {{ players.max }}</span>
+      </div>
     </div>
 
-    <div v-if="players" class="srv-players">
-      <Users :size="14" aria-hidden="true" />
-      <span class="srv-bar" aria-hidden="true"><span :style="{ width: `${fill}%` }" /></span>
-      <span class="srv-count"><b>{{ players.online }}</b> / {{ players.max }}</span>
-    </div>
-
-    <div class="srv-actions">
-      <button type="button" class="srv-copy" :class="{ 'is-done': copied }" @click="copyAddress">
-        <Check v-if="copied" :size="15" aria-hidden="true" />
-        <Copy v-else :size="15" aria-hidden="true" />
-        <span>{{ copied ? 'copied!' : server.address }}</span>
-      </button>
-      <a
-        v-if="server.websiteUrl"
-        class="srv-site"
-        :href="server.websiteUrl"
-        target="_blank"
-        rel="noopener noreferrer"
-        :aria-label="`${server.name} website`"
-        title="Website"
-      >
-        <Globe :size="16" aria-hidden="true" />
-      </a>
-    </div>
+    <a
+      v-if="server.websiteUrl"
+      class="srv-site"
+      :href="server.websiteUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+      :aria-label="`${server.name} website`"
+    >
+      <Globe :size="16" aria-hidden="true" />
+      <span class="srv-site-host">{{ siteHost }}</span>
+      <ArrowUpRight :size="14" class="srv-site-arrow" aria-hidden="true" />
+    </a>
   </section>
 </template>
 
 <style scoped>
 .srv {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 0.85rem;
   width: 100%;
-  padding: 1.1rem 1.2rem 1.2rem;
+  padding: 0.85rem 1rem;
   border-radius: 1.25rem;
-}
-
-.srv-head {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-width: 0;
 }
 
 .srv-icon {
@@ -123,22 +78,25 @@ const copyAddress = async (): Promise<void> => {
   background: rgba(255, 255, 255, 0.06);
 }
 
-.srv-title {
+.srv-main {
   display: flex;
   flex-direction: column;
+  gap: 0.45rem;
   min-width: 0;
   flex: 1;
+}
+
+.srv-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
 }
 
 .srv-name {
   margin: 0;
   font-size: 1rem;
   font-weight: 700;
-}
-
-.srv-meta {
-  font-size: 0.72rem;
-  color: var(--color-text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -149,7 +107,7 @@ const copyAddress = async (): Promise<void> => {
   align-items: center;
   gap: 0.4rem;
   flex-shrink: 0;
-  padding: 0.3rem 0.65rem;
+  padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   background: rgba(242, 63, 67, 0.12);
   color: #f87171;
@@ -176,24 +134,6 @@ const copyAddress = async (): Promise<void> => {
 
 .srv-pill.is-online .srv-dot {
   animation: srv-pulse 2s ease-out infinite;
-}
-
-.srv-motd {
-  padding: 0.6rem 0.75rem;
-  border-radius: 0.75rem;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: #aaaaaa;
-  /* В Minecraftia нет капителей (ᴄɪꜱᴘʀᴀᴄ) — они разъезжаются, поэтому основной шрифт */
-  font-size: 0.75rem;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  text-align: center;
-}
-
-.srv-motd p {
-  margin: 0;
-  overflow-wrap: anywhere;
 }
 
 .srv-players {
@@ -229,70 +169,56 @@ const copyAddress = async (): Promise<void> => {
   color: var(--color-text);
 }
 
-.srv-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: auto;
-}
-
-.srv-copy,
 .srv-site {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
+  flex-shrink: 0;
   height: 2.6rem;
+  padding: 0 0.85rem;
   border-radius: 0.8rem;
   border: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(255, 255, 255, 0.05);
   color: var(--color-text);
   font-size: 0.8rem;
   font-weight: 700;
-  cursor: pointer;
   transition:
     background 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease;
+    border-color 0.2s ease;
 }
 
-.srv-copy {
-  flex: 1;
-  min-width: 0;
+.srv-site-arrow {
+  color: var(--color-text-muted);
 }
 
-.srv-copy span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.srv-copy.is-done {
-  color: #4ade80;
-}
-
-.srv-site {
-  width: 2.6rem;
-  flex-shrink: 0;
-}
-
-.srv-copy:focus-visible,
 .srv-site:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.5);
   outline-offset: 1px;
 }
 
 @media (hover: hover) {
-  .srv-copy:hover,
   .srv-site:hover {
     background: rgba(255, 255, 255, 0.09);
     border-color: rgba(255, 255, 255, 0.14);
   }
 }
 
-/* На узкой плитке пробелы-отступы из игры не влезают — схлопываем их */
-@container (max-width: 24rem) {
-  .srv-motd {
-    white-space: normal;
+/* Узкая плитка — от кнопки сайта остаётся только глобус, чтобы влезло название */
+@container (max-width: 28rem) {
+  .srv {
+    gap: 0.7rem;
+    padding: 0.8rem 0.85rem;
+  }
+
+  .srv-site {
+    width: 2.6rem;
+    padding: 0;
+  }
+
+  .srv-site-host,
+  .srv-site-arrow {
+    display: none;
   }
 }
 

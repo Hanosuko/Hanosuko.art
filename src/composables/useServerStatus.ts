@@ -4,10 +4,7 @@ import { onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
 export interface ServerStatusResponse {
   online: boolean
   icon?: string
-  version?: string
-  protocol?: { name?: string }
   players?: { online: number; max: number }
-  motd?: { raw: string[] }
 }
 
 // mcsrvstat.us кеширует ответ на 5 минут — чаще опрашивать нет смысла
