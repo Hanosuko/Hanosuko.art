@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { AlertCircle, ExternalLink, RotateCw } from 'lucide-vue-next'
-import { Check, Copy } from 'lucide'
-import { MorphIcon } from 'morphicons/vue'
 import { profile } from '@/config/profile'
 import { useMyTiers } from '@/composables/useMyTiers'
 import { useCistiers } from '@/composables/useCistiers'
@@ -93,24 +91,9 @@ onBeforeUnmount(() => window.removeEventListener('scroll', hideTip, { capture: t
 const nickname = computed(() => tierProfile.value?.nickname ?? mytiers.username)
 // Рендер скина по нику — один и тот же для обеих вкладок
 const skinUrl = new URL(`/api/avatar/${encodeURIComponent(mytiers.username)}?s=256`, mytiers.siteUrl).href
-const nameMcUrl = computed(() => `https://namemc.com/profile/${encodeURIComponent(nickname.value)}`)
 
 const score = computed(() => tierProfile.value?.points ?? 0)
 const pointsWord = computed(() => (score.value === 1 ? 'point' : 'points'))
-
-const copied = ref(false)
-let copiedTimer: number | undefined
-
-const copyNickname = async (): Promise<void> => {
-  try {
-    await navigator.clipboard.writeText(nickname.value)
-    copied.value = true
-    window.clearTimeout(copiedTimer)
-    copiedTimer = window.setTimeout(() => (copied.value = false), 1200)
-  } catch {
-    copied.value = false
-  }
-}
 
 const hideBrokenImage = (event: Event): void => {
   ;(event.target as HTMLImageElement).style.visibility = 'hidden'
@@ -201,30 +184,10 @@ const hideBrokenImage = (event: Event): void => {
 
       <TierTooltip v-if="tip" :variant="activeId" :kit="tip.kit" :x="tip.x" :y="tip.y" />
 
-      <div class="mt-actions">
-        <button
-          type="button"
-          class="mt-action is-square"
-          :class="{ 'is-done': copied }"
-          :aria-label="copied ? 'Copied' : 'Copy nickname'"
-          :title="copied ? 'Copied' : 'Copy nickname'"
-          @click="copyNickname"
-        >
-          <MorphIcon :icon="copied ? Check : Copy" :size="16" spring="bouncy" reduced-motion="user" />
-        </button>
-        <a
-          class="mt-action is-square mt-namemc"
-          :href="nameMcUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Open on NameMC"
-          title="NameMC"
-        >n</a>
-        <a class="mt-action is-wide" :href="active.profileUrl" target="_blank" rel="noopener noreferrer">
-          <ExternalLink :size="16" aria-hidden="true" />
-          <span>Open on {{ active.label }}</span>
-        </a>
-      </div>
+      <a class="mt-action" :href="active.profileUrl" target="_blank" rel="noopener noreferrer">
+        <ExternalLink :size="16" aria-hidden="true" />
+        <span>Open on {{ active.label }}</span>
+      </a>
     </div>
   </section>
 </template>
@@ -586,17 +549,13 @@ const hideBrokenImage = (event: Event): void => {
   cursor: pointer;
 }
 
-.mt-actions {
-  display: flex;
-  gap: 0.5rem;
-  padding-top: 1rem;
-}
-
+/* Одна длинная кнопка на сайт открытой вкладки */
 .mt-action {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  margin-top: 1rem;
   height: 2.75rem;
   border-radius: 0.85rem;
   border: 1px solid rgba(255, 255, 255, 0.04);
@@ -618,26 +577,6 @@ const hideBrokenImage = (event: Event): void => {
   background: rgba(255, 255, 255, 0.09);
   border-color: rgba(255, 255, 255, 0.12);
   outline: none;
-}
-
-.mt-action.is-square {
-  width: 2.75rem;
-  flex-shrink: 0;
-}
-
-.mt-action.is-wide {
-  flex: 1;
-}
-
-.mt-action.is-done {
-  color: #34d399;
-}
-
-.mt-namemc {
-  font-family: 'Minecraftia', 'Monocraft', monospace;
-  font-size: 1.15rem;
-  line-height: 1;
-  padding-top: 0.45rem;
 }
 
 @keyframes mt-rise {
