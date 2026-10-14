@@ -9,6 +9,7 @@ import { profileThemeTokens } from '@/utils/discordTheme'
 import type { ConnectionRow } from '@/utils/discordConnections'
 import BrandIcon from '@/components/BrandIcon.vue'
 import DiscordActivity from '@/components/DiscordActivity.vue'
+import ProfileEffect from '@/components/ProfileEffect.vue'
 
 // 👇 Всё про карточку — в src/config/profile.ts → discord. «Обо мне» — identity.bio,
 // интеграции — из Discord, к ним добавляются ссылки из social
@@ -109,6 +110,8 @@ const hideBrokenImage = (event: Event): void => {
     :style="themeStyle"
     aria-label="Discord profile"
   >
+    <ProfileEffect v-if="discord.profileEffect" :effect="discord.profileEffect" />
+
     <div class="dc-banner" :style="{ backgroundColor: bannerColor ?? undefined }" aria-hidden="true">
       <img v-if="bannerSrc" class="dc-banner-img" :src="bannerSrc" alt="" @error="hideBrokenImage" />
     </div>

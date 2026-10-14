@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useIntro } from '@/composables/useIntro'
 
 const visible = ref(true)
+const { enter } = useIntro()
 
 const dismiss = (): void => {
   visible.value = false
+  enter()
 }
 
 const onKey = (event: KeyboardEvent): void => {

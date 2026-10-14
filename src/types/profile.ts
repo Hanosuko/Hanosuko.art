@@ -59,6 +59,25 @@ export interface DiscordBadgeConfig {
   iconUrl: string
 }
 
+// Слой эффекта профиля — поля как в Discord (collectibles-products → items[].effects[])
+export interface ProfileEffectLayer {
+  src: string
+  // Через сколько мс после старта показать и сколько он играет
+  start: number
+  duration: number
+  loop?: boolean
+  // Пауза между повторами петли
+  loopDelay?: number
+  zIndex?: number
+}
+
+export interface ProfileEffect {
+  title: string
+  // Статичная картинка вместо анимации при prefers-reduced-motion
+  reducedMotionSrc?: string
+  layers: ProfileEffectLayer[]
+}
+
 export interface DiscordSettings {
   userId: string
   // Цвета темы профиля Nitro («Тема и баннер»): основной сверху, акцент снизу. Без них — тёмная карточка сайта
@@ -69,6 +88,8 @@ export interface DiscordSettings {
   nameStyle?: { font: string; effect: 'toon' | 'none' }
   // Свои значки вместо тех, что приходят из API
   badges?: DiscordBadgeConfig[]
+  // Эффект профиля — анимация поверх карточки
+  profileEffect?: ProfileEffect
 }
 
 export interface ServerSettings {

@@ -24,6 +24,16 @@ export const profile: Profile = {
     pronouns: 'https://hanosuko.art',
     // 👇 НИК: шрифт (из src/style.css) и эффект toon — белые буквы с контуром и тенью
     nameStyle: { font: 'Almendra', effect: 'toon' },
+    // 👇 ЭФФЕКТ ПРОФИЛЯ «Поиграем?» (Let's Play) — анимация поверх карточки, тайминги как в Discord.
+    // Файлы лежат в public/effects/. Как достать другой эффект — в README, раздел «Profile Effect»
+    profileEffect: {
+      title: "Let's Play",
+      reducedMotionSrc: '/effects/lets-play/static.png',
+      layers: [
+        { src: '/effects/lets-play/intro.png', start: 0, duration: 4904, zIndex: 110 },
+        { src: '/effects/lets-play/loop.png', start: 7906, duration: 4906, loop: true, loopDelay: 3000, zIndex: 100 },
+      ],
+    },
   },
 
   // 👇 ЦВЕТА ТЕМЫ — все цвета сайта берутся отсюда
