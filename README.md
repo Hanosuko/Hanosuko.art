@@ -70,7 +70,7 @@ Supported extensions: `.mp3`, `.ogg`, `.wav`, `.m4a`, `.flac`, `.opus`.
 public/music/manifest.json
 ```
 
-Real music files are ignored by Git on purpose. Do not publish copyrighted tracks unless you have the right to distribute them.
+Do not publish copyrighted tracks unless you have the right to distribute them.
 
 ## Photos
 
@@ -81,8 +81,6 @@ public/photos/
 ```
 
 or bundle template-safe assets through `src/assets/photos/`.
-
-Real photos in `public/photos/` are ignored by Git on purpose.
 
 ## Optional Backend
 
@@ -128,8 +126,6 @@ This repository intentionally ignores:
 
 - `node_modules/`
 - `dist/`
-- real music files in `public/music/`
-- real photos in `public/photos/`
 - `.env` files
 
 Before publishing, run:

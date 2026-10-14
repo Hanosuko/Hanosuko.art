@@ -34,17 +34,6 @@ const kitDisplayName: Record<string, string> = {
   mace: 'Mace',
 }
 
-const kitIconUrl: Record<string, string> = {
-  vanilla: '/tier-icons/vanilla.png',
-  sword: '/tier-icons/sword.png',
-  netherite: '/tier-icons/netherite.png',
-  dpot: '/tier-icons/dpot.png',
-  uhc: '/tier-icons/uhc.png',
-  smp: '/tier-icons/smp.png',
-  op: '/tier-icons/op.png',
-  mace: '/tier-icons/mace.png',
-}
-
 const sortedTiers = computed<CistiersCurrentTier[]>(() => {
   const list = data.value?.tier_stats.current_tiers ?? []
   return [...list].sort((a, b) => (kitOrder[a.kit] ?? 99) - (kitOrder[b.kit] ?? 99))
@@ -77,7 +66,7 @@ const closeTier = (): void => {
 }
 
 const renderUrlFor = (kit: string): string =>
-  cistiers.tierRenders[kit] ?? kitIconUrl[kit] ?? ''
+  cistiers.tierRenders[kit] ?? ''
 </script>
 
 <template>
@@ -120,7 +109,7 @@ const renderUrlFor = (kit: string): string =>
         <span class="tier-icon-wrap">
           <img
             class="tier-icon"
-            :src="kitIconUrl[tier.kit] ?? ''"
+            :src="renderUrlFor(tier.kit)"
             :alt="kitDisplayName[tier.kit] ?? tier.kit"
             loading="lazy"
           />
