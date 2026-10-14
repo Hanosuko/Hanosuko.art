@@ -50,8 +50,28 @@ export interface MyTiersSettings {
   kitColors: Record<string, string>
 }
 
+export interface DiscordBadgeConfig {
+  label: string
+  iconUrl: string
+}
+
+export interface DiscordGame {
+  name: string
+  iconUrl: string
+}
+
 export interface DiscordSettings {
   userId: string
+  // Цвета темы профиля Nitro («Тема и баннер»): основной сверху, акцент снизу. Без них — тёмная карточка сайта
+  theme?: { primary: string; accent: string }
+  // Строка после юзернейма (в Discord — поле «Местоимения»)
+  pronouns?: string
+  // Стиль отображаемого имени: шрифт и эффект toon (белая заливка, контур и тень)
+  nameStyle?: { font: string; effect: 'toon' | 'none' }
+  // Значки целиком. API отдаёт только HypeSquad и Nitro — остальные (Quest, Orbs и т.д.) только так
+  badges?: DiscordBadgeConfig[]
+  // «Коллекция игр»: первые иконки и сколько ещё
+  games?: { items: DiscordGame[]; more?: number }
 }
 
 export interface ServerSettings {

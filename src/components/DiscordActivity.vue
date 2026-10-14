@@ -104,7 +104,7 @@ const progress = computed(() => {
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: var(--color-text-muted);
+  color: var(--dc-muted, var(--color-text-muted));
 }
 
 .activity-body {
@@ -112,7 +112,7 @@ const progress = computed(() => {
   align-items: center;
   gap: 0.85rem;
   min-width: 0;
-  color: var(--color-text);
+  color: var(--dc-text, var(--color-text));
 }
 
 .activity-art {
@@ -123,8 +123,8 @@ const progress = computed(() => {
   display: grid;
   place-items: center;
   border-radius: 0.6rem;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--color-text-muted);
+  background: var(--dc-surface, rgba(255, 255, 255, 0.06));
+  color: var(--dc-muted, var(--color-text-muted));
 }
 
 .activity-large {
@@ -141,8 +141,8 @@ const progress = computed(() => {
   width: 1.4rem;
   height: 1.4rem;
   border-radius: 9999px;
-  border: 3px solid #1d1d1d;
-  background: #1d1d1d;
+  border: 3px solid var(--dc-ring, #1d1d1d);
+  background: var(--dc-ring, #1d1d1d);
 }
 
 .activity-text {
@@ -165,11 +165,11 @@ const progress = computed(() => {
 }
 
 .activity-line {
-  color: var(--color-text-muted);
+  color: var(--dc-muted, var(--color-text-muted));
 }
 
 .activity-timer {
-  color: #43c87a;
+  color: #23a55a;
   font-variant-numeric: tabular-nums;
 }
 
@@ -178,7 +178,7 @@ const progress = computed(() => {
   align-items: center;
   gap: 0.6rem;
   font-size: 0.68rem;
-  color: var(--color-text-muted);
+  color: var(--dc-muted, var(--color-text-muted));
   font-variant-numeric: tabular-nums;
 }
 
@@ -186,7 +186,7 @@ const progress = computed(() => {
   flex: 1;
   height: 4px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(127, 127, 127, 0.3);
   overflow: hidden;
 }
 
@@ -194,7 +194,7 @@ const progress = computed(() => {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--color-text);
+  background: var(--dc-text, var(--color-text));
   transition: width 1s linear;
 }
 
