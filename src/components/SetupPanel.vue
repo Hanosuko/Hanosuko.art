@@ -5,7 +5,7 @@ const setup = profile.setup
 </script>
 
 <template>
-  <section class="glass-card neon-ring setup-card" aria-label="My setup">
+  <section class="glass-card setup-card" aria-label="My setup">
     <header class="setup-header">
       <h2 class="setup-title">{{ setup.title }}</h2>
       <p v-if="setup.description" class="setup-description">{{ setup.description }}</p>

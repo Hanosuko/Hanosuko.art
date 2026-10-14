@@ -7,7 +7,7 @@ const identity = profile.identity
 </script>
 
 <template>
-  <section class="glass-card neon-ring profile-card">
+  <section class="glass-card profile-card">
     <div class="avatar-wrap">
       <span class="avatar-orbit" aria-hidden="true" />
       <img

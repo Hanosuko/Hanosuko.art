@@ -5,7 +5,7 @@ const gallery = profile.gallery
 </script>
 
 <template>
-  <section class="glass-card neon-ring photo-card" aria-label="Photo gallery">
+  <section class="glass-card photo-card" aria-label="Photo gallery">
     <header class="photo-header">
       <h2 class="photo-title">{{ gallery.title }}</h2>
     </header>
