@@ -7,6 +7,10 @@ export type SocialKind =
   | 'minecraft'
   | 'namemc'
   | 'modrinth'
+  | 'steam'
+  | 'epicgames'
+  | 'twitch'
+  | 'xbox'
 
 export interface SocialLink {
   kind: SocialKind
@@ -55,11 +59,6 @@ export interface DiscordBadgeConfig {
   iconUrl: string
 }
 
-export interface DiscordGame {
-  name: string
-  iconUrl: string
-}
-
 export interface DiscordSettings {
   userId: string
   // Цвета темы профиля Nitro («Тема и баннер»): основной сверху, акцент снизу. Без них — тёмная карточка сайта
@@ -68,10 +67,8 @@ export interface DiscordSettings {
   pronouns?: string
   // Стиль отображаемого имени: шрифт и эффект toon (белая заливка, контур и тень)
   nameStyle?: { font: string; effect: 'toon' | 'none' }
-  // Значки целиком. API отдаёт только HypeSquad и Nitro — остальные (Quest, Orbs и т.д.) только так
+  // Свои значки вместо тех, что приходят из API
   badges?: DiscordBadgeConfig[]
-  // «Коллекция игр»: первые иконки и сколько ещё
-  games?: { items: DiscordGame[]; more?: number }
 }
 
 export interface ServerSettings {

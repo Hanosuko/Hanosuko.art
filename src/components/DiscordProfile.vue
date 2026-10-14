@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ArrowUpRight } from 'lucide-vue-next'
+import { ArrowUpRight, Link2 } from 'lucide-vue-next'
 import { profile } from '@/config/profile'
 import type { SocialLink } from '@/types/profile'
 import { useDiscordProfile } from '@/composables/useDiscordProfile'
 import { useProgressiveImage } from '@/composables/useProgressiveImage'
 import { profileThemeTokens } from '@/utils/discordTheme'
+import type { ConnectionRow } from '@/utils/discordConnections'
 import BrandIcon from '@/components/BrandIcon.vue'
 import DiscordActivity from '@/components/DiscordActivity.vue'
 
-// 👇 Всё про карточку — в src/config/profile.ts → discord. «Обо мне» — identity.bio, соцсети — social
+// 👇 Всё про карточку — в src/config/profile.ts → discord. «Обо мне» — identity.bio,
+// интеграции — из Discord, к ним добавляются ссылки из social
 const { identity, discord } = profile
 
 const {
@@ -21,6 +23,8 @@ const {
   bannerColor,
   clan,
   badges,
+  connections,
+  profileSettled,
   createdAt,
   status,
   customStatus,
@@ -51,24 +55,14 @@ const themeStyle = theme
 const nameStyle = discord.nameStyle
 const nameFont = nameStyle ? { fontFamily: `'${nameStyle.font}', serif` } : undefined
 
-// Значки из конфига целиком заменяют автоматические (API знает только HypeSquad и Nitro)
+// Значки из конфига целиком заменяют те, что пришли из API
 const badgeList = computed(() => discord.badges ?? badges.value)
-
-// «Коллекция игр»: три иконки, четвёртая затемнена и с «+N», как в Discord
-const games = discord.games
-const shownGames = games ? games.items.slice(0, games.more ? 3 : 4) : []
-const moreGamesTile = games?.more ? (games.items[3] ?? null) : null
 
 const STATUS_LABELS = { online: 'Online', idle: 'Idle', dnd: 'Do Not Disturb', offline: 'Offline' } as const
 const statusLabel = computed(() => (status.value ? STATUS_LABELS[status.value] : null))
 
-const memberSince = new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).format(
-  createdAt,
-)
-
-const discordUrl = `https://discord.com/users/${discord.userId}`
-
-const connections = computed(() => profile.social.filter((link) => link.url.trim().length > 0))
+const dateFormat = new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
+const memberSince = dateFormat.format(createdAt)
 
 const sanitize = (url: string): string => (/^https?:\/\//i.test(url) ? url : '#')
 
@@ -82,6 +76,26 @@ const handleOf = (link: SocialLink): string => {
     return link.label ?? link.kind
   }
 }
+
+const socialRow = (link: SocialLink): ConnectionRow => ({
+  key: link.url,
+  type: link.kind,
+  kind: link.kind,
+  name: handleOf(link),
+  url: sanitize(link.url),
+  since: null,
+  stats: [],
+})
+
+// Сначала интеграции из Discord, потом ссылки из social, которых среди них нет.
+// Ждём ответа профиля, чтобы список не перестраивался на глазах
+const connectionRows = computed<ConnectionRow[]>(() => {
+  if (!profileSettled.value) return []
+  const fromDiscord = connections.value
+  const covered = new Set(fromDiscord.map((row) => row.type))
+  const extra = profile.social.filter((link) => link.url.trim().length > 0 && !covered.has(link.kind)).map(socialRow)
+  return [...fromDiscord, ...extra]
+})
 
 const hideBrokenImage = (event: Event): void => {
   ;(event.target as HTMLImageElement).style.visibility = 'hidden'
@@ -143,28 +157,10 @@ const hideBrokenImage = (event: Event): void => {
         </li>
       </ul>
 
-      <a class="dc-open" :href="discordUrl" target="_blank" rel="noopener noreferrer">
-        <BrandIcon kind="discord" />
-        <span>Open in Discord</span>
-      </a>
-
       <section class="dc-section">
         <h2 class="dc-heading">About me</h2>
         <p class="dc-bio">{{ identity.bio }}</p>
       </section>
-
-      <div v-if="games" class="dc-games">
-        <span class="dc-games-label">Game collection</span>
-        <ul class="dc-games-list">
-          <li v-for="game in shownGames" :key="game.name" :title="game.name">
-            <img :src="game.iconUrl" :alt="game.name" loading="lazy" @error="hideBrokenImage" />
-          </li>
-          <li v-if="games.more" class="dc-games-more" :title="`+${games.more} more`">
-            <img v-if="moreGamesTile" :src="moreGamesTile.iconUrl" alt="" loading="lazy" @error="hideBrokenImage" />
-            <span>+{{ games.more }}</span>
-          </li>
-        </ul>
-      </div>
 
       <section class="dc-section">
         <h2 class="dc-heading">Member since</h2>
@@ -179,18 +175,36 @@ const hideBrokenImage = (event: Event): void => {
         </div>
       </section>
 
-      <section v-if="connections.length" class="dc-section dc-connections-section">
+      <section v-if="connectionRows.length" class="dc-section dc-connections-section">
         <h2 class="dc-heading">Connections</h2>
         <ul class="dc-connections">
-          <li v-for="link in connections" :key="link.url">
-            <a class="dc-connection" :href="sanitize(link.url)" target="_blank" rel="noopener noreferrer">
-              <span class="dc-connection-icon"><BrandIcon :kind="link.kind" /></span>
-              <span class="dc-connection-text">
-                <span class="dc-connection-handle">{{ handleOf(link) }}</span>
-                <span class="dc-connection-label">{{ link.label ?? link.kind }}</span>
-              </span>
-              <ArrowUpRight class="dc-connection-arrow" :size="15" aria-hidden="true" />
-            </a>
+          <li v-for="row in connectionRows" :key="row.key" class="dc-connection">
+            <span class="dc-connection-icon" :class="`is-${row.type}`">
+              <BrandIcon v-if="row.kind" :kind="row.kind" />
+              <Link2 v-else :size="18" aria-hidden="true" />
+            </span>
+            <div class="dc-connection-body">
+              <a v-if="row.url" class="dc-connection-name" :href="row.url" target="_blank" rel="noopener noreferrer">
+                <span>{{ row.name }}</span>
+                <ArrowUpRight :size="18" :stroke-width="2.4" aria-hidden="true" />
+              </a>
+              <span v-else class="dc-connection-name">{{ row.name }}</span>
+              <p v-if="row.since" class="dc-connection-line">Member since {{ dateFormat.format(row.since) }}</p>
+              <p v-if="row.stats.length" class="dc-connection-stats">
+                <span
+                  v-for="stat in row.stats"
+                  :key="`${stat.prefix ?? ''}${stat.title ?? ''}`"
+                  class="dc-stat"
+                  :class="{ 'has-icon': stat.iconUrl }"
+                  :title="stat.title"
+                >
+                  <img v-if="stat.iconUrl" :src="stat.iconUrl" :alt="stat.title ?? ''" loading="lazy" @error="hideBrokenImage" />
+                  <span v-if="stat.prefix">{{ stat.prefix }}</span>
+                  <b>{{ stat.value }}</b>
+                  <span v-if="stat.suffix">{{ stat.suffix }}</span>
+                </span>
+              </p>
+            </div>
           </li>
         </ul>
       </section>
@@ -478,37 +492,6 @@ const hideBrokenImage = (event: Event): void => {
   }
 }
 
-.dc-open {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  align-self: flex-start;
-  margin-top: 0.9rem;
-  padding: 0.55rem 1rem;
-  border-radius: 0.55rem;
-  background: #5865f2;
-  color: #fff;
-  font-size: 0.82rem;
-  font-weight: 700;
-  transition: background 0.2s ease;
-}
-
-.dc-open :deep(.brand-icon) {
-  font-size: 1.1rem;
-}
-
-.dc-open:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 2px;
-}
-
-@media (hover: hover) {
-  .dc-open:hover {
-    background: #4752c4;
-  }
-}
-
 .dc-section {
   display: flex;
   flex-direction: column;
@@ -534,60 +517,6 @@ const hideBrokenImage = (event: Event): void => {
   white-space: pre-line;
 }
 
-.dc-games {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-top: 1rem;
-  padding: 0.6rem 0.75rem;
-  border-radius: 0.75rem;
-  background: var(--dc-surface);
-}
-
-.dc-games-label {
-  font-size: 0.88rem;
-  font-weight: 600;
-}
-
-.dc-games-list {
-  list-style: none;
-  display: flex;
-  gap: 0.35rem;
-  margin: 0;
-  padding: 0;
-}
-
-.dc-games-list li {
-  position: relative;
-  width: 2.3rem;
-  height: 2.3rem;
-  border-radius: 0.45rem;
-  overflow: hidden;
-  background: var(--dc-surface);
-}
-
-.dc-games-list img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.dc-games-more img {
-  filter: brightness(0.35);
-}
-
-.dc-games-more span {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
 .dc-activities {
   display: flex;
   flex-direction: column;
@@ -605,87 +534,142 @@ const hideBrokenImage = (event: Event): void => {
 
 .dc-connections {
   list-style: none;
-  margin: 0;
+  margin: 0.25rem 0 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0.15rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
 }
 
-@container (min-width: 19rem) {
-  .dc-connections {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-/* Строка как в «Интеграциях» Discord: иконка в плашке, ник и стрелка */
+/* Строка как в «Интеграциях» Discord: иконка в плашке, ник со стрелкой и цифры под ним */
 .dc-connection {
   display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.35rem 0.4rem 0.35rem 0;
-  border-radius: 0.6rem;
-  color: var(--dc-text);
-}
-
-.dc-connection:focus-visible {
-  outline: 2px solid var(--dc-muted);
-  outline-offset: 1px;
+  align-items: flex-start;
+  gap: 0.85rem;
 }
 
 .dc-connection-icon {
   display: grid;
   place-items: center;
-  width: 2.1rem;
-  height: 2.1rem;
+  width: 2.5rem;
+  height: 2.5rem;
   flex-shrink: 0;
-  border-radius: 0.6rem;
+  border-radius: 0.7rem;
   background: var(--dc-surface);
   border: 1px solid var(--dc-border);
-  font-size: 1.05rem;
+  font-size: 1.35rem;
 }
 
-/* В светлой теме иконки на белых плашках, как в Discord */
+/* В светлой теме — белые плашки и фирменные цвета, как в Discord */
 .dc.is-light .dc-connection-icon {
   background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  color: #111;
 }
 
-.dc-connection-text {
+.dc.is-light .dc-connection-icon.is-twitch {
+  color: #9146ff;
+}
+
+.dc.is-light .dc-connection-icon.is-xbox {
+  color: #107c10;
+}
+
+.dc.is-light .dc-connection-icon.is-youtube {
+  color: #ff0000;
+}
+
+.dc.is-light .dc-connection-icon.is-telegram {
+  color: #229ed9;
+}
+
+.dc.is-light .dc-connection-icon.is-modrinth {
+  color: #1bd96a;
+}
+
+.dc-connection-body {
   display: flex;
   flex-direction: column;
+  gap: 0.3rem;
   min-width: 0;
   flex: 1;
-  line-height: 1.25;
+  /* Ник по центру иконки, даже если строк с цифрами нет */
+  padding-top: 0.45rem;
 }
 
-.dc-connection-handle {
-  font-size: 0.92rem;
+.dc-connection-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  align-self: flex-start;
+  max-width: 100%;
+  color: var(--dc-text);
+  font-size: 1.05rem;
   font-weight: 500;
+  line-height: 1.3;
+}
+
+.dc-connection-name span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.dc-connection-label {
-  font-size: 0.72rem;
-  color: var(--dc-muted);
+.dc-connection-name svg {
+  flex-shrink: 0;
 }
 
-.dc-connection-arrow {
-  flex-shrink: 0;
-  color: var(--dc-muted);
-  opacity: 0.5;
-  transition: opacity 0.2s ease;
+a.dc-connection-name:focus-visible {
+  outline: 2px solid var(--dc-muted);
+  outline-offset: 2px;
+  border-radius: 0.3rem;
 }
 
 @media (hover: hover) {
-  .dc-connection:hover .dc-connection-handle {
+  a.dc-connection-name:hover span {
     text-decoration: underline;
   }
+}
 
-  .dc-connection:hover .dc-connection-arrow {
-    opacity: 1;
-  }
+.dc-connection-line,
+.dc-connection-stats {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: var(--dc-text);
+}
+
+.dc-connection-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.9rem;
+  margin-top: 0.2rem;
+  color: var(--dc-muted);
+}
+
+.dc-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.dc-stat b {
+  font-weight: 400;
+}
+
+/* Предметы игры: круглая иконка и жирное число, как в Discord */
+.dc-stat.has-icon b {
+  font-weight: 700;
+  color: var(--dc-text);
+}
+
+.dc-stat img {
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 9999px;
+  background: #fff;
+  object-fit: cover;
 }
 
 /* Узкая плитка (телефон) */
@@ -706,13 +690,27 @@ const hideBrokenImage = (event: Event): void => {
     font-size: 1.6rem;
   }
 
-  .dc-games-list li {
-    width: 2rem;
-    height: 2rem;
+  .dc-connection {
+    gap: 0.7rem;
   }
 
-  .dc-connection-arrow {
-    display: none;
+  .dc-connection-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 1.2rem;
+  }
+
+  .dc-connection-body {
+    padding-top: 0.3rem;
+  }
+
+  .dc-connection-name {
+    font-size: 0.98rem;
+  }
+
+  .dc-connection-stats {
+    gap: 0.25rem 0.7rem;
+    font-size: 0.8rem;
   }
 }
 </style>
