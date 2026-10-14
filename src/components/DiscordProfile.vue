@@ -221,7 +221,7 @@ const hideBrokenImage = (event: Event): void => {
   --dc-surface: rgba(255, 255, 255, 0.04);
   --dc-border: rgba(255, 255, 255, 0.07);
   --dc-bubble: #232323;
-  --dc-avatar: 6rem;
+  --dc-avatar: 5.25rem;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -241,7 +241,7 @@ const hideBrokenImage = (event: Event): void => {
 
 .dc-banner {
   aspect-ratio: 2.8 / 1;
-  max-height: 11rem;
+  max-height: 9.5rem;
   background: rgba(127, 127, 127, 0.15);
   overflow: hidden;
 }
@@ -385,12 +385,12 @@ const hideBrokenImage = (event: Event): void => {
   display: flex;
   flex-direction: column;
   flex: 1;
-  padding: 0.6rem 1.25rem 1.25rem;
+  padding: 0.5rem 1.1rem 1.1rem;
 }
 
 .dc-name {
   margin: 0;
-  font-size: 1.95rem;
+  font-size: 1.7rem;
   font-weight: 700;
   line-height: 1.2;
   overflow-wrap: anywhere;
@@ -410,8 +410,8 @@ const hideBrokenImage = (event: Event): void => {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.35rem 0.45rem;
-  margin-top: 0.35rem;
-  font-size: 0.92rem;
+  margin-top: 0.3rem;
+  font-size: 0.86rem;
   color: var(--dc-muted);
 }
 
@@ -494,8 +494,8 @@ const hideBrokenImage = (event: Event): void => {
 .dc-section {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  margin-top: 1.1rem;
+  gap: 0.3rem;
+  margin-top: 0.9rem;
 }
 
 .dc-heading {
@@ -508,7 +508,7 @@ const hideBrokenImage = (event: Event): void => {
 .dc-bio,
 .dc-text {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 0.86rem;
   line-height: 1.4;
 }
 
@@ -528,7 +528,7 @@ const hideBrokenImage = (event: Event): void => {
 /* Соцсети прижаты к низу: если карточка выше содержимого, пустота остаётся над ними, а не под */
 .dc-connections-section {
   margin-top: auto;
-  padding-top: 1.1rem;
+  padding-top: 0.9rem;
 }
 
 .dc-connections {
@@ -537,26 +537,26 @@ const hideBrokenImage = (event: Event): void => {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: 0.75rem;
 }
 
 /* Строка как в «Интеграциях» Discord: иконка в плашке, ник со стрелкой и цифры под ним */
 .dc-connection {
   display: flex;
   align-items: flex-start;
-  gap: 0.85rem;
+  gap: 0.75rem;
 }
 
 .dc-connection-icon {
   display: grid;
   place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.15rem;
+  height: 2.15rem;
   flex-shrink: 0;
-  border-radius: 0.7rem;
+  border-radius: 0.6rem;
   background: var(--dc-surface);
   border: 1px solid var(--dc-border);
-  font-size: 1.35rem;
+  font-size: 1.15rem;
 }
 
 /* В светлой теме — белые плашки и фирменные цвета, как в Discord */
@@ -589,11 +589,11 @@ const hideBrokenImage = (event: Event): void => {
 .dc-connection-body {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.2rem;
   min-width: 0;
   flex: 1;
   /* Ник по центру иконки, даже если строк с цифрами нет */
-  padding-top: 0.45rem;
+  padding-top: 0.4rem;
 }
 
 .dc-connection-name {
@@ -603,9 +603,9 @@ const hideBrokenImage = (event: Event): void => {
   align-self: flex-start;
   max-width: 100%;
   color: var(--dc-text);
-  font-size: 1.05rem;
+  font-size: 0.92rem;
   font-weight: 500;
-  line-height: 1.3;
+  line-height: 1.25;
 }
 
 .dc-connection-name span {
@@ -633,7 +633,7 @@ a.dc-connection-name:focus-visible {
 .dc-connection-line,
 .dc-connection-stats {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   line-height: 1.35;
   color: var(--dc-text);
 }
@@ -642,8 +642,8 @@ a.dc-connection-name:focus-visible {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.3rem 0.9rem;
-  margin-top: 0.2rem;
+  gap: 0.25rem 0.75rem;
+  margin-top: 0.15rem;
   color: var(--dc-muted);
 }
 
@@ -664,8 +664,8 @@ a.dc-connection-name:focus-visible {
 }
 
 .dc-stat img {
-  width: 1.45rem;
-  height: 1.45rem;
+  width: 1.25rem;
+  height: 1.25rem;
   border-radius: 9999px;
   background: #fff;
   object-fit: cover;
@@ -686,30 +686,7 @@ a.dc-connection-name:focus-visible {
   }
 
   .dc-name {
-    font-size: 1.6rem;
-  }
-
-  .dc-connection {
-    gap: 0.7rem;
-  }
-
-  .dc-connection-icon {
-    width: 2.25rem;
-    height: 2.25rem;
-    font-size: 1.2rem;
-  }
-
-  .dc-connection-body {
-    padding-top: 0.3rem;
-  }
-
-  .dc-connection-name {
-    font-size: 0.98rem;
-  }
-
-  .dc-connection-stats {
-    gap: 0.25rem 0.7rem;
-    font-size: 0.8rem;
+    font-size: 1.55rem;
   }
 }
 </style>

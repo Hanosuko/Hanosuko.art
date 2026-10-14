@@ -73,6 +73,13 @@ useAnimatedTitle(profile.identity.nickname)
   max-width: 72rem;
 }
 
+/* На десктопе колонка Discord-профиля уже: карточка ближе к размеру профиля в самом Discord */
+@media (min-width: 1024px) {
+  .bento {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+}
+
 .bento-col {
   display: flex;
   flex-direction: column;
