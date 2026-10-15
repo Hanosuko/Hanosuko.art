@@ -1,7 +1,16 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { profile } from '@/config/profile'
 
 const setup = profile.setup
+
+// Рамка берёт пропорции самого фото, поэтому его не обрезает; до загрузки — 4:3, как у нынешнего фото
+const photoRatio = ref('4 / 3')
+
+const onPhotoLoad = (event: Event): void => {
+  const { naturalWidth, naturalHeight } = event.target as HTMLImageElement
+  if (naturalWidth && naturalHeight) photoRatio.value = `${naturalWidth} / ${naturalHeight}`
+}
 </script>
 
 <template>
@@ -11,13 +20,14 @@ const setup = profile.setup
       <p v-if="setup.description" class="setup-description">{{ setup.description }}</p>
     </header>
 
-    <figure class="setup-photo-wrap">
+    <figure class="setup-photo-wrap" :style="{ aspectRatio: photoRatio }">
       <img
         class="setup-photo"
         :src="setup.photoUrl"
         :alt="setup.title"
         loading="lazy"
         decoding="async"
+        @load="onPhotoLoad"
       />
     </figure>
 
@@ -70,7 +80,6 @@ const setup = profile.setup
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: var(--color-background);
-  aspect-ratio: 16 / 10;
   /* Если колонка длиннее плитки, растёт фото, а не пустота под списком */
   flex: 1 0 auto;
   position: relative;
