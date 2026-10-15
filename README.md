@@ -105,6 +105,10 @@ Discord has no public API for connections or for the full badge list (the API gi
 
 Animated banners and decorations load after their static versions and are skipped entirely with `prefers-reduced-motion`.
 
+### Server tag card
+
+Clicking the server tag next to the username (MyTL) opens a server card like in Discord: banner, icon, name, tag, online and member counts, and the founding date (computed from the server ID). Discord has no public API for other servers, so the name, icon, banner colors, and counts are set in `profile.discord.guild`; without it the tag is a plain pill. The «Go to Server» button doesn't navigate anywhere — the label slides away and «Maybe next time :)» slides in, then it switches back. The card closes on a second click on the tag, a click elsewhere, or Esc.
+
 ### Badge tooltips
 
 Hovering a badge shows a tooltip like in Discord. The kind is set per badge in `profile.discord.badges`:
