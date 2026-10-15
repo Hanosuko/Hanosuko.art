@@ -146,14 +146,23 @@ export interface DiscordSettings {
   guild?: DiscordGuildConfig
 }
 
+// Строка сервера из списка серверов Minecraft. Все картинки — скриншоты игры при интерфейсе ×2
+export interface ServerMotd {
+  // Обычное состояние: строка 610×72 с прозрачным фоном
+  image: string
+  // По клику: та же строка в белой рамке на чёрном, как выбранный сервер в игре
+  selectedImage: string
+  // Подсказка при наведении на онлайн и значок пинга
+  tooltipImage: string
+  // Текст подсказки для скринридеров
+  tooltipText: string
+}
+
 export interface ServerSettings {
   name: string
-  // IP для игроков: по нему проверяется онлайн, он же подписан на плитке
+  // IP для игроков: по нему проверяется онлайн
   address: string
-  // Логотип плитки; без него — иконка сервера из майнкрафта
-  logoUrl?: string
-  // Полоска заполняется так, будто слотов столько, а не players.max (991 — полоска почти пустая)
-  barMax?: number
+  motd: ServerMotd
 }
 
 export interface CistiersSettings {

@@ -10,7 +10,7 @@ The page is a responsive bento layout: a Discord-style profile with live status,
 - Discord profile card: banner, avatar decoration, profile effect, badges with Discord-style hover cards, server tag, live status, custom status, activities and Spotify, connections with TikTok stats
 - Animated icons ([morphicons](https://www.morphicons.com)): play/pause, mute, copy IP, hover effects
 - Tiers card with MyTiers / CISTiers tabs, each styled like its own site, with its font and hover tooltips; kit icons and logos are stored in the project
-- Minecraft server status: online players bar and a copy-IP button
+- Minecraft server status as a row from the in-game server list: MOTD, live online count in the game font, selection on click, tooltip on the ping icon
 - Link preview (Open Graph) image generated at build time from the config
 - Music player with an auto-generated `public/music/manifest.json`
 - Photo bento for up to 6 photos and a PC setup tile
@@ -203,11 +203,17 @@ import { MorphIcon } from 'morphicons/vue'
 
 ## Minecraft Server Status
 
-The server tile (`profile.server`) is a short row: the server logo, the name, online/max players with a bar, and a button with the server IP. Data comes from our `GET /api/server` (`server/minecraft.js`): the backend pings the server itself over the Minecraft Server List Ping protocol (SRV record first, then port 25565) and caches the answer for 30 seconds; the tile refreshes every 30 seconds. It's faster than [api.mcsrvstat.us](https://api.mcsrvstat.us), which caches for 5 minutes and is often slow without a VPN from Russia — mcsrvstat.us is only used when the backend doesn't answer. In dev and preview Vite answers `/api/server` itself. The pinged address is `cisprac.xyz` by default (`server/minecraft.js`); set `MC_SERVER_ADDRESS` (`host` or `host:port`) for another server. When the server is offline it reports no players, so the bar is hidden and only the name is left. Turn the tile off with `features.serverStatus`.
+The server tile (`profile.server`) looks like the server's row in the Minecraft multiplayer list: icon, name, MOTD, ping icon and the online count.
 
-- `logoUrl` — the logo (the CISPractice one is the www.cisprac.xyz favicon, stored in `src/assets/brands/`). Without it the in-game server icon is shown
-- `barMax` — the bar is full at this many players instead of the slot count (991 slots make even 100 players a thin sliver); the numbers still show the real max
-- `address` — the IP players connect to. The button copies it: the copy icon morphs into a check, the address slides up and «IP copied!» slides in, the button turns green for a moment. In a very narrow tile only the icon is left
+- The row is a game screenshot at GUI scale 2 (610×72): `motd.image` with a transparent background for the normal state and `motd.selectedImage` (white frame on black, like a selected server in the game) after a click. A click anywhere else, Tab or Esc returns the normal state; a second click on the row does too. Both images are in `src/assets/server/`. The normal one was made from the selected one: the frame removed and the black background made transparent, so both states show exactly the same MOTD (obfuscated `§k` characters differ between screenshots otherwise).
+- The online count («45/991») is drawn on top in the top right corner, like in the game: in the game font, with the same vertical gradient and shadow, 13 px left of the ping icon (`src/utils/minecraftText.ts`). The digits 4, 5, 9, 1 and «/» were taken pixel by pixel from a game screenshot; 0, 2, 3, 6, 7 and 8 were not on it and are drawn in the same style — fix any of them right in the glyph table. While the server hasn't answered or is offline the count is hidden.
+- Hovering the count or the ping icon shows `motd.tooltipImage` next to the cursor, like a game tooltip (on phones — tap, it hides on the next tap). `motd.tooltipText` is the same text for screen readers.
+- The row is drawn on a canvas so it can't be dragged or saved by a long press. Its size is picked so that one game GUI pixel is a whole number of screen pixels (610 px wide on desktop, 305 px on phones), otherwise the pixels would come out uneven. If the coordinates of the ping icon change in a new screenshot, update the constants at the top of `ServerStatus.vue`.
+
+Data comes from our `GET /api/server` (`server/minecraft.js`): the backend pings the server itself over the Minecraft Server List Ping protocol (SRV record first, then port 25565) and caches the answer for 30 seconds; the tile refreshes every 30 seconds. It's faster than [api.mcsrvstat.us](https://api.mcsrvstat.us), which caches for 5 minutes and is often slow without a VPN from Russia — mcsrvstat.us is only used when the backend doesn't answer. In dev and preview Vite answers `/api/server` itself. The pinged address is `cisprac.xyz` by default (`server/minecraft.js`); set `MC_SERVER_ADDRESS` (`host` or `host:port`) for another server. Turn the tile off with `features.serverStatus`.
+
+- `address` — the IP players connect to; its online count is shown
+- `motd` — the three images and the tooltip text described above
 
 The partner pills (`profile.partners`) sit under the tiers card in one row; their icons are the same logos stored in the project.
 

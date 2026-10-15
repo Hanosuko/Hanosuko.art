@@ -19,6 +19,9 @@ import orbsApprenticeCard from '@/assets/badges/orbs-apprentice.webp'
 import giftingPatronCard from '@/assets/badges/gifting-patron.png'
 import mytlGuildIcon from '@/assets/brands/mytl-guild.webp'
 import cispracticeLogo from '@/assets/brands/cispractice.webp'
+import motdImage from '@/assets/server/motd.png'
+import motdSelectedImage from '@/assets/server/motd-selected.png'
+import motdTooltipImage from '@/assets/server/motd-tooltip.png'
 import letsPlayIntro from '@/assets/effects/lets-play/intro.png'
 import letsPlayLoop from '@/assets/effects/lets-play/loop.png'
 import letsPlayStatic from '@/assets/effects/lets-play/static.png'
@@ -202,16 +205,22 @@ export const profile: Profile = {
     siteUrl: 'https://cistiers.com',
   },
 
-  // 👇 СТАТУС MINECRAFT-СЕРВЕРА: плитка с логотипом, «IP: address» и полоской онлайна.
+  // 👇 СТАТУС MINECRAFT-СЕРВЕРА: плитка — строка сервера из списка серверов Minecraft (MOTD).
+  // По клику строка выделяется рамкой, клик в любое другое место снимает выделение.
+  // Онлайн «45/991» рисуется поверх картинки шрифтом игры (src/utils/minecraftText.ts), наведение
+  // на онлайн и значок пинга показывает подсказку. Картинки лежат в src/assets/server/, как их
+  // сделать — в README, раздел «Minecraft Server Status».
   // Онлайн пингует наш сервер (/api/server, раз в 30 секунд), запасной вариант — api.mcsrvstat.us.
   // Адрес для /api/server задаётся в server/minecraft.js или переменной MC_SERVER_ADDRESS. Выключить — features.serverStatus.
-  // Логотип — фавикон www.cisprac.xyz, лежит в src/assets/brands/
   server: {
     name: 'CISPractice',
     address: 'cisprac.xyz',
-    logoUrl: cispracticeLogo,
-    // 👇 Полоска заполнена целиком при стольких игроках (слотов 991, но столько не бывает)
-    barMax: 300,
+    motd: {
+      image: motdImage,
+      selectedImage: motdSelectedImage,
+      tooltipImage: motdTooltipImage,
+      tooltipText: 'dsc.gg/cisprac, t.me/cisprac',
+    },
   },
 
   // 👇 ПАРТНЁРЫ — короткие плашки в ряд под карточкой тиров. Иконки — те же логотипы, что лежат в проекте
