@@ -207,9 +207,10 @@ export const profile: Profile = {
     ],
   },
 
-  // 👇 ГАЛЕРЕЯ: плитка-коллаж из 4 фото.
-  // Место и ширина плитки в бенто-сетке — в src/App.vue.
-  // Файлы можно положить в src/assets/photos/ или public/photos/.
+  // 👇 ГАЛЕРЕЯ: плитка-бенто до 6 фото: 1-е — широкое сверху, 2-е и 3-е — квадраты слева,
+  // 4-е — высокое справа (под вертикальное фото), 5-е и 6-е — нижний ряд. Раскладка сама
+  // подстраивается под число фото. Добавить фото: положи photo5.jpg / photo6.jpg в public/photos/
+  // (или src/assets/photos/) и убери // перед строкой ниже. Фото без файла просто не показывается.
   gallery: {
     title: 'me :]',
     photos: [
@@ -217,6 +218,8 @@ export const profile: Profile = {
       photoUrl('photo2.jpg'),
       photoUrl('photo3.jpg'),
       photoUrl('photo4.jpg'),
+      // photoUrl('photo5.jpg'),
+      // photoUrl('photo6.jpg'),
     ],
   },
 }

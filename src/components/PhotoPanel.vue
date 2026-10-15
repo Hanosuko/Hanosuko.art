@@ -1,7 +1,19 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import { profile } from '@/config/profile'
 
 const gallery = profile.gallery
+
+// Фото, которое не загрузилось (файла нет), убираем — раскладка перестраивается под оставшиеся
+const missing = ref(new Set<string>())
+const photos = computed(() => gallery.photos.filter((src) => !missing.value.has(src)))
+
+const dropPhoto = (src: string): void => {
+  missing.value = new Set(missing.value).add(src)
+}
+
+// Своя раскладка для 1–6 фото; седьмое и дальше встают парами ниже
+const layout = computed(() => `count-${Math.min(photos.value.length, 6)}`)
 </script>
 
 <template>
@@ -10,9 +22,9 @@ const gallery = profile.gallery
       <h2 class="photo-title">{{ gallery.title }}</h2>
     </header>
 
-    <div class="photo-grid">
+    <div class="photo-grid" :class="layout">
       <figure
-        v-for="(src, index) in gallery.photos"
+        v-for="(src, index) in photos"
         :key="src"
         class="photo-cell"
         :class="`photo-cell-${index + 1}`"
@@ -23,6 +35,7 @@ const gallery = profile.gallery
           :alt="`${gallery.title} ${index + 1}`"
           loading="lazy"
           decoding="async"
+          @error="dropPhoto(src)"
         />
       </figure>
     </div>
@@ -57,21 +70,55 @@ const gallery = profile.gallery
   color: var(--color-accent);
 }
 
+/* Бенто: 1-е фото широкое сверху, 2-е и 3-е — квадраты слева, 4-е — высокое справа
+   (под вертикальное фото), 5-е и 6-е — нижний ряд. Ряды не ниже минимума, а если колонка
+   длиннее — коллаж дотягивается до её низа и фото растут */
 .photo-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(10.5rem, 1.35fr);
+  grid-auto-rows: minmax(8.5rem, 1fr);
   gap: 0.5rem;
   flex: 1 1 auto;
-  /* Пропорции задают высоту плитки; если колонка длиннее — коллаж дотягивается до её низа */
-  aspect-ratio: 3 / 4;
 }
 
-/* В широкой плитке коллаж квадратный, иначе он выходит длиннее соседней колонки */
-@container (min-width: 30rem) {
-  .photo-grid {
-    aspect-ratio: 1 / 1;
-  }
+.photo-grid.count-1 {
+  grid-template-areas: 'p1 p1';
+}
+
+.photo-grid.count-2 {
+  grid-template-areas:
+    'p1 p1'
+    'p2 p2';
+}
+
+.photo-grid.count-3 {
+  grid-template-areas:
+    'p1 p1'
+    'p2 p3';
+}
+
+.photo-grid.count-4 {
+  grid-template-areas:
+    'p1 p1'
+    'p2 p4'
+    'p3 p4';
+}
+
+.photo-grid.count-5 {
+  grid-template-areas:
+    'p1 p1'
+    'p2 p4'
+    'p3 p4'
+    'p5 p5';
+}
+
+.photo-grid.count-6 {
+  grid-template-areas:
+    'p1 p1'
+    'p2 p4'
+    'p3 p4'
+    'p5 p6';
 }
 
 .photo-cell {
@@ -96,23 +143,27 @@ const gallery = profile.gallery
 }
 
 .photo-cell-1 {
-  grid-column: span 2;
-  grid-row: span 1;
+  grid-area: p1;
 }
 
 .photo-cell-2 {
-  grid-column: span 2;
-  grid-row: span 1;
+  grid-area: p2;
 }
 
 .photo-cell-3 {
-  grid-column: 1;
-  grid-row: 3;
+  grid-area: p3;
 }
 
 .photo-cell-4 {
-  grid-column: 2;
-  grid-row: 3;
+  grid-area: p4;
+}
+
+.photo-cell-5 {
+  grid-area: p5;
+}
+
+.photo-cell-6 {
+  grid-area: p6;
 }
 
 .photo-img {
