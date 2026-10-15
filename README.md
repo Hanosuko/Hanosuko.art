@@ -10,7 +10,7 @@ The page is a responsive bento layout: a Discord-style profile with live status,
 - Discord profile card: banner, avatar decoration, profile effect, badges with Discord-style hover cards, server tag, live status, custom status, activities and Spotify, connections with TikTok stats
 - Animated icons ([morphicons](https://www.morphicons.com)): play/pause, mute, copy IP, hover effects
 - Tiers card with MyTiers / CISTiers tabs, each styled like its own site, with its font and hover tooltips; kit icons and logos are stored in the project
-- Minecraft server status as a row from the in-game server list: MOTD, live online count in the game font, selection on click, tooltip on the ping icon
+- Minecraft server status as a small in-game «Multiplayer» screen: the server row with MOTD and live online count in the game font, selection on click, the «Play» arrow, tooltip on the ping icon, game-style buttons
 - Link preview (Open Graph) image generated at build time from the config
 - Music player with an auto-generated `public/music/manifest.json`
 - Photo bento for up to 6 photos and a PC setup tile
@@ -203,17 +203,22 @@ import { MorphIcon } from 'morphicons/vue'
 
 ## Minecraft Server Status
 
-The server tile (`profile.server`) looks like the server's row in the Minecraft multiplayer list: icon, name, MOTD, ping icon and the online count.
+The server tile (`profile.server`) is a small Minecraft «Multiplayer» screen: a heading like the other tiles (`title`, `description`), the dark server list with separators, the server's row in it (icon, name, MOTD, ping icon and the online count), the «Scanning for games on your local network» line with running dots, and two game-style buttons: «Play» opens `siteUrl` in a new tab, «Refresh» pings the server again (the ping bars run and the count is hidden while it waits, like in the game). Texts are in `labels`.
 
-- The row is a game screenshot at GUI scale 2 (610×72): `motd.image` with a transparent background for the normal state and `motd.selectedImage` (white frame on black, like a selected server in the game) after a click. A click anywhere else, Tab or Esc returns the normal state; a second click on the row does too. Both images are in `src/assets/server/`. The normal one was made from the selected one: the frame removed and the black background made transparent, so both states show exactly the same MOTD (obfuscated `§k` characters differ between screenshots otherwise).
+On desktop the tile stretches down to the bottom of the player on the left, so its height depends on the Discord card. Only the row in the list is required; the buttons, the heading and the LAN line appear in that order when the tile is tall enough, and the content never makes the tile taller — so the neighbouring tiles never move. On phones (narrower than 768 px) the whole screen is shown and the row fills the full width.
+
+- The row is a game screenshot at GUI scale 2 (610×72): `motd.image`, with a transparent background and an empty icon square. A click selects it like in the game — a white frame on black, drawn by the site; a click anywhere else (buttons included), a second click on the row, Tab or Esc removes the selection.
+- The icon is `motd.logo` in high quality (not the pixelated 64×64 server icon). Hovering the row shades the icon and shows the «Play» arrow (`motd.joinImage`), hovering the arrow highlights it (`motd.joinHighlightedImage`), a click on it opens `siteUrl` in a new tab. On phones the arrow appears on a selected row: tap the row, then tap the arrow.
 - The online count («45/991») is drawn on top in the top right corner, like in the game: in the game font, with the same vertical gradient and shadow, 13 px left of the ping icon (`src/utils/minecraftText.ts`). The digits 4, 5, 9, 1 and «/» were taken pixel by pixel from a game screenshot; 0, 2, 3, 6, 7 and 8 were not on it and are drawn in the same style — fix any of them right in the glyph table. While the server hasn't answered or is offline the count is hidden.
 - Hovering the count or the ping icon shows `motd.tooltipImage` next to the cursor, like a game tooltip (on phones — tap, it hides on the next tap). `motd.tooltipText` is the same text for screen readers.
-- The row is drawn on a canvas so it can't be dragged or saved by a long press. Its size is picked so that one game GUI pixel is a whole number of screen pixels (610 px wide on desktop, 305 px on phones), otherwise the pixels would come out uneven. If the coordinates of the ping icon change in a new screenshot, update the constants at the top of `ServerStatus.vue`.
+- The row is drawn on a canvas so it can't be dragged or saved by a long press. On desktop its size is picked so that one game GUI pixel is a whole number of screen pixels (610 px wide), otherwise the pixels come out uneven; on phones it fills the width. If the icon or the ping icon moves in a new screenshot, update the constants at the top of `ServerStatus.vue`.
 
-Data comes from our `GET /api/server` (`server/minecraft.js`): the backend pings the server itself over the Minecraft Server List Ping protocol (SRV record first, then port 25565) and caches the answer for 30 seconds; the tile refreshes every 30 seconds. It's faster than [api.mcsrvstat.us](https://api.mcsrvstat.us), which caches for 5 minutes and is often slow without a VPN from Russia — mcsrvstat.us is only used when the backend doesn't answer. In dev and preview Vite answers `/api/server` itself. The pinged address is `cisprac.xyz` by default (`server/minecraft.js`); set `MC_SERVER_ADDRESS` (`host` or `host:port`) for another server. Turn the tile off with `features.serverStatus`.
+Data comes from our `GET /api/server` (`server/minecraft.js`): the backend pings the server itself over the Minecraft Server List Ping protocol (SRV record first, then port 25565) and caches the answer for 30 seconds; the tile refreshes every 30 seconds. «Refresh» asks for `?fresh=1` — a new ping, but not more often than once every 5 seconds. It's faster than [api.mcsrvstat.us](https://api.mcsrvstat.us), which caches for 5 minutes and is often slow without a VPN from Russia — mcsrvstat.us is only used when the backend doesn't answer. In dev and preview Vite answers `/api/server` itself. The pinged address is `cisprac.xyz` by default (`server/minecraft.js`); set `MC_SERVER_ADDRESS` (`host` or `host:port`) for another server. Turn the tile off with `features.serverStatus`.
 
 - `address` — the IP players connect to; its online count is shown
-- `motd` — the three images and the tooltip text described above
+- `siteUrl` — opened by the arrow and «Play»
+- `title`, `description`, `labels` — texts of the tile
+- `motd` — the images and the tooltip text described above
 
 The partner pills (`profile.partners`) sit under the tiers card in one row; their icons are the same logos stored in the project.
 

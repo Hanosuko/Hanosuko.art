@@ -146,22 +146,38 @@ export interface DiscordSettings {
   guild?: DiscordGuildConfig
 }
 
-// Строка сервера из списка серверов Minecraft. Все картинки — скриншоты игры при интерфейсе ×2
+// Строка сервера из списка серверов Minecraft. Картинки строки — скриншоты игры при интерфейсе ×2
 export interface ServerMotd {
-  // Обычное состояние: строка 610×72 с прозрачным фоном
+  // Строка 610×72 с прозрачным фоном и пустым квадратом иконки. Рамку выделения по клику рисует сайт
   image: string
-  // По клику: та же строка в белой рамке на чёрном, как выбранный сервер в игре
-  selectedImage: string
+  // Логотип в иконке — в высоком качестве, без фона
+  logo: string
+  // Стрелка поверх иконки при наведении на строку и она же, когда курсор на самой стрелке
+  joinImage: string
+  joinHighlightedImage: string
   // Подсказка при наведении на онлайн и значок пинга
   tooltipImage: string
   // Текст подсказки для скринридеров
   tooltipText: string
 }
 
+// Надписи экрана «Сетевая игра» вокруг строки
+export interface ServerScreenLabels {
+  scanning: string
+  play: string
+  refresh: string
+}
+
 export interface ServerSettings {
   name: string
   // IP для игроков: по нему проверяется онлайн
   address: string
+  // Сайт сервера: стрелка в иконке и кнопка «Играть» открывают его в новой вкладке
+  siteUrl: string
+  // Заголовок плитки, как у соседних блоков
+  title: string
+  description?: string
+  labels: ServerScreenLabels
   motd: ServerMotd
 }
 

@@ -20,7 +20,9 @@ import giftingPatronCard from '@/assets/badges/gifting-patron.png'
 import mytlGuildIcon from '@/assets/brands/mytl-guild.webp'
 import cispracticeLogo from '@/assets/brands/cispractice.webp'
 import motdImage from '@/assets/server/motd.png'
-import motdSelectedImage from '@/assets/server/motd-selected.png'
+import motdLogo from '@/assets/server/logo.webp'
+import motdJoinImage from '@/assets/server/motd-join.webp'
+import motdJoinHighlightedImage from '@/assets/server/motd-join-highlighted.webp'
 import motdTooltipImage from '@/assets/server/motd-tooltip.png'
 import letsPlayIntro from '@/assets/effects/lets-play/intro.png'
 import letsPlayLoop from '@/assets/effects/lets-play/loop.png'
@@ -205,8 +207,10 @@ export const profile: Profile = {
     siteUrl: 'https://cistiers.com',
   },
 
-  // 👇 СТАТУС MINECRAFT-СЕРВЕРА: плитка — строка сервера из списка серверов Minecraft (MOTD).
-  // По клику строка выделяется рамкой, клик в любое другое место снимает выделение.
+  // 👇 СТАТУС MINECRAFT-СЕРВЕРА: плитка — экран «Сетевая игра» из Minecraft: заголовок, список со строкой
+  // сервера (MOTD) и поиском игр в локальной сети, кнопки «Играть» и «Обновить». Если плитка низкая,
+  // лишнее прячется. По клику строка выделяется рамкой, клик в любое другое место снимает выделение.
+  // Наведение на строку показывает стрелку в иконке, клик по стрелке открывает siteUrl.
   // Онлайн «45/991» рисуется поверх картинки шрифтом игры (src/utils/minecraftText.ts), наведение
   // на онлайн и значок пинга показывает подсказку. Картинки лежат в src/assets/server/, как их
   // сделать — в README, раздел «Minecraft Server Status».
@@ -215,9 +219,19 @@ export const profile: Profile = {
   server: {
     name: 'CISPractice',
     address: 'cisprac.xyz',
+    siteUrl: 'https://www.cisprac.xyz',
+    title: 'My Server',
+    description: 'CISPractice — Minecraft PvP server',
+    labels: {
+      scanning: 'Поиск игр в локальной сети',
+      play: 'Играть',
+      refresh: 'Обновить',
+    },
     motd: {
       image: motdImage,
-      selectedImage: motdSelectedImage,
+      logo: motdLogo,
+      joinImage: motdJoinImage,
+      joinHighlightedImage: motdJoinHighlightedImage,
       tooltipImage: motdTooltipImage,
       tooltipText: 'dsc.gg/cisprac, t.me/cisprac',
     },
