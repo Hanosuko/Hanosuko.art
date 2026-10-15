@@ -59,7 +59,7 @@ onMounted(() => {
 <style scoped>
 /* Цвета и размеры сняты со скриншотов Discord */
 .badge-tip {
-  --tip-bg: #0a0a0b;
+  --tip-bg: #121212;
   --tip-border: #26262a;
   position: fixed;
   top: 0;
