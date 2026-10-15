@@ -1,5 +1,6 @@
 import type { Profile } from '@/types/profile'
 import { identity } from './identity'
+import mytiersLogo from '@/assets/tiers/mytiers-logo.svg'
 
 const photoAssets = import.meta.glob('/src/assets/photos/*.{avif,gif,jpeg,jpg,png,webp}', {
   eager: true,
@@ -169,17 +170,17 @@ export const profile: Profile = {
     logoUrl: '/brands/cispractice.webp',
   },
 
-  // 👇 ПАРТНЁРЫ — короткие плашки в ряд под карточкой тиров
+  // 👇 ПАРТНЁРЫ — короткие плашки в ряд под карточкой тиров. Иконки — те же логотипы, что лежат в проекте
   partners: [
     {
       name: 'cisprac.xyz',
       url: 'https://cisprac.xyz',
-      iconUrl: 'https://www.google.com/s2/favicons?domain=cisprac.xyz&sz=64',
+      iconUrl: '/brands/cispractice.webp',
     },
     {
       name: 'mytiers.ru',
       url: 'https://mytiers.ru',
-      iconUrl: 'https://mytiers.ru/favicon-32x32.png',
+      iconUrl: mytiersLogo,
     },
   ],
 
