@@ -15,6 +15,25 @@ const LANYARD_REST = 'https://api.lanyard.rest/v1/users/'
 const LANYARD_SOCKET = 'wss://api.lanyard.rest/socket'
 const JAPI = 'https://japi.rest/discord/v1/user/'
 const DISCORD_EPOCH = 1420070400000n
+// Те же ответы через наш сервер (server/discord.js) — без VPN japi.rest и Lanyard могут не открыться
+const API = '/api/discord/'
+// Если WebSocket Lanyard не открывается — статус опрашивается через наш сервер
+const POLL_MS = 30_000
+
+// Сначала наш сервер, при ошибке — сам сервис напрямую (например, если бэкенд не запущен)
+const getJson = async <T>(urls: string[]): Promise<T> => {
+  let lastError: unknown
+  for (const url of urls) {
+    try {
+      const response = await fetch(url, { signal: AbortSignal.timeout(10_000) })
+      if (!response.ok) throw new Error(`${url} responded ${response.status}`)
+      return (await response.json()) as T
+    } catch (caught) {
+      lastError = caught
+    }
+  }
+  throw lastError
+}
 
 // Значки из битового поля public_flags (официальная документация Discord) + Nitro от japi.rest
 const FLAG_BADGES: { bit: number; id: string; label: string; icon: string }[] = [
@@ -60,9 +79,7 @@ export function useDiscordProfile(userId: string, media: DiscordMedia = {}) {
 
   const loadUser = async (): Promise<void> => {
     try {
-      const response = await fetch(`${JAPI}${userId}`)
-      if (!response.ok) throw new Error(`japi.rest responded ${response.status}`)
-      user.value = ((await response.json()) as JapiResponse).data
+      user.value = (await getJson<JapiResponse>([`${API}user?id=${userId}`, `${JAPI}${userId}`])).data
     } catch (caught) {
       console.warn('[discord] profile fetch failed:', caught instanceof Error ? caught.message : caught)
     }
@@ -72,12 +89,37 @@ export function useDiscordProfile(userId: string, media: DiscordMedia = {}) {
   let socket: WebSocket | null = null
   let heartbeat: number | undefined
   let reconnectTimer: number | undefined
+  let pollTimer: number | undefined
   let reconnectDelay = 2000
   let disposed = false
 
+  const fetchPresence = (): Promise<LanyardResponse> =>
+    getJson<LanyardResponse>([`${API}presence?id=${userId}`, `${LANYARD_REST}${userId}`])
+
+  // WebSocket так и не открылся (Lanyard недоступен) — опрашиваем наш сервер, пока вкладка видна
+  const startPolling = (): void => {
+    if (pollTimer !== undefined || disposed) return
+    pollTimer = window.setInterval(() => {
+      if (document.visibilityState !== 'visible') return
+      fetchPresence()
+        .then((payload) => {
+          if (payload.success && payload.data) presence.value = payload.data
+        })
+        .catch(() => undefined)
+    }, POLL_MS)
+  }
+
   const connect = (): void => {
-    socket = new WebSocket(LANYARD_SOCKET)
-    socket.addEventListener('message', (event) => {
+    let opened = false
+    const current = new WebSocket(LANYARD_SOCKET)
+    socket = current
+    // При блокировке соединение может висеть без ответа минутами — ждём 10 секунд
+    const openTimeout = window.setTimeout(() => current.close(), 10_000)
+    current.addEventListener('open', () => {
+      opened = true
+      window.clearTimeout(openTimeout)
+    })
+    current.addEventListener('message', (event) => {
       let message: { op: number; d?: { heartbeat_interval?: number } & Partial<LanyardPresence> }
       try {
         message = JSON.parse(String(event.data))
@@ -93,9 +135,14 @@ export function useDiscordProfile(userId: string, media: DiscordMedia = {}) {
         presence.value = message.d as LanyardPresence
       }
     })
-    socket.addEventListener('close', () => {
+    current.addEventListener('close', () => {
+      window.clearTimeout(openTimeout)
       window.clearInterval(heartbeat)
       if (disposed) return
+      if (!opened) {
+        startPolling()
+        return
+      }
       reconnectTimer = window.setTimeout(connect, reconnectDelay)
       reconnectDelay = Math.min(reconnectDelay * 2, 60_000)
     })
@@ -103,8 +150,7 @@ export function useDiscordProfile(userId: string, media: DiscordMedia = {}) {
 
   const loadPresence = async (): Promise<void> => {
     try {
-      const response = await fetch(`${LANYARD_REST}${userId}`)
-      const payload = (await response.json()) as LanyardResponse
+      const payload = await fetchPresence()
       // user_not_monitored — пользователь ещё не зашёл на discord.gg/lanyard
       if (!payload.success || !payload.data) return
       presence.value = payload.data
@@ -123,6 +169,7 @@ export function useDiscordProfile(userId: string, media: DiscordMedia = {}) {
     disposed = true
     window.clearInterval(heartbeat)
     window.clearTimeout(reconnectTimer)
+    window.clearInterval(pollTimer)
     socket?.close()
   })
 

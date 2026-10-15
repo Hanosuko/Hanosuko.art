@@ -14,5 +14,5 @@
     "outDir": "./dist-tsc",
     "types": ["node"]
   },
-  "include": ["vite.config.ts", "vite-plugins/**/*.ts", "server/cistiers.js", "server/minecraft.js"]
+  "include": ["vite.config.ts", "vite-plugins/**/*.ts", "server/cistiers.js", "server/minecraft.js", "server/discord.js"]
 }

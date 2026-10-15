@@ -84,7 +84,7 @@ Every tile is a CSS container (`container-type: inline-size`), so components ada
 
 ## Discord Profile
 
-The profile card is built from the Discord user ID (`profile.discord.userId`) and public APIs that work straight from the browser:
+The profile card is built from the Discord user ID (`profile.discord.userId`) and public APIs. japi.rest and Lanyard are called through our backend first (`GET /api/discord/user?id=` and `/api/discord/presence?id=`, `server/discord.js`, cached for 10 minutes and 10 seconds), because without a VPN the browser may not reach them from Russia; if the backend doesn't answer, the browser calls them directly. Live updates come from the Lanyard WebSocket; if it doesn't open within 10 seconds, the status is polled through the backend every 30 seconds instead. The backend proxies only one user ID (`DISCORD_USER_ID`, by default the one in `server/discord.js`), so it can't be used as an open proxy. In dev and preview Vite answers these routes itself.
 
 | Data | Source | Updates |
 | --- | --- | --- |

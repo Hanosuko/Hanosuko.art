@@ -4,10 +4,11 @@ import { fileURLToPath, URL } from 'node:url'
 import { musicManifestPlugin } from './vite-plugins/music-manifest'
 import { cistiersDevApiPlugin } from './vite-plugins/cistiers-dev-api'
 import { serverStatusDevApiPlugin } from './vite-plugins/server-status-dev-api'
+import { discordDevApiPlugin } from './vite-plugins/discord-dev-api'
 import { ogImagePlugin } from './vite-plugins/og-image'
 
 export default defineConfig({
-  plugins: [vue(), musicManifestPlugin(), cistiersDevApiPlugin(), serverStatusDevApiPlugin(), ogImagePlugin()],
+  plugins: [vue(), musicManifestPlugin(), cistiersDevApiPlugin(), serverStatusDevApiPlugin(), discordDevApiPlugin(), ogImagePlugin()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
