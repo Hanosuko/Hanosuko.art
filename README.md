@@ -89,7 +89,7 @@ The profile card is built from the Discord user ID (`profile.discord.userId`) an
 | Data | Source | Updates |
 | --- | --- | --- |
 | Status, device, custom status, games, Spotify | [Lanyard](https://github.com/Phineas/lanyard) (REST + WebSocket) | live |
-| Avatar, banner, avatar decoration, server tag icon, badge icons | local copies in `public/discord/` and `public/badges/icons/` (`profile.discord.media`) | manual |
+| Avatar, banner, avatar decoration, server tag icon, badge icons | local copies in `src/assets/discord/`, `public/discord/avatar.png` and `src/assets/badges/icons/` (`profile.discord.media`) | manual |
 | Display name, server tag | Lanyard, with the full profile as fallback | live |
 | HypeSquad and Nitro badges (when `badges` is not set) | [japi.rest](https://japi.rest) | on page load |
 | Full badge list with hover tooltips, connections (with TikTok stats) | `profile.discord.badges`, `profile.discord.connections` | manual |
@@ -102,19 +102,19 @@ The profile card is built from the Discord user ID (`profile.discord.userId`) an
 
 ### Discord images
 
-`cdn.discordapp.com` doesn't open in Russia without a VPN, so the avatar, banner, decoration and server tag icon are stored in the project and set in `profile.discord.media` — they always win over what the API returns. Remove a field and the card falls back to the Discord CDN. After changing them in Discord, download them again (from somewhere the CDN opens). The hashes are in `https://japi.rest/discord/v1/user/<id>` → `data`:
+`cdn.discordapp.com` doesn't open in Russia without a VPN, so the avatar, banner, decoration and server tag icon are stored in the project and set in `profile.discord.media` — they always win over what the API returns. They are in `src/assets/discord/` (the build adds a hash to the names, so they are cached for a year and a new file shows up right away); only the avatar is in `public/discord/`, because the link preview (`identity.avatarUrl`) is rendered from it too. Remove a field and the card falls back to the Discord CDN. After changing them in Discord, download them again (from somewhere the CDN opens). The hashes are in `https://japi.rest/discord/v1/user/<id>` → `data`:
 
 ```sh
 C=https://cdn.discordapp.com U=<user id>
-curl -o public/discord/avatar.png              "$C/avatars/$U/<avatar>.png?size=256"
-curl -o public/discord/banner.png              "$C/banners/$U/<banner>.png?size=600"
-curl -o public/discord/banner.webp             "$C/banners/$U/<banner>.webp?size=600&animated=true"
-curl -o public/discord/decoration.png          "$C/avatar-decoration-presets/<avatar_decoration_data.asset>.png?size=240&passthrough=false"
-curl -o public/discord/decoration-animated.png "$C/avatar-decoration-presets/<avatar_decoration_data.asset>.png?size=240&passthrough=true"
-curl -o public/discord/clan-badge.png          "$C/clan-badges/<primary_guild.identity_guild_id>/<primary_guild.badge>.png?size=32"
+curl -o public/discord/avatar.png                  "$C/avatars/$U/<avatar>.png?size=256"
+curl -o src/assets/discord/banner.png              "$C/banners/$U/<banner>.png?size=600"
+curl -o src/assets/discord/banner.webp             "$C/banners/$U/<banner>.webp?size=600&animated=true"
+curl -o src/assets/discord/decoration.png          "$C/avatar-decoration-presets/<avatar_decoration_data.asset>.png?size=240&passthrough=false"
+curl -o src/assets/discord/decoration-animated.png "$C/avatar-decoration-presets/<avatar_decoration_data.asset>.png?size=240&passthrough=true"
+curl -o src/assets/discord/clan-badge.png          "$C/clan-badges/<primary_guild.identity_guild_id>/<primary_guild.badge>.png?size=32"
 ```
 
-Badge icons from `profile.discord.badges` are in `public/badges/icons/` (`$C/badge-icons/<hash>.png`).
+Badge icons from `profile.discord.badges` are in `src/assets/badges/icons/` (`$C/badge-icons/<hash>.png`).
 
 Discord has no public API for connections or for the full badge list (the API gives only HypeSquad and Nitro), so both are listed in the config. Connections are shown like in Discord: an icon tile, the account name with an arrow when there is a `url` (Discord shows Epic Games and Xbox without one), and stats under the name. The `metadata` keys are the same as in Discord: `created_at`, `game_count`, `item_count_dota2`, `item_count_tf2` for Steam, `follower_count`, `following_count`, `likes_count` for TikTok. The numbers are updated by hand. TikTok blocks requests from servers with an anti-bot page, so they can't be fetched automatically; the official way is the [TikTok Display API](https://developers.tiktok.com/doc/tiktok-api-v2-get-user-info), which needs a TikTok developer app authorized by the account owner. Links from `profile.social` are added after the connections, except for services that are already in `connections`.
 
@@ -130,7 +130,7 @@ Hovering a badge shows a tooltip like in Discord. The kind is set per badge in `
 
 - no `tooltip` — a dark tooltip with the badge `label` (HypeSquad, Completed a Quest, Originally known as…); long text wraps
 - `tooltip: { kind: 'detail', title, text }` — a dark tooltip with the badge icon on the left (Last Meadow Online / Level 44 Reached)
-- `tooltip: { kind: 'card', theme, imageUrl, eyebrow?, title, text? }` — a card with a big image: `light` (Orbs), `dark` (Gifting) or `nitro` (light with a golden tint, the title is followed by NITRO). The big images are stored in `public/badges/`
+- `tooltip: { kind: 'card', theme, imageUrl, eyebrow?, title, text? }` — a card with a big image: `light` (Orbs), `dark` (Gifting) or `nitro` (light with a golden tint, the title is followed by NITRO). The big images are stored in `src/assets/badges/`
 
 The tooltip is rendered into `<body>`, so the card never clips it. Near the edge of the screen it moves inward while the arrow stays above the badge, and it opens below the badge when there is no room above. On phones it opens on tap and closes on a tap elsewhere; with a keyboard it opens on focus.
 
@@ -138,13 +138,13 @@ The tooltip is rendered into `<body>`, so the card never clips it. Near the edge
 
 The animation over the Discord card (`profile.discord.profileEffect`) is a Discord profile effect, played with Discord's own timings. The current one is "Let's Play" («Поиграем?»): the intro plays once after the "click to me" screen is closed, then a short loop repeats every few seconds.
 
-The effect files are APNG images in `public/effects/`. They are served from the site itself because the player fetches each file once and creates a new blob URL for every run, so the animation restarts from the first frame. With `prefers-reduced-motion` or data saver on, a static frame (`reducedMotionSrc`) is shown instead.
+The effect files are APNG images in `src/assets/effects/`. They are served from the site itself because the player fetches each file once and creates a new blob URL for every run, so the animation restarts from the first frame. With `prefers-reduced-motion` or data saver on, a static frame (`reducedMotionSrc`) is shown instead.
 
 To use a different effect:
 
 1. Find the effect in the Discord Shop and copy its SKU from the item link (`…/shop#itemSkuId=<sku_id>`).
 2. Open `https://discord.com/api/v9/collectibles-products/<sku_id>`. In `items[0]` you get `reducedMotionSrc` and the `effects` list: `src`, `start`, `duration`, `loop`, `loopDelay`, `zIndex` for every layer.
-3. Download every `src` and `reducedMotionSrc` into `public/effects/<name>/` and copy the numbers into `profileEffect.layers`.
+3. Download every `src` and `reducedMotionSrc` into `src/assets/effects/<name>/`, import them in `src/config/profile.ts` and copy the numbers into `profileEffect.layers`.
 
 Remove `profileEffect` to turn the effect off.
 
@@ -205,7 +205,7 @@ import { MorphIcon } from 'morphicons/vue'
 
 The server tile (`profile.server`) is a short row: the server logo, the name, online/max players with a bar, and a button with the server IP. Data comes from our `GET /api/server` (`server/minecraft.js`): the backend pings the server itself over the Minecraft Server List Ping protocol (SRV record first, then port 25565) and caches the answer for 30 seconds; the tile refreshes every 30 seconds. It's faster than [api.mcsrvstat.us](https://api.mcsrvstat.us), which caches for 5 minutes and is often slow without a VPN from Russia — mcsrvstat.us is only used when the backend doesn't answer. In dev and preview Vite answers `/api/server` itself. The pinged address is `cisprac.xyz` by default (`server/minecraft.js`); set `MC_SERVER_ADDRESS` (`host` or `host:port`) for another server. When the server is offline it reports no players, so the bar is hidden and only the name is left. Turn the tile off with `features.serverStatus`.
 
-- `logoUrl` — the logo (the CISPractice one is the www.cisprac.xyz favicon, stored in `public/brands/`). Without it the in-game server icon is shown
+- `logoUrl` — the logo (the CISPractice one is the www.cisprac.xyz favicon, stored in `src/assets/brands/`). Without it the in-game server icon is shown
 - `barMax` — the bar is full at this many players instead of the slot count (991 slots make even 100 players a thin sliver); the numbers still show the real max
 - `address` — the IP players connect to. The button copies it: the copy icon morphs into a check, the address slides up and «IP copied!» slides in, the button turns green for a moment. In a very narrow tile only the icon is left
 

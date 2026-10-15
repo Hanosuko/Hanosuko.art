@@ -1,6 +1,27 @@
 import type { Profile } from '@/types/profile'
 import { identity } from './identity'
 import mytiersLogo from '@/assets/tiers/mytiers-logo.svg'
+// Картинки импортируются из src/assets/: сборка даёт им хеш в имени, и браузер кеширует их на год
+import bannerStatic from '@/assets/discord/banner.png'
+import bannerAnimated from '@/assets/discord/banner.webp'
+import decorationStatic from '@/assets/discord/decoration.png'
+import decorationAnimated from '@/assets/discord/decoration-animated.png'
+import clanBadge from '@/assets/discord/clan-badge.png'
+import nitroGoldIcon from '@/assets/badges/icons/nitro-gold.png'
+import hypesquadBrillianceIcon from '@/assets/badges/icons/hypesquad-brilliance.png'
+import legacyUsernameIcon from '@/assets/badges/icons/legacy-username.png'
+import questIcon from '@/assets/badges/icons/quest.png'
+import lastMeadowIcon from '@/assets/badges/icons/last-meadow.png'
+import orbsApprenticeIcon from '@/assets/badges/icons/orbs-apprentice.png'
+import giftingPatronIcon from '@/assets/badges/icons/gifting-patron.png'
+import nitroGoldCard from '@/assets/badges/nitro-gold.svg'
+import orbsApprenticeCard from '@/assets/badges/orbs-apprentice.webp'
+import giftingPatronCard from '@/assets/badges/gifting-patron.png'
+import mytlGuildIcon from '@/assets/brands/mytl-guild.webp'
+import cispracticeLogo from '@/assets/brands/cispractice.webp'
+import letsPlayIntro from '@/assets/effects/lets-play/intro.png'
+import letsPlayLoop from '@/assets/effects/lets-play/loop.png'
+import letsPlayStatic from '@/assets/effects/lets-play/static.png'
 
 const photoAssets = import.meta.glob('/src/assets/photos/*.{avif,gif,jpeg,jpg,png,webp}', {
   eager: true,
@@ -20,47 +41,48 @@ export const profile: Profile = {
   // «Обо мне» — это identity.bio, после интеграций идут ссылки из social ниже.
   discord: {
     userId: '835533218869936168',
-    // 👇 АВАТАР, БАННЕР, УКРАШЕНИЕ И ЗНАЧОК ТЕГА — копии из Discord в public/discord/.
+    // 👇 АВАТАР, БАННЕР, УКРАШЕНИЕ И ЗНАЧОК ТЕГА — копии из Discord в src/assets/discord/
+    // (аватар — в public/discord/: его же берёт превью ссылки, см. identity.ts).
     // Discord CDN без VPN в РФ не открывается, поэтому картинки лежат у нас. Сменил аватар или
     // украшение в Discord — перекачай файл (как — в README, раздел «Discord images»)
     media: {
-      avatar: '/discord/avatar.png',
-      banner: { static: '/discord/banner.png', animated: '/discord/banner.webp' },
-      decoration: { static: '/discord/decoration.png', animated: '/discord/decoration-animated.png' },
-      clanBadge: '/discord/clan-badge.png',
+      avatar: identity.avatarUrl,
+      banner: { static: bannerStatic, animated: bannerAnimated },
+      decoration: { static: decorationStatic, animated: decorationAnimated },
+      clanBadge,
     },
     // 👇 ТЕМА ПРОФИЛЯ NITRO — два цвета из Discord → «Тема и баннер». Убери theme — карточка станет тёмной
     theme: { primary: '#cecdc8', accent: '#000000' },
     pronouns: 'https://hanosuko.art',
     // 👇 НИК: шрифт (из src/style.css) и эффект toon — белые буквы с контуром и тенью
     nameStyle: { font: 'Almendra', effect: 'toon' },
-    // 👇 ЗНАЧКИ в порядке Discord. Иконки лежат в public/badges/icons/ — скачаны с
+    // 👇 ЗНАЧКИ в порядке Discord. Иконки лежат в src/assets/badges/icons/ — скачаны с
     // cdn.discordapp.com/badge-icons/<хеш>.png, хеши ищи на github.com/mezotv/discord-badges. Без этого списка — только HypeSquad и Nitro из API.
     // Подсказка при наведении как в Discord: без tooltip — тёмная с текстом label,
-    // kind: 'detail' — с иконкой слева, kind: 'card' — карточка с большой картинкой (лежат в public/badges/)
+    // kind: 'detail' — с иконкой слева, kind: 'card' — карточка с большой картинкой (лежат в src/assets/badges/)
     badges: [
       {
         label: 'Gold Nitro, subscriber since Jan 23, 2026',
-        iconUrl: '/badges/icons/nitro-gold.png',
-        tooltip: { kind: 'card', theme: 'nitro', imageUrl: '/badges/nitro-gold.svg', title: 'Gold', text: 'Subscriber since 1/23/26' },
+        iconUrl: nitroGoldIcon,
+        tooltip: { kind: 'card', theme: 'nitro', imageUrl: nitroGoldCard, title: 'Gold', text: 'Subscriber since 1/23/26' },
       },
-      { label: 'HypeSquad Brilliance', iconUrl: '/badges/icons/hypesquad-brilliance.png' },
-      { label: 'Originally known as metemx7echosis#9897', iconUrl: '/badges/icons/legacy-username.png' },
-      { label: 'Completed a Quest', iconUrl: '/badges/icons/quest.png' },
+      { label: 'HypeSquad Brilliance', iconUrl: hypesquadBrillianceIcon },
+      { label: 'Originally known as metemx7echosis#9897', iconUrl: legacyUsernameIcon },
+      { label: 'Completed a Quest', iconUrl: questIcon },
       {
         label: 'Last Meadow Online: Level 44 Reached',
-        iconUrl: '/badges/icons/last-meadow.png',
+        iconUrl: lastMeadowIcon,
         tooltip: { kind: 'detail', title: 'Last Meadow Online', text: 'Level 44 Reached' },
       },
       {
         label: 'Orbs: Apprentice',
-        iconUrl: '/badges/icons/orbs-apprentice.png',
-        tooltip: { kind: 'card', theme: 'light', imageUrl: '/badges/orbs-apprentice.webp', eyebrow: 'Orbs', title: 'Apprentice' },
+        iconUrl: orbsApprenticeIcon,
+        tooltip: { kind: 'card', theme: 'light', imageUrl: orbsApprenticeCard, eyebrow: 'Orbs', title: 'Apprentice' },
       },
       {
         label: 'Gifting: Patron',
-        iconUrl: '/badges/icons/gifting-patron.png',
-        tooltip: { kind: 'card', theme: 'dark', imageUrl: '/badges/gifting-patron.png', eyebrow: 'Gifting', title: 'Patron' },
+        iconUrl: giftingPatronIcon,
+        tooltip: { kind: 'card', theme: 'dark', imageUrl: giftingPatronCard, eyebrow: 'Gifting', title: 'Patron' },
       },
     ],
     // 👇 ИНТЕГРАЦИИ (Connections) в порядке Discord. Публичного API у Discord для них нет, поэтому вручную.
@@ -79,19 +101,19 @@ export const profile: Profile = {
     // Кнопка «Go to Server» никуда не ведёт — только анимация «Maybe next time»
     guild: {
       name: 'MyTiers - Высший Стафф',
-      iconUrl: '/brands/mytl-guild.webp',
+      iconUrl: mytlGuildIcon,
       banner: ['#d94d47', '#f0a092'],
       online: 3,
       members: 43,
     },
     // 👇 ЭФФЕКТ ПРОФИЛЯ «Поиграем?» (Let's Play) — анимация поверх карточки, тайминги как в Discord.
-    // Файлы лежат в public/effects/. Как достать другой эффект — в README, раздел «Profile Effect»
+    // Файлы лежат в src/assets/effects/. Как достать другой эффект — в README, раздел «Profile Effect»
     profileEffect: {
       title: "Let's Play",
-      reducedMotionSrc: '/effects/lets-play/static.png',
+      reducedMotionSrc: letsPlayStatic,
       layers: [
-        { src: '/effects/lets-play/intro.png', start: 0, duration: 4904, zIndex: 110 },
-        { src: '/effects/lets-play/loop.png', start: 7906, duration: 4906, loop: true, loopDelay: 3000, zIndex: 100 },
+        { src: letsPlayIntro, start: 0, duration: 4904, zIndex: 110 },
+        { src: letsPlayLoop, start: 7906, duration: 4906, loop: true, loopDelay: 3000, zIndex: 100 },
       ],
     },
   },
@@ -183,11 +205,11 @@ export const profile: Profile = {
   // 👇 СТАТУС MINECRAFT-СЕРВЕРА: плитка с логотипом, «IP: address» и полоской онлайна.
   // Онлайн пингует наш сервер (/api/server, раз в 30 секунд), запасной вариант — api.mcsrvstat.us.
   // Адрес для /api/server задаётся в server/minecraft.js или переменной MC_SERVER_ADDRESS. Выключить — features.serverStatus.
-  // Логотип — фавикон www.cisprac.xyz, лежит в public/brands/
+  // Логотип — фавикон www.cisprac.xyz, лежит в src/assets/brands/
   server: {
     name: 'CISPractice',
     address: 'cisprac.xyz',
-    logoUrl: '/brands/cispractice.webp',
+    logoUrl: cispracticeLogo,
     // 👇 Полоска заполнена целиком при стольких игроках (слотов 991, но столько не бывает)
     barMax: 300,
   },
@@ -197,7 +219,7 @@ export const profile: Profile = {
     {
       name: 'cisprac.xyz',
       url: 'https://cisprac.xyz',
-      iconUrl: '/brands/cispractice.webp',
+      iconUrl: cispracticeLogo,
     },
     {
       name: 'mytiers.ru',
