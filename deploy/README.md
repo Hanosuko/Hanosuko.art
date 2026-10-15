@@ -131,5 +131,6 @@ Smoke tests:
 curl -i https://example.com/api/health
 curl -i -X POST https://example.com/api/views
 curl -i "https://example.com/api/cistiers?username=YourNick"
+curl -i https://example.com/api/server
 curl -I https://example.com/og.png
 ```

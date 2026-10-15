@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.6
-# API: счётчик просмотров (SQLite) и прокси CISTiers
+# API: счётчик просмотров (SQLite), прокси CISTiers и онлайн Minecraft-сервера
 FROM node:22-alpine
 WORKDIR /app
 

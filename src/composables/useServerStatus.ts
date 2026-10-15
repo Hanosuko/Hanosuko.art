@@ -1,14 +1,20 @@
 import { onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
 
-// Ответ https://api.mcsrvstat.us/3/<адрес> (только нужные поля)
+// Ответ /api/server и https://api.mcsrvstat.us/3/<адрес> (только нужные поля, формат одинаковый)
 export interface ServerStatusResponse {
   online: boolean
   icon?: string
   players?: { online: number; max: number }
 }
 
-// mcsrvstat.us кеширует ответ на 5 минут — чаще опрашивать нет смысла
-const REFRESH_MS = 150_000
+// Наш /api/server пингует сервер сам и держит ответ 30 секунд
+const REFRESH_MS = 30_000
+
+const getStatus = async (url: string): Promise<ServerStatusResponse> => {
+  const response = await fetch(url, { signal: AbortSignal.timeout(8_000) })
+  if (!response.ok) throw new Error(`${url} responded ${response.status}`)
+  return (await response.json()) as ServerStatusResponse
+}
 
 export function useServerStatus(address: string) {
   const status = shallowRef<ServerStatusResponse | null>(null)
@@ -18,9 +24,10 @@ export function useServerStatus(address: string) {
 
   const load = async (): Promise<void> => {
     try {
-      const response = await fetch(`https://api.mcsrvstat.us/3/${encodeURIComponent(address)}`)
-      if (!response.ok) throw new Error(`mcsrvstat responded ${response.status}`)
-      status.value = (await response.json()) as ServerStatusResponse
+      // Свой API быстрее и работает без VPN; mcsrvstat.us — запасной, если бэкенд не запущен
+      status.value = await getStatus('/api/server').catch(() =>
+        getStatus(`https://api.mcsrvstat.us/3/${encodeURIComponent(address)}`),
+      )
       error.value = null
       lastLoaded = Date.now()
     } catch (caught) {

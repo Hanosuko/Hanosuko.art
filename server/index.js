@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto'
 import { mkdirSync } from 'node:fs'
 import { dirname } from 'node:path'
 import { createCistiersClient } from './cistiers.js'
+import { createServerStatusClient } from './minecraft.js'
 
 const PORT = Number(process.env.PORT ?? 3000)
 const HOST = process.env.HOST ?? '127.0.0.1'
@@ -45,6 +46,8 @@ const today = () => new Date().toISOString().slice(0, 10)
 
 const cistiers = createCistiersClient({ userAgent: process.env.CISTIERS_USER_AGENT || undefined })
 
+const serverStatus = createServerStatusClient({ address: process.env.MC_SERVER_ADDRESS || undefined })
+
 const app = express()
 app.disable('x-powered-by')
 app.set('trust proxy', 'loopback')
@@ -68,6 +71,10 @@ app.get('/api/cistiers', async (req, res) => {
     .status(status)
     .set('cache-control', status === 200 ? 'public, max-age=300' : 'no-store')
     .json(body)
+})
+
+app.get('/api/server', async (_req, res) => {
+  res.set('cache-control', 'public, max-age=30').json(await serverStatus.get())
 })
 
 app.get('/api/health', (_req, res) => {
