@@ -5,6 +5,9 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#121212" />
+    <!-- Основной шрифт сайта — качаем сразу, не дожидаясь CSS -->
+    <link rel="preload" href="/src/assets/fonts/Monocraft.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/src/assets/fonts/Monocraft-Bold.woff2" as="font" type="font/woff2" crossorigin />
     <!-- description и og:/twitter:-теги добавляет vite-plugins/og-image.ts из src/config/identity.ts -->
     <title>Hanosuko</title>
   </head>

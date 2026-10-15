@@ -180,7 +180,7 @@ Each tab looks like its own site:
 - **MyTiers** — tilted kit icons and the tier in the kit color, text in [Geist](https://vercel.com/font); ranked kits first, sorted by points
 - **CISTiers** — tiles as in a cistiers.com profile: the kit color over a dark gradient, the icon straight above the tier, untested kits dimmed with a dash, kits in the site's order; text in [Open Sans](https://fonts.google.com/specimen/Open+Sans)
 
-Both fonts are self-hosted in `public/fonts/` (variable fonts, latin, latin-ext, and cyrillic as separate files, so the browser downloads only what it needs). Tab labels always use their own font, so switching tabs doesn't change their width. Tiles of both tabs have the same size, so the card height doesn't jump.
+Both fonts are self-hosted in `src/assets/fonts/` (variable fonts, latin, latin-ext, and cyrillic as separate files, so the browser downloads only what it needs). Tab labels always use their own font, so switching tabs doesn't change their width. Tiles of both tabs have the same size, so the card height doesn't jump.
 
 Tiles are not links: hovering lifts a tile and shows a tooltip in the style of the current tab's site (MyTiers — tier name and points above the tile, with a Peak note when the peak was higher; CISTiers — kit icon, name, and points following the cursor), a click only presses it. Under the grid there is one wide button to the profile on the open tab's site.
 

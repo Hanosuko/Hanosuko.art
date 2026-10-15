@@ -42,8 +42,8 @@ const loadImage = async (url: string, root: string): Promise<string | null> => {
 
 const renderOgImage = async (root: string): Promise<Buffer> => {
   const [regular, bold, avatar] = await Promise.all([
-    readFile(path.join(root, 'public/fonts/Monocraft.ttf')),
-    readFile(path.join(root, 'public/fonts/Monocraft-Bold.ttf')),
+    readFile(path.join(root, 'src/assets/fonts/Monocraft.ttf')),
+    readFile(path.join(root, 'src/assets/fonts/Monocraft-Bold.ttf')),
     loadImage(identity.avatarUrl, root),
   ])
 

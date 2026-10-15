@@ -2,9 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Шрифты лежат в src/assets/fonts/: сборка даёт им хеш в имени, и браузер кеширует их на год.
+   Основной Monocraft ещё и предзагружается из index.html, чтобы текст не «прыгал» при загрузке.
+   TTF рядом — только для превью ссылки (satori не читает woff2), на сайт они не попадают */
 @font-face {
   font-family: 'Monocraft';
-  src: url('/fonts/Monocraft.ttf') format('truetype');
+  src: url('./assets/fonts/Monocraft.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -12,7 +15,7 @@
 
 @font-face {
   font-family: 'Monocraft';
-  src: url('/fonts/Monocraft-Bold.ttf') format('truetype');
+  src: url('./assets/fonts/Monocraft-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -21,7 +24,7 @@
 /* Шрифт ника в Discord-карточке — ближайший свободный аналог шрифта Discord (SIL Open Font License) */
 @font-face {
   font-family: 'Almendra';
-  src: url('/fonts/Almendra-Bold.woff2') format('woff2');
+  src: url('./assets/fonts/Almendra-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -29,7 +32,7 @@
 
 @font-face {
   font-family: 'Minecraftia';
-  src: url('/fonts/Minecraftia-Regular.ttf') format('truetype');
+  src: url('./assets/fonts/Minecraftia-Regular.woff2') format('woff2');
   font-weight: 400 700;
   font-style: normal;
   font-display: swap;
@@ -40,7 +43,7 @@
 /* Geist: cyrillic */
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/Geist-cyrillic.woff2') format('woff2');
+  src: url('./assets/fonts/Geist-cyrillic.woff2') format('woff2');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -50,7 +53,7 @@
 /* Geist: latin-ext */
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/Geist-latin-ext.woff2') format('woff2');
+  src: url('./assets/fonts/Geist-latin-ext.woff2') format('woff2');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -60,7 +63,7 @@
 /* Geist: latin */
 @font-face {
   font-family: 'Geist';
-  src: url('/fonts/Geist-latin.woff2') format('woff2');
+  src: url('./assets/fonts/Geist-latin.woff2') format('woff2');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -70,7 +73,7 @@
 /* Open Sans: cyrillic */
 @font-face {
   font-family: 'Open Sans';
-  src: url('/fonts/OpenSans-cyrillic.woff2') format('woff2');
+  src: url('./assets/fonts/OpenSans-cyrillic.woff2') format('woff2');
   font-weight: 300 800;
   font-style: normal;
   font-display: swap;
@@ -80,7 +83,7 @@
 /* Open Sans: latin-ext */
 @font-face {
   font-family: 'Open Sans';
-  src: url('/fonts/OpenSans-latin-ext.woff2') format('woff2');
+  src: url('./assets/fonts/OpenSans-latin-ext.woff2') format('woff2');
   font-weight: 300 800;
   font-style: normal;
   font-display: swap;
@@ -90,7 +93,7 @@
 /* Open Sans: latin */
 @font-face {
   font-family: 'Open Sans';
-  src: url('/fonts/OpenSans-latin.woff2') format('woff2');
+  src: url('./assets/fonts/OpenSans-latin.woff2') format('woff2');
   font-weight: 300 800;
   font-style: normal;
   font-display: swap;
