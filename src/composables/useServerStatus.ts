@@ -22,10 +22,11 @@ export function useServerStatus(address: string) {
   let lastLoaded = 0
   let timer: number | undefined
 
-  const load = async (): Promise<void> => {
+  // fresh — свежий пинг мимо 30-секундного кеша (кнопка «Обновить»)
+  const load = async ({ fresh = false } = {}): Promise<void> => {
     try {
       // Свой API быстрее и работает без VPN; mcsrvstat.us — запасной, если бэкенд не запущен
-      status.value = await getStatus('/api/server').catch(() =>
+      status.value = await getStatus(fresh ? '/api/server?fresh=1' : '/api/server').catch(() =>
         getStatus(`https://api.mcsrvstat.us/3/${encodeURIComponent(address)}`),
       )
       error.value = null

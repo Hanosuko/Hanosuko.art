@@ -75,8 +75,9 @@ app.get('/api/cistiers', async (req, res) => {
     .json(body)
 })
 
-app.get('/api/server', async (_req, res) => {
-  res.set('cache-control', 'public, max-age=30').json(await serverStatus.get())
+app.get('/api/server', async (req, res) => {
+  const fresh = req.query.fresh === '1'
+  res.set('cache-control', fresh ? 'no-store' : 'public, max-age=30').json(await serverStatus.get({ fresh }))
 })
 
 for (const [kind, maxAge] of [['user', 300], ['presence', 10]]) {

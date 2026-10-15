@@ -10,6 +10,8 @@ export const DEFAULT_ADDRESS = 'cisprac.xyz'
 const DEFAULT_PORT = 25565
 const TIMEOUT_MS = 5_000
 const CACHE_TTL_MS = 30_000
+// Кнопка «Обновить» просит свежий пинг, но не чаще раза в 5 секунд — чтобы сервер не заспамили
+const FRESH_MIN_MS = 5_000
 
 const varInt = (value) => {
   const bytes = []
@@ -117,8 +119,8 @@ export const createServerStatusClient = ({ address = DEFAULT_ADDRESS } = {}) => 
     }
   }
 
-  const get = async () => {
-    if (cached && Date.now() - cached.at < CACHE_TTL_MS) return cached.body
+  const get = async ({ fresh = false } = {}) => {
+    if (cached && Date.now() - cached.at < (fresh ? FRESH_MIN_MS : CACHE_TTL_MS)) return cached.body
     // Одновременные запросы ждут один и тот же пинг
     pending ??= load().then((body) => {
       cached = { at: Date.now(), body }

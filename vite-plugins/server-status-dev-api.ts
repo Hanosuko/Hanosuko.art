@@ -3,9 +3,10 @@ import { createServerStatusClient } from '../server/minecraft.js'
 
 const client = createServerStatusClient({ address: process.env.MC_SERVER_ADDRESS || undefined })
 
-const handler: Connect.SimpleHandleFunction = async (_req, res) => {
+const handler: Connect.SimpleHandleFunction = async (req, res) => {
+  const fresh = new URL(req.url ?? '/', 'http://localhost').searchParams.get('fresh') === '1'
   res.setHeader('content-type', 'application/json; charset=utf-8')
-  res.end(JSON.stringify(await client.get()))
+  res.end(JSON.stringify(await client.get({ fresh })))
 }
 
 // В dev и preview /api/server отвечает сам Vite — запускать server/ ради онлайна не нужно
