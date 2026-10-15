@@ -56,7 +56,7 @@ Two config files:
 
 ## Layout
 
-The layout is defined in `src/App.vue`. It is not a grid with aligned rows: there are two independent columns, and every tile keeps its natural height, so tiles of different sizes sit next to each other.
+The layout is defined in `src/App.vue`. It has two rows, each with two groups of tiles: Discord and the music player | tiers, partner pills and the server on top; photos | setup at the bottom. Inside a group every tile keeps its natural height, so tiles of different sizes sit next to each other.
 
 ```text
 desktop and tablet (≥768px)              phone
@@ -65,18 +65,16 @@ desktop and tablet (≥768px)              phone
 │   Discord    │              │          │ tiers    │
 │   profile    ├───────┬──────┤          │ pills    │
 │              │cisprac│mytier│          │ music    │
-│              ├───────┴──────┤          │ server   │
-│              │    server    │          │ photos   │
+├──────────────┼───────┴──────┤          │ server   │
+│    music     │    server    │          │ photos   │
 ├──────────────┼──────────────┤          │ setup    │
-│    music     │              │          └──────────┘
-├──────────────┤    setup     │
-│    photos    │              │
+│    photos    │    setup     │          └──────────┘
 └──────────────┴──────────────┘
 ```
 
-The bottoms of the columns line up because the last tile of each column (photos on the left, setup on the right) grows to fill the shorter column: the photo collage or the setup photo gets taller instead of leaving empty space.
+The edges line up because the last tile of each group grows to match the other group in its row: the server tile stretches down to the bottom of the music player, so the photos and the setup start on one line, and the photo collage grows to the bottom of the setup.
 
-On phones the columns turn into one stream (`display: contents`), and the order is set with Tailwind `order-*` classes on each tile. To add a new block, create a component whose root is a card (for example `class="glass-card"`), put it into a column above its last tile (the last one is the one that stretches), and give it an `order-*` class for its place in the phone stream, renumbering the others if needed:
+On phones the groups turn into one stream (`display: contents`), and the order is set with Tailwind `order-*` classes on each tile. To add a new block, create a component whose root is a card (for example `class="glass-card"`), put it into a group above its last tile (the last one is the one that stretches), and give it an `order-*` class for its place in the phone stream, renumbering the others if needed:
 
 ```vue
 <MyBlock class="order-5" />

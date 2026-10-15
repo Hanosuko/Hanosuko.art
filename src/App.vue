@@ -22,23 +22,30 @@ useAnimatedTitle(profile.identity.nickname)
   <AnimatedBackground />
   <main class="page">
     <!--
-      👇 БЕНТО: две независимые колонки — у каждой плитки своя высота, ряды не выравниваются.
-      Низ колонок совпадает за счёт последних плиток (фото и сетап) — они дотягиваются.
-      На телефоне колонки разбираются в одну ленту, порядок — классами order-*.
-      Новый блок — добавь компонент в нужную колонку, например:
+      👇 БЕНТО: два ряда по две группы плиток. Верх: Discord и плеер | тиры, плашки и сервер.
+      Низ: фото | сетап. В каждой группе плитки своей высоты, а последняя дотягивается до низа
+      соседней группы — поэтому середина (низ плеера и сервера) и низ страницы ровные.
+      На телефоне группы разбираются в одну ленту, порядок — классами order-*.
+      Новый блок — добавь компонент в нужную группу выше её последней плитки, например:
       <MyBlock class="order-9" />
     -->
     <div class="bento">
-      <div class="bento-col">
+      <div class="bento-group">
         <DiscordProfile class="order-1" />
         <MusicPlayer v-if="profile.features.audioPlayer" class="order-4" />
-        <PhotoPanel v-if="profile.features.gallery" class="order-6" />
       </div>
 
-      <div class="bento-col">
+      <div class="bento-group">
         <TiersCard v-if="profile.features.tiers" class="order-2" />
         <PartnerLinks class="order-3" />
         <ServerStatus v-if="profile.features.serverStatus" class="order-5" />
+      </div>
+
+      <div class="bento-group">
+        <PhotoPanel v-if="profile.features.gallery" class="order-6" />
+      </div>
+
+      <div class="bento-group">
         <SetupPanel v-if="profile.features.setup" class="order-7" />
       </div>
 
@@ -80,15 +87,15 @@ useAnimatedTitle(profile.identity.nickname)
   }
 }
 
-.bento-col {
+.bento-group {
   display: flex;
   flex-direction: column;
   gap: 1rem;
   min-width: 0;
 }
 
-/* Колонка короче соседней — её последняя плитка вытягивается, низ сетки ровный */
-.bento-col > :deep(:last-child) {
+/* Группа короче соседней в ряду — её последняя плитка вытягивается, края ряда ровные */
+.bento-group > :deep(:last-child) {
   flex-grow: 1;
 }
 
@@ -97,7 +104,7 @@ useAnimatedTitle(profile.identity.nickname)
 }
 
 /* Каждая плитка — контейнер: блоки подстраиваются под ширину своей ячейки, а не экрана */
-.bento-col > :deep(*),
+.bento-group > :deep(*),
 .bento > :deep(.bento-wide) {
   position: relative;
   min-width: 0;
@@ -105,8 +112,8 @@ useAnimatedTitle(profile.identity.nickname)
 }
 
 /* Подсказки и поповеры плитки под курсором не прячутся под соседними плитками */
-.bento-col > :deep(*:hover),
-.bento-col > :deep(*:focus-within) {
+.bento-group > :deep(*:hover),
+.bento-group > :deep(*:focus-within) {
   z-index: 2;
 }
 
@@ -118,11 +125,11 @@ useAnimatedTitle(profile.identity.nickname)
     gap: 0.75rem;
   }
 
-  .bento-col {
+  .bento-group {
     display: contents;
   }
 
-  .bento-col > :deep(:last-child) {
+  .bento-group > :deep(:last-child) {
     flex-grow: 0;
   }
 }
