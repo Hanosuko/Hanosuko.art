@@ -1,20 +1,15 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import type { DiscordBadgeConfig } from '@/types/profile'
+import { placeOver, type PopoverPlace } from '@/utils/popover'
 
 // Подсказка значка как в Discord. Висит поверх всей страницы (Teleport в body), поэтому не обрезается
 // карточкой; стоит над значком со стрелкой на него. У края экрана сдвигается внутрь, а стрелка остаётся
 // над значком; если сверху не хватает места — открывается под значком.
 const props = defineProps<{ badge: DiscordBadgeConfig; anchor: DOMRect }>()
 
-// От значка до подсказки и от подсказки до края экрана
-const GAP = 12
-const EDGE = 8
-// Стрелка не заезжает на скруглённые углы
-const ARROW_INSET = 16
-
 const box = ref<HTMLElement | null>(null)
-const place = ref<{ left: number; top: number; arrow: number; below: boolean } | null>(null)
+const place = ref<PopoverPlace | null>(null)
 
 const card = computed(() => (props.badge.tooltip?.kind === 'card' ? props.badge.tooltip : null))
 const detail = computed(() => (props.badge.tooltip?.kind === 'detail' ? props.badge.tooltip : null))
@@ -26,19 +21,7 @@ const variant = computed(() => {
 // Размер считается до показа: подсказка сначала невидима в углу экрана, потом встаёт на место
 onMounted(() => {
   const el = box.value
-  if (!el) return
-  const width = el.offsetWidth
-  const height = el.offsetHeight
-  const { anchor } = props
-  const center = anchor.left + anchor.width / 2
-  const left = Math.min(Math.max(center - width / 2, EDGE), window.innerWidth - EDGE - width)
-  const below = anchor.top - GAP - height < EDGE
-  place.value = {
-    left,
-    top: below ? anchor.bottom + GAP : anchor.top - GAP - height,
-    arrow: Math.min(Math.max(center - left, ARROW_INSET), width - ARROW_INSET),
-    below,
-  }
+  if (el) place.value = placeOver(props.anchor, el.offsetWidth, el.offsetHeight)
 })
 </script>
 
