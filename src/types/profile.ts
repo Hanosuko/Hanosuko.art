@@ -54,9 +54,26 @@ export interface MyTiersSettings {
   kitColors: Record<string, string>
 }
 
+// Подсказка значка при наведении, как в Discord
+export type DiscordBadgeTooltip =
+  // Тёмная подсказка с иконкой значка слева: заголовок и строка под ним
+  | { kind: 'detail'; title: string; text: string }
+  // Карточка с большой картинкой: надпись сверху, крупный заголовок, строка под ним.
+  // light / dark — светлая или тёмная, nitro — светлая с золотым отливом и словом NITRO после заголовка
+  | {
+      kind: 'card'
+      theme: 'light' | 'dark' | 'nitro'
+      imageUrl: string
+      eyebrow?: string
+      title: string
+      text?: string
+    }
+
 export interface DiscordBadgeConfig {
+  // Название значка: текст обычной подсказки (если tooltip не задан) и подпись для скринридеров
   label: string
   iconUrl: string
+  tooltip?: DiscordBadgeTooltip
 }
 
 // Интеграция из Discord («Connections»). Публичного API у Discord для них нет — список ведётся вручную

@@ -25,15 +25,33 @@ export const profile: Profile = {
     // 👇 НИК: шрифт (из src/style.css) и эффект toon — белые буквы с контуром и тенью
     nameStyle: { font: 'Almendra', effect: 'toon' },
     // 👇 ЗНАЧКИ в порядке Discord. Иконки: cdn.discordapp.com/badge-icons/<хеш>.png,
-    // хеши ищи на github.com/mezotv/discord-badges. Без этого списка — только HypeSquad и Nitro из API
+    // хеши ищи на github.com/mezotv/discord-badges. Без этого списка — только HypeSquad и Nitro из API.
+    // Подсказка при наведении как в Discord: без tooltip — тёмная с текстом label,
+    // kind: 'detail' — с иконкой слева, kind: 'card' — карточка с большой картинкой (лежат в public/badges/)
     badges: [
-      { label: 'Nitro · Gold', iconUrl: 'https://cdn.discordapp.com/badge-icons/2895086c18d5531d499862e41d1155a6.png' },
+      {
+        label: 'Gold Nitro, subscriber since Jan 23, 2026',
+        iconUrl: 'https://cdn.discordapp.com/badge-icons/2895086c18d5531d499862e41d1155a6.png',
+        tooltip: { kind: 'card', theme: 'nitro', imageUrl: '/badges/nitro-gold.svg', title: 'Gold', text: 'Subscriber since 1/23/26' },
+      },
       { label: 'HypeSquad Brilliance', iconUrl: 'https://cdn.discordapp.com/badge-icons/011940fd013da3f7fb926e4a1cd2e618.png' },
       { label: 'Originally known as metemx7echosis#9897', iconUrl: 'https://cdn.discordapp.com/badge-icons/6de6d34650760ba5551a79732e98ed60.png' },
       { label: 'Completed a Quest', iconUrl: 'https://cdn.discordapp.com/badge-icons/7d9ae358c8c5e118768335dbe68b4fb8.png' },
-      { label: 'Level 44 Reached', iconUrl: 'https://cdn.discordapp.com/badge-icons/ca105ad9cfc8580c765101d17bbb2323.png' },
-      { label: 'Collected the Orb Profile Badge', iconUrl: 'https://cdn.discordapp.com/badge-icons/83d8a1eb09a8d64e59233eec5d4d5c2d.png' },
-      { label: 'Gifting Patron', iconUrl: 'https://cdn.discordapp.com/badge-icons/025035e4f4c124c44d29b369936c6843.png' },
+      {
+        label: 'Last Meadow Online: Level 44 Reached',
+        iconUrl: 'https://cdn.discordapp.com/badge-icons/ca105ad9cfc8580c765101d17bbb2323.png',
+        tooltip: { kind: 'detail', title: 'Last Meadow Online', text: 'Level 44 Reached' },
+      },
+      {
+        label: 'Orbs: Apprentice',
+        iconUrl: 'https://cdn.discordapp.com/badge-icons/83d8a1eb09a8d64e59233eec5d4d5c2d.png',
+        tooltip: { kind: 'card', theme: 'light', imageUrl: '/badges/orbs-apprentice.webp', eyebrow: 'Orbs', title: 'Apprentice' },
+      },
+      {
+        label: 'Gifting: Patron',
+        iconUrl: 'https://cdn.discordapp.com/badge-icons/025035e4f4c124c44d29b369936c6843.png',
+        tooltip: { kind: 'card', theme: 'dark', imageUrl: '/badges/gifting-patron.png', eyebrow: 'Gifting', title: 'Patron' },
+      },
     ],
     // 👇 ИНТЕГРАЦИИ (Connections) в порядке Discord. Публичного API у Discord для них нет, поэтому вручную.
     // url не указан — ник без стрелки. Цифры TikTok сверены с tiktok.com/@hanosuko 14.10.2026

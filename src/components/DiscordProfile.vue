@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, ref, shallowRef } from 'vue'
 import { Link2 } from 'lucide-vue-next'
 import { ArrowRight, ArrowUpRight } from 'lucide'
 import { MorphIcon } from 'morphicons/vue'
 import { profile } from '@/config/profile'
-import type { SocialLink } from '@/types/profile'
+import type { DiscordBadgeConfig, SocialLink } from '@/types/profile'
 import { useDiscordProfile } from '@/composables/useDiscordProfile'
 import { useProgressiveImage } from '@/composables/useProgressiveImage'
 import { profileThemeTokens } from '@/utils/discordTheme'
 import { connectionRowOf, type ConnectionRow } from '@/utils/discordConnections'
+import BadgeTooltip from '@/components/BadgeTooltip.vue'
 import BrandIcon from '@/components/BrandIcon.vue'
 import DiscordActivity from '@/components/DiscordActivity.vue'
 import ProfileEffect from '@/components/ProfileEffect.vue'
@@ -57,7 +58,40 @@ const nameStyle = discord.nameStyle
 const nameFont = nameStyle ? { fontFamily: `'${nameStyle.font}', serif` } : undefined
 
 // Значки из конфига целиком заменяют автоматические (API знает только HypeSquad и Nitro)
-const badgeList = computed(() => discord.badges ?? badges.value)
+const badgeList = computed<DiscordBadgeConfig[]>(() => discord.badges ?? badges.value)
+
+// Подсказка значка: мышь — при наведении, клавиатура — при фокусе, телефон — по тапу до тапа мимо
+const badgeTip = shallowRef<{ badge: DiscordBadgeConfig; anchor: DOMRect } | null>(null)
+
+const showBadgeTip = (badge: DiscordBadgeConfig, event: Event): void => {
+  badgeTip.value = { badge, anchor: (event.currentTarget as Element).getBoundingClientRect() }
+}
+
+const hideBadgeTip = (): void => {
+  badgeTip.value = null
+}
+
+const onBadgeEnter = (badge: DiscordBadgeConfig, event: PointerEvent): void => {
+  if (event.pointerType === 'mouse') showBadgeTip(badge, event)
+}
+
+const onBadgeLeave = (event: PointerEvent): void => {
+  if (event.pointerType === 'mouse') hideBadgeTip()
+}
+
+const onPointerOutside = (event: PointerEvent): void => {
+  if (badgeTip.value && !(event.target as Element | null)?.closest('.dc-badge')) hideBadgeTip()
+}
+
+// Подсказка привязана к экрану, поэтому при прокрутке и смене размера окна прячется
+window.addEventListener('scroll', hideBadgeTip, { capture: true, passive: true })
+window.addEventListener('resize', hideBadgeTip, { passive: true })
+document.addEventListener('pointerdown', onPointerOutside, { capture: true })
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', hideBadgeTip, { capture: true })
+  window.removeEventListener('resize', hideBadgeTip)
+  document.removeEventListener('pointerdown', onPointerOutside, { capture: true })
+})
 
 const STATUS_LABELS = { online: 'Online', idle: 'Idle', dnd: 'Do Not Disturb', offline: 'Offline' } as const
 const statusLabel = computed(() => (status.value ? STATUS_LABELS[status.value] : null))
@@ -155,11 +189,23 @@ const hideBrokenImage = (event: Event): void => {
       </div>
 
       <ul v-if="badgeList.length" class="dc-badges" aria-label="Badges">
-        <li v-for="badge in badgeList" :key="badge.label" class="dc-badge" tabindex="0" :aria-label="badge.label">
+        <li
+          v-for="badge in badgeList"
+          :key="badge.label"
+          class="dc-badge"
+          tabindex="0"
+          :aria-label="badge.label"
+          @pointerenter="onBadgeEnter(badge, $event)"
+          @pointerleave="onBadgeLeave"
+          @focus="showBadgeTip(badge, $event)"
+          @blur="hideBadgeTip"
+          @click="showBadgeTip(badge, $event)"
+          @keydown.esc="hideBadgeTip"
+        >
           <img :src="badge.iconUrl" alt="" @error="hideBrokenImage" />
-          <span class="dc-badge-tip" aria-hidden="true">{{ badge.label }}</span>
         </li>
       </ul>
+      <BadgeTooltip v-if="badgeTip" :key="badgeTip.badge.label" :badge="badgeTip.badge" :anchor="badgeTip.anchor" />
 
       <section class="dc-section">
         <h2 class="dc-heading">About me</h2>
@@ -468,8 +514,14 @@ const hideBrokenImage = (event: Event): void => {
 }
 
 .dc-badge {
-  position: relative;
+  border-radius: 0.3rem;
   outline: none;
+  cursor: default;
+}
+
+.dc-badge:focus-visible {
+  outline: 2px solid var(--dc-muted);
+  outline-offset: 2px;
 }
 
 .dc-badge img {
@@ -477,39 +529,6 @@ const hideBrokenImage = (event: Event): void => {
   width: 1.45rem;
   height: 1.45rem;
   object-fit: contain;
-}
-
-/* Подсказка над значком, как в Discord */
-.dc-badge-tip {
-  position: absolute;
-  bottom: calc(100% + 0.45rem);
-  left: 50%;
-  z-index: 5;
-  padding: 0.35rem 0.6rem;
-  border-radius: 0.4rem;
-  background: #111214;
-  color: #f2f3f5;
-  font-size: 0.75rem;
-  font-weight: 600;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transform: translate(-50%, 3px);
-  transition:
-    opacity 0.12s ease,
-    transform 0.12s ease;
-}
-
-.dc-badge:focus-visible .dc-badge-tip {
-  opacity: 1;
-  transform: translate(-50%, 0);
-}
-
-@media (hover: hover) {
-  .dc-badge:hover .dc-badge-tip {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
 }
 
 .dc-section {
