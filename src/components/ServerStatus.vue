@@ -9,9 +9,11 @@ const server = profile.server
 const { status } = useServerStatus(server.address)
 
 const players = computed(() => status.value?.players ?? null)
+// Полоска считается от barMax, а не от 991 слота — иначе даже сотня игроков почти не видна
 const fill = computed(() => {
   const current = players.value
-  return current && current.max > 0 ? Math.min((current.online / current.max) * 100, 100) : 0
+  const max = server.barMax ?? current?.max ?? 0
+  return current && max > 0 ? Math.min((current.online / max) * 100, 100) : 0
 })
 </script>
 

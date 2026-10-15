@@ -181,12 +181,15 @@ export const profile: Profile = {
   },
 
   // 👇 СТАТУС MINECRAFT-СЕРВЕРА: плитка с логотипом, «IP: address» и полоской онлайна.
-  // Данные — с api.mcsrvstat.us (обновляются раз в 2,5 минуты). Выключить — features.serverStatus.
+  // Онлайн пингует наш сервер (/api/server, раз в 30 секунд), запасной вариант — api.mcsrvstat.us.
+  // Адрес для /api/server задаётся в server/minecraft.js или переменной MC_SERVER_ADDRESS. Выключить — features.serverStatus.
   // Логотип — фавикон www.cisprac.xyz, лежит в public/brands/
   server: {
     name: 'CISPractice',
     address: 'cisprac.xyz',
     logoUrl: '/brands/cispractice.webp',
+    // 👇 Полоска заполнена целиком при стольких игроках (слотов 991, но столько не бывает)
+    barMax: 300,
   },
 
   // 👇 ПАРТНЁРЫ — короткие плашки в ряд под карточкой тиров. Иконки — те же логотипы, что лежат в проекте

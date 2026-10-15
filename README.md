@@ -203,9 +203,10 @@ import { MorphIcon } from 'morphicons/vue'
 
 ## Minecraft Server Status
 
-The server tile (`profile.server`) is a short row: the server logo, the name, online/max players with a bar, and a button with the server IP. Data comes from [api.mcsrvstat.us](https://api.mcsrvstat.us) in the browser and refreshes every 2.5 minutes. When the server is offline it reports no players, so the bar is hidden and only the name is left. Turn the tile off with `features.serverStatus`.
+The server tile (`profile.server`) is a short row: the server logo, the name, online/max players with a bar, and a button with the server IP. Data comes from our `GET /api/server` (`server/minecraft.js`): the backend pings the server itself over the Minecraft Server List Ping protocol (SRV record first, then port 25565) and caches the answer for 30 seconds; the tile refreshes every 30 seconds. It's faster than [api.mcsrvstat.us](https://api.mcsrvstat.us), which caches for 5 minutes and is often slow without a VPN from Russia — mcsrvstat.us is only used when the backend doesn't answer. In dev and preview Vite answers `/api/server` itself. The pinged address is `cisprac.xyz` by default (`server/minecraft.js`); set `MC_SERVER_ADDRESS` (`host` or `host:port`) for another server. When the server is offline it reports no players, so the bar is hidden and only the name is left. Turn the tile off with `features.serverStatus`.
 
-- `logoUrl` — the logo (the CISPractice one is the www.cisprac.xyz favicon, stored in `public/brands/`). Without it the in-game server icon from mcsrvstat.us is shown
+- `logoUrl` — the logo (the CISPractice one is the www.cisprac.xyz favicon, stored in `public/brands/`). Without it the in-game server icon is shown
+- `barMax` — the bar is full at this many players instead of the slot count (991 slots make even 100 players a thin sliver); the numbers still show the real max
 - `address` — the IP players connect to. The button copies it: the copy icon morphs into a check, the address slides up and «IP copied!» slides in, the button turns green for a moment. In a very narrow tile only the icon is left
 
 The partner pills (`profile.partners`) sit under the tiers card in one row; their icons are the same logos stored in the project.
