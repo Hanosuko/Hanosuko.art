@@ -208,10 +208,10 @@ export const profile: Profile = {
 
   // 👇 БЛОК «MY SETUP»: плитка с фото сетапа и списком комплектующих.
   // Место и ширина плитки в бенто-сетке — в src/App.vue.
-  // Фото класть в src/assets/photos/setup.jpg или public/photos/setup.jpg.
+  // Фото класть в src/assets/photos/setup.webp (как пережать — в README, раздел «Photos»).
   // Добавляй/убирай пункты в specs свободно — верстка подхватит.
   setup: {
-    photoUrl: photoUrl('setup.jpg'),
+    photoUrl: photoUrl('setup.webp'),
     title: 'My Setup',
     description: 'My current PC build and peripherals.',
     specs: [
@@ -232,17 +232,17 @@ export const profile: Profile = {
 
   // 👇 ГАЛЕРЕЯ: плитка-бенто до 6 фото: 1-е — широкое сверху, 2-е и 3-е — квадраты слева,
   // 4-е — высокое справа (под вертикальное фото), 5-е и 6-е — нижний ряд. Раскладка сама
-  // подстраивается под число фото. Добавить фото: положи photo5.jpg / photo6.jpg в public/photos/
-  // (или src/assets/photos/) и убери // перед строкой ниже. Фото без файла просто не показывается.
+  // подстраивается под число фото. Фото лежат в src/assets/photos/ в WebP (как пережать — в README,
+  // раздел «Photos»): так они в разы легче и кешируются на год. Фото без файла просто не показывается.
   gallery: {
     title: 'me :]',
     photos: [
-      photoUrl('photo1.jpg'),
-      photoUrl('photo2.jpg'),
-      photoUrl('photo3.jpg'),
-      photoUrl('photo4.jpg'),
-      photoUrl('photo5.jpg'),
-      photoUrl('photo6.jpg'),
+      photoUrl('photo1.webp'),
+      photoUrl('photo2.webp'),
+      photoUrl('photo3.webp'),
+      photoUrl('photo4.webp'),
+      photoUrl('photo5.webp'),
+      photoUrl('photo6.webp'),
     ],
   },
 }

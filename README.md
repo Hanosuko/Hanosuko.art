@@ -237,15 +237,16 @@ Do not publish copyrighted tracks unless you have the right to distribute them.
 
 ## Photos
 
-Put personal photos in:
+Photos live in `src/assets/photos/` as WebP: the build adds a hash to their names, so browsers cache them for a year and a replaced photo shows up right away. The cells are a few hundred pixels wide, so 1440 px on the long side is plenty. Convert a new photo with `cwebp` (`brew install webp`):
 
-```text
-public/photos/
+```sh
+cwebp -q 80 -m 6 -metadata none -resize 1440 0 photo.jpg -o src/assets/photos/photo1.webp   # landscape
+cwebp -q 80 -m 6 -metadata none -resize 0 1440 photo.jpg -o src/assets/photos/photo4.webp   # portrait
 ```
 
-or bundle template-safe assets through `src/assets/photos/`.
+A file in `public/photos/` also works (`photoUrl` falls back to it), but without the hash it is cached for a week under the same name.
 
-The gallery (`profile.gallery.photos`) is a bento for up to 6 photos: the 1st is wide on top, the 2nd and 3rd are squares on the left, the 4th is tall on the right (good for a vertical photo), the 5th and 6th fill the bottom row. The layout adapts to the number of photos, and a photo whose file is missing is skipped, so there are never empty or broken cells. Two extra places are already in the config: put `photo5.jpg` and `photo6.jpg` into `public/photos/` and uncomment their lines.
+The gallery (`profile.gallery.photos`) is a bento for up to 6 photos: the 1st is wide on top, the 2nd and 3rd are squares on the left, the 4th is tall on the right (good for a vertical photo), the 5th and 6th fill the bottom row. The layout adapts to the number of photos, and a photo whose file is missing is skipped, so there are never empty or broken cells. Two extra places are already in the config: `photo5.webp` and `photo6.webp`.
 
 The setup photo frame takes the proportions of the photo itself, so a new setup photo is never cropped.
 

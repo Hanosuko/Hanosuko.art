@@ -1,14 +1,6 @@
 # Photos
 
-Put your own gallery and setup photos here while developing locally.
+Gallery and setup photos live in `src/assets/photos/` as WebP — see the «Photos» section of the main README.
 
-Default paths used by `src/config/profile.ts`:
-
-- `setup.jpg`
-- `photo1.jpg`
-- `photo2.jpg`
-- `photo3.jpg`
-- `photo4.jpg` (tall cell — a vertical photo fits best)
-- `photo5.jpg`, `photo6.jpg` (optional, uncomment them in `gallery.photos`)
-
-You can also bundle public template-safe images through `src/assets/photos/`.
+A file put here also works (`photoUrl` in `src/config/profile.ts` falls back to `public/photos/`),
+but without a hash in its name the browser caches it for a week under the same URL.
