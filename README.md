@@ -89,8 +89,9 @@ The profile card is built from the Discord user ID (`profile.discord.userId`) an
 | Data | Source | Updates |
 | --- | --- | --- |
 | Status, device, custom status, games, Spotify | [Lanyard](https://github.com/Phineas/lanyard) (REST + WebSocket) | live |
-| Avatar, avatar decoration, display name, server tag | Lanyard, with the full profile as fallback | live |
-| Banner, HypeSquad and Nitro badges | [japi.rest](https://japi.rest) | on page load |
+| Avatar, banner, avatar decoration, server tag icon, badge icons | local copies in `public/discord/` and `public/badges/icons/` (`profile.discord.media`) | manual |
+| Display name, server tag | Lanyard, with the full profile as fallback | live |
+| HypeSquad and Nitro badges (when `badges` is not set) | [japi.rest](https://japi.rest) | on page load |
 | Full badge list with hover tooltips, connections (with TikTok stats) | `profile.discord.badges`, `profile.discord.connections` | manual |
 | Member since | computed from the ID itself | — |
 | About me | `identity.bio` | manual |
@@ -98,6 +99,22 @@ The profile card is built from the Discord user ID (`profile.discord.userId`) an
 | Extra links after the connections | `profile.social` | manual |
 
 **Lanyard only tracks users who joined its Discord server.** Join [discord.gg/lanyard](https://discord.gg/lanyard) once — until then the card works, but without status and activities.
+
+### Discord images
+
+`cdn.discordapp.com` doesn't open in Russia without a VPN, so the avatar, banner, decoration and server tag icon are stored in the project and set in `profile.discord.media` — they always win over what the API returns. Remove a field and the card falls back to the Discord CDN. After changing them in Discord, download them again (from somewhere the CDN opens). The hashes are in `https://japi.rest/discord/v1/user/<id>` → `data`:
+
+```sh
+C=https://cdn.discordapp.com U=<user id>
+curl -o public/discord/avatar.png              "$C/avatars/$U/<avatar>.png?size=256"
+curl -o public/discord/banner.png              "$C/banners/$U/<banner>.png?size=600"
+curl -o public/discord/banner.webp             "$C/banners/$U/<banner>.webp?size=600&animated=true"
+curl -o public/discord/decoration.png          "$C/avatar-decoration-presets/<avatar_decoration_data.asset>.png?size=240&passthrough=false"
+curl -o public/discord/decoration-animated.png "$C/avatar-decoration-presets/<avatar_decoration_data.asset>.png?size=240&passthrough=true"
+curl -o public/discord/clan-badge.png          "$C/clan-badges/<primary_guild.identity_guild_id>/<primary_guild.badge>.png?size=32"
+```
+
+Badge icons from `profile.discord.badges` are in `public/badges/icons/` (`$C/badge-icons/<hash>.png`).
 
 Discord has no public API for connections or for the full badge list (the API gives only HypeSquad and Nitro), so both are listed in the config. Connections are shown like in Discord: an icon tile, the account name with an arrow when there is a `url` (Discord shows Epic Games and Xbox without one), and stats under the name. The `metadata` keys are the same as in Discord: `created_at`, `game_count`, `item_count_dota2`, `item_count_tf2` for Steam, `follower_count`, `following_count`, `likes_count` for TikTok. The numbers are updated by hand. TikTok blocks requests from servers with an anti-bot page, so they can't be fetched automatically; the official way is the [TikTok Display API](https://developers.tiktok.com/doc/tiktok-api-v2-get-user-info), which needs a TikTok developer app authorized by the account owner. Links from `profile.social` are added after the connections, except for services that are already in `connections`.
 

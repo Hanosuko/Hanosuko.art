@@ -20,37 +20,46 @@ export const profile: Profile = {
   // «Обо мне» — это identity.bio, после интеграций идут ссылки из social ниже.
   discord: {
     userId: '835533218869936168',
+    // 👇 АВАТАР, БАННЕР, УКРАШЕНИЕ И ЗНАЧОК ТЕГА — копии из Discord в public/discord/.
+    // Discord CDN без VPN в РФ не открывается, поэтому картинки лежат у нас. Сменил аватар или
+    // украшение в Discord — перекачай файл (как — в README, раздел «Discord images»)
+    media: {
+      avatar: '/discord/avatar.png',
+      banner: { static: '/discord/banner.png', animated: '/discord/banner.webp' },
+      decoration: { static: '/discord/decoration.png', animated: '/discord/decoration-animated.png' },
+      clanBadge: '/discord/clan-badge.png',
+    },
     // 👇 ТЕМА ПРОФИЛЯ NITRO — два цвета из Discord → «Тема и баннер». Убери theme — карточка станет тёмной
     theme: { primary: '#cecdc8', accent: '#000000' },
     pronouns: 'https://hanosuko.art',
     // 👇 НИК: шрифт (из src/style.css) и эффект toon — белые буквы с контуром и тенью
     nameStyle: { font: 'Almendra', effect: 'toon' },
-    // 👇 ЗНАЧКИ в порядке Discord. Иконки: cdn.discordapp.com/badge-icons/<хеш>.png,
-    // хеши ищи на github.com/mezotv/discord-badges. Без этого списка — только HypeSquad и Nitro из API.
+    // 👇 ЗНАЧКИ в порядке Discord. Иконки лежат в public/badges/icons/ — скачаны с
+    // cdn.discordapp.com/badge-icons/<хеш>.png, хеши ищи на github.com/mezotv/discord-badges. Без этого списка — только HypeSquad и Nitro из API.
     // Подсказка при наведении как в Discord: без tooltip — тёмная с текстом label,
     // kind: 'detail' — с иконкой слева, kind: 'card' — карточка с большой картинкой (лежат в public/badges/)
     badges: [
       {
         label: 'Gold Nitro, subscriber since Jan 23, 2026',
-        iconUrl: 'https://cdn.discordapp.com/badge-icons/2895086c18d5531d499862e41d1155a6.png',
+        iconUrl: '/badges/icons/nitro-gold.png',
         tooltip: { kind: 'card', theme: 'nitro', imageUrl: '/badges/nitro-gold.svg', title: 'Gold', text: 'Subscriber since 1/23/26' },
       },
-      { label: 'HypeSquad Brilliance', iconUrl: 'https://cdn.discordapp.com/badge-icons/011940fd013da3f7fb926e4a1cd2e618.png' },
-      { label: 'Originally known as metemx7echosis#9897', iconUrl: 'https://cdn.discordapp.com/badge-icons/6de6d34650760ba5551a79732e98ed60.png' },
-      { label: 'Completed a Quest', iconUrl: 'https://cdn.discordapp.com/badge-icons/7d9ae358c8c5e118768335dbe68b4fb8.png' },
+      { label: 'HypeSquad Brilliance', iconUrl: '/badges/icons/hypesquad-brilliance.png' },
+      { label: 'Originally known as metemx7echosis#9897', iconUrl: '/badges/icons/legacy-username.png' },
+      { label: 'Completed a Quest', iconUrl: '/badges/icons/quest.png' },
       {
         label: 'Last Meadow Online: Level 44 Reached',
-        iconUrl: 'https://cdn.discordapp.com/badge-icons/ca105ad9cfc8580c765101d17bbb2323.png',
+        iconUrl: '/badges/icons/last-meadow.png',
         tooltip: { kind: 'detail', title: 'Last Meadow Online', text: 'Level 44 Reached' },
       },
       {
         label: 'Orbs: Apprentice',
-        iconUrl: 'https://cdn.discordapp.com/badge-icons/83d8a1eb09a8d64e59233eec5d4d5c2d.png',
+        iconUrl: '/badges/icons/orbs-apprentice.png',
         tooltip: { kind: 'card', theme: 'light', imageUrl: '/badges/orbs-apprentice.webp', eyebrow: 'Orbs', title: 'Apprentice' },
       },
       {
         label: 'Gifting: Patron',
-        iconUrl: 'https://cdn.discordapp.com/badge-icons/025035e4f4c124c44d29b369936c6843.png',
+        iconUrl: '/badges/icons/gifting-patron.png',
         tooltip: { kind: 'card', theme: 'dark', imageUrl: '/badges/gifting-patron.png', eyebrow: 'Gifting', title: 'Patron' },
       },
     ],

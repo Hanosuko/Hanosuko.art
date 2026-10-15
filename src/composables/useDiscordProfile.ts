@@ -8,6 +8,7 @@ import type {
   LanyardPresence,
   LanyardResponse,
 } from '@/types/discord'
+import type { DiscordMedia } from '@/types/profile'
 
 const CDN = 'https://cdn.discordapp.com'
 const LANYARD_REST = 'https://api.lanyard.rest/v1/users/'
@@ -52,7 +53,8 @@ export const activityImageUrl = (activity: LanyardActivity, key: 'large_image' |
 // Дата регистрации зашита в сам ID (snowflake)
 const createdAtOf = (userId: string): Date => new Date(Number((BigInt(userId) >> 22n) + DISCORD_EPOCH))
 
-export function useDiscordProfile(userId: string) {
+// media — локальные копии картинок: они важнее CDN, который без VPN не грузится
+export function useDiscordProfile(userId: string, media: DiscordMedia = {}) {
   const user = shallowRef<JapiUser | null>(null)
   const presence = shallowRef<LanyardPresence | null>(null)
 
@@ -131,11 +133,13 @@ export function useDiscordProfile(userId: string) {
   const username = computed(() => liveUser.value?.username ?? user.value?.username ?? null)
 
   const avatarUrl = computed(() => {
+    if (media.avatar) return media.avatar
     const hash = liveUser.value?.avatar ?? user.value?.avatar
     return hash ? avatarUrlFor(userId, hash) : null
   })
 
   const decoration = computed(() => {
+    if (media.decoration) return media.decoration
     const asset = (liveUser.value?.avatar_decoration_data ?? user.value?.avatar_decoration_data)?.asset
     if (!asset) return null
     const base = `${CDN}/avatar-decoration-presets/${asset}.png?size=240`
@@ -143,6 +147,7 @@ export function useDiscordProfile(userId: string) {
   })
 
   const banner = computed(() => {
+    if (media.banner) return media.banner
     const hash = user.value?.banner
     if (!hash) return null
     const base = `${CDN}/banners/${userId}/${hash}`
@@ -158,9 +163,10 @@ export function useDiscordProfile(userId: string) {
     const guild = liveUser.value?.primary_guild ?? user.value?.primary_guild
     if (!guild?.tag) return null
     const badgeUrl =
-      guild.identity_guild_id && guild.badge
+      media.clanBadge ??
+      (guild.identity_guild_id && guild.badge
         ? `${CDN}/clan-badges/${guild.identity_guild_id}/${guild.badge}.png?size=32`
-        : null
+        : null)
     return { tag: guild.tag, badgeUrl, guildId: guild.identity_guild_id }
   })
 

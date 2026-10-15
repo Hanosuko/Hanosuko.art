@@ -33,7 +33,7 @@ const {
   customStatus,
   activities,
   spotify,
-} = useDiscordProfile(discord.userId)
+} = useDiscordProfile(discord.userId, discord.media)
 
 const bannerSrc = useProgressiveImage(() => banner.value)
 const decorationSrc = useProgressiveImage(() => decoration.value)

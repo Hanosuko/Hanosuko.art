@@ -116,8 +116,20 @@ export interface DiscordGuildConfig {
   members: number
 }
 
+// Картинки профиля из проекта (public/discord/). Discord CDN без VPN в РФ не открывается,
+// поэтому заданные здесь файлы всегда важнее того, что пришло из API
+export interface DiscordMedia {
+  avatar?: string
+  // Баннер и украшение: статичная картинка сразу, анимированная подменяет её после загрузки
+  banner?: { static: string; animated: string | null }
+  decoration?: { static: string; animated: string | null }
+  // Значок тега сервера рядом с ником
+  clanBadge?: string
+}
+
 export interface DiscordSettings {
   userId: string
+  media?: DiscordMedia
   // Цвета темы профиля Nitro («Тема и баннер»): основной сверху, акцент снизу. Без них — тёмная карточка сайта
   theme?: { primary: string; accent: string }
   // Строка после юзернейма (в Discord — поле «Местоимения»)
@@ -138,8 +150,10 @@ export interface ServerSettings {
   name: string
   // IP для игроков: по нему проверяется онлайн, он же подписан на плитке
   address: string
-  // Логотип плитки; без него — иконка сервера из майнкрафта (с mcsrvstat.us)
+  // Логотип плитки; без него — иконка сервера из майнкрафта
   logoUrl?: string
+  // Полоска заполняется так, будто слотов столько, а не players.max (991 — полоска почти пустая)
+  barMax?: number
 }
 
 export interface CistiersSettings {

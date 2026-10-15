@@ -22,9 +22,15 @@ const el = (type: string, style: Record<string, unknown>, children?: unknown, at
   props: { style, children, ...attrs },
 })
 
-// satori не умеет WebP — у Discord CDN та же картинка есть в PNG
-const loadImage = async (url: string): Promise<string | null> => {
+// satori не умеет WebP — у Discord CDN та же картинка есть в PNG.
+// Путь от корня сайта (/discord/avatar.png) читается из public/
+const loadImage = async (url: string, root: string): Promise<string | null> => {
   try {
+    if (url.startsWith('/')) {
+      const type = url.endsWith('.png') ? 'image/png' : /\.jpe?g$/.test(url) ? 'image/jpeg' : null
+      if (!type) return null
+      return `data:${type};base64,${(await readFile(path.join(root, 'public', url))).toString('base64')}`
+    }
     const response = await fetch(url.replace(/\.webp(?=$|\?)/, '.png'), { signal: AbortSignal.timeout(10_000) })
     const type = response.headers.get('content-type') ?? ''
     if (!response.ok || !/^image\/(png|jpeg)/.test(type)) return null
@@ -38,7 +44,7 @@ const renderOgImage = async (root: string): Promise<Buffer> => {
   const [regular, bold, avatar] = await Promise.all([
     readFile(path.join(root, 'public/fonts/Monocraft.ttf')),
     readFile(path.join(root, 'public/fonts/Monocraft-Bold.ttf')),
-    loadImage(identity.avatarUrl),
+    loadImage(identity.avatarUrl, root),
   ])
 
   const avatarNode = avatar
