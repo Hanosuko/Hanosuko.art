@@ -35,7 +35,9 @@ let nextId = 0
 const download = (src: string): Promise<Blob | null> => {
   let file = files.get(src)
   if (!file) {
-    file = fetch(src)
+    // Эффект весит ~7 МБ (растровые точки почти не сжимаются) — низкий приоритет,
+    // чтобы шрифты, аватар и остальная страница грузились первыми
+    file = fetch(src, { priority: 'low' })
       .then((response) => (response.ok ? response.blob() : null))
       .catch(() => null)
     files.set(src, file)
@@ -86,8 +88,13 @@ const start = async (): Promise<void> => {
 
 onMounted(() => {
   if (staticOnly) return
-  // Качаем заранее, пока висит заставка, — после клика эффект стартует сразу
-  for (const layer of props.effect.layers) void download(layer.src)
+  // Качаем заранее, пока висит заставка, — после клика эффект стартует сразу.
+  // Но только когда загрузилась сама страница: start() всё равно дождётся файлов
+  const prefetch = (): void => {
+    if (!disposed) for (const layer of props.effect.layers) void download(layer.src)
+  }
+  if (document.readyState === 'complete') prefetch()
+  else window.addEventListener('load', prefetch, { once: true })
   if (root.value) {
     observer = new IntersectionObserver(([entry]) => {
       inView = entry?.isIntersecting ?? true
