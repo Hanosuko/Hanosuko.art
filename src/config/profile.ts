@@ -65,6 +65,16 @@ export const profile: Profile = {
       },
       { type: 'youtube', name: 'Hanosuko', url: 'https://www.youtube.com/channel/UCOOGHlOMbu1w6lRph7bP_Jg' },
     ],
+    // 👇 КАРТОЧКА СЕРВЕРА по клику на тег MyTL, как в Discord. У Discord нет открытого API для чужих
+    // серверов, поэтому название, иконка, баннер и цифры — вручную; дата основания считается из ID сервера.
+    // Кнопка «Go to Server» никуда не ведёт — только анимация «Maybe next time»
+    guild: {
+      name: 'MyTiers - Высший Стафф',
+      iconUrl: '/brands/mytl-guild.webp',
+      banner: ['#d94d47', '#f0a092'],
+      online: 3,
+      members: 43,
+    },
     // 👇 ЭФФЕКТ ПРОФИЛЯ «Поиграем?» (Let's Play) — анимация поверх карточки, тайминги как в Discord.
     // Файлы лежат в public/effects/. Как достать другой эффект — в README, раздел «Profile Effect»
     profileEffect: {
@@ -219,8 +229,8 @@ export const profile: Profile = {
       photoUrl('photo2.jpg'),
       photoUrl('photo3.jpg'),
       photoUrl('photo4.jpg'),
-      // photoUrl('photo5.jpg'),
-      // photoUrl('photo6.jpg'),
+      photoUrl('photo5.jpg'),
+      photoUrl('photo6.jpg'),
     ],
   },
 }

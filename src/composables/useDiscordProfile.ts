@@ -161,7 +161,7 @@ export function useDiscordProfile(userId: string) {
       guild.identity_guild_id && guild.badge
         ? `${CDN}/clan-badges/${guild.identity_guild_id}/${guild.badge}.png?size=32`
         : null
-    return { tag: guild.tag, badgeUrl }
+    return { tag: guild.tag, badgeUrl, guildId: guild.identity_guild_id }
   })
 
   const badges = computed<DiscordBadge[]>(() => {

@@ -106,6 +106,16 @@ export interface ProfileEffect {
   layers: ProfileEffectLayer[]
 }
 
+// Карточка сервера по клику на тег. Открытого API у чужих серверов нет, поэтому данные вручную
+export interface DiscordGuildConfig {
+  name: string
+  iconUrl: string
+  // Баннер карточки: цвет сверху и снизу
+  banner: [string, string]
+  online: number
+  members: number
+}
+
 export interface DiscordSettings {
   userId: string
   // Цвета темы профиля Nitro («Тема и баннер»): основной сверху, акцент снизу. Без них — тёмная карточка сайта
@@ -120,6 +130,8 @@ export interface DiscordSettings {
   connections?: DiscordConnectionConfig[]
   // Эффект профиля — анимация поверх карточки
   profileEffect?: ProfileEffect
+  // Сервер тега рядом с ником: без этого поля тег просто плашка, с ним — открывает карточку сервера
+  guild?: DiscordGuildConfig
 }
 
 export interface ServerSettings {

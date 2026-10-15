@@ -10,6 +10,7 @@ import { useProgressiveImage } from '@/composables/useProgressiveImage'
 import { profileThemeTokens } from '@/utils/discordTheme'
 import { connectionRowOf, type ConnectionRow } from '@/utils/discordConnections'
 import BadgeTooltip from '@/components/BadgeTooltip.vue'
+import GuildCard from '@/components/GuildCard.vue'
 import BrandIcon from '@/components/BrandIcon.vue'
 import DiscordActivity from '@/components/DiscordActivity.vue'
 import ProfileEffect from '@/components/ProfileEffect.vue'
@@ -79,18 +80,38 @@ const onBadgeLeave = (event: PointerEvent): void => {
   if (event.pointerType === 'mouse') hideBadgeTip()
 }
 
-const onPointerOutside = (event: PointerEvent): void => {
-  if (badgeTip.value && !(event.target as Element | null)?.closest('.dc-badge')) hideBadgeTip()
+// Карточка сервера открывается и закрывается кликом по тегу, закрывается кликом мимо и Esc
+const guildAnchor = shallowRef<DOMRect | null>(null)
+
+const toggleGuild = (event: MouseEvent): void => {
+  guildAnchor.value = guildAnchor.value ? null : (event.currentTarget as Element).getBoundingClientRect()
 }
 
-// Подсказка привязана к экрану, поэтому при прокрутке и смене размера окна прячется
-window.addEventListener('scroll', hideBadgeTip, { capture: true, passive: true })
-window.addEventListener('resize', hideBadgeTip, { passive: true })
+const hidePopups = (): void => {
+  hideBadgeTip()
+  guildAnchor.value = null
+}
+
+const onPointerOutside = (event: PointerEvent): void => {
+  const target = event.target as Element | null
+  if (badgeTip.value && !target?.closest('.dc-badge')) hideBadgeTip()
+  if (guildAnchor.value && !target?.closest('.dc-clan, .guild-card')) guildAnchor.value = null
+}
+
+const onKeydown = (event: KeyboardEvent): void => {
+  if (event.key === 'Escape') guildAnchor.value = null
+}
+
+// Подсказка и карточка привязаны к экрану, поэтому при прокрутке и смене размера окна прячутся
+window.addEventListener('scroll', hidePopups, { capture: true, passive: true })
+window.addEventListener('resize', hidePopups, { passive: true })
 document.addEventListener('pointerdown', onPointerOutside, { capture: true })
+document.addEventListener('keydown', onKeydown)
 onBeforeUnmount(() => {
-  window.removeEventListener('scroll', hideBadgeTip, { capture: true })
-  window.removeEventListener('resize', hideBadgeTip)
+  window.removeEventListener('scroll', hidePopups, { capture: true })
+  window.removeEventListener('resize', hidePopups)
   document.removeEventListener('pointerdown', onPointerOutside, { capture: true })
+  document.removeEventListener('keydown', onKeydown)
 })
 
 const STATUS_LABELS = { online: 'Online', idle: 'Idle', dnd: 'Do Not Disturb', offline: 'Offline' } as const
@@ -182,7 +203,18 @@ const hideBrokenImage = (event: Event): void => {
           <span aria-hidden="true">•</span>
           <span class="dc-pronouns">{{ discord.pronouns }}</span>
         </template>
-        <span v-if="clan" class="dc-clan" :title="`Server tag ${clan.tag}`">
+        <button
+          v-if="clan && discord.guild"
+          type="button"
+          class="dc-clan is-button"
+          :aria-expanded="guildAnchor !== null"
+          aria-haspopup="dialog"
+          @click="toggleGuild"
+        >
+          <img v-if="clan.badgeUrl" :src="clan.badgeUrl" alt="" />
+          {{ clan.tag }}
+        </button>
+        <span v-else-if="clan" class="dc-clan" :title="`Server tag ${clan.tag}`">
           <img v-if="clan.badgeUrl" :src="clan.badgeUrl" alt="" />
           {{ clan.tag }}
         </span>
@@ -205,6 +237,14 @@ const hideBrokenImage = (event: Event): void => {
           <img :src="badge.iconUrl" alt="" @error="hideBrokenImage" />
         </li>
       </ul>
+      <GuildCard
+        v-if="guildAnchor && clan && discord.guild"
+        :guild="discord.guild"
+        :tag="clan.tag"
+        :badge-url="clan.badgeUrl"
+        :guild-id="clan.guildId"
+        :anchor="guildAnchor"
+      />
       <BadgeTooltip v-if="badgeTip" :key="badgeTip.badge.label" :badge="badgeTip.badge" :anchor="badgeTip.anchor" />
 
       <section class="dc-section">
@@ -502,6 +542,29 @@ const hideBrokenImage = (event: Event): void => {
 .dc-clan img {
   width: 0.95rem;
   height: 0.95rem;
+}
+
+.dc-clan.is-button {
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    filter 0.15s ease,
+    transform 0.15s ease;
+}
+
+@media (hover: hover) {
+  .dc-clan.is-button:hover {
+    filter: brightness(0.94);
+  }
+}
+
+.dc-clan.is-button:active {
+  transform: scale(0.95);
+}
+
+.dc-clan.is-button:focus-visible {
+  outline: 2px solid var(--dc-muted);
+  outline-offset: 2px;
 }
 
 .dc-badges {
