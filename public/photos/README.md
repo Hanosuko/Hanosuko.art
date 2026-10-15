@@ -8,6 +8,7 @@ Default paths used by `src/config/profile.ts`:
 - `photo1.jpg`
 - `photo2.jpg`
 - `photo3.jpg`
-- `photo4.jpg`
+- `photo4.jpg` (tall cell — a vertical photo fits best)
+- `photo5.jpg`, `photo6.jpg` (optional, uncomment them in `gallery.photos`)
 
 You can also bundle public template-safe images through `src/assets/photos/`.
