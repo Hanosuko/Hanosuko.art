@@ -35,7 +35,7 @@ const VIEWPORT_MARGIN = 4
 // Высоты частей экрана в пикселях интерфейса игры — те же числа, что в стилях ниже
 const LIST_CHROME = 8
 const ROW_GUI = 36
-const LAN_GUI = 24
+const LAN_GUI = 30
 const BUTTONS_GUI = 24
 // Заголовок плитки — в rem, как у соседних блоков
 const HEADER_REM = 3.5
@@ -627,7 +627,9 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   flex: none;
-  height: calc(var(--g) * 24);
+  /* Отступ сверху — строка поиска не жмётся к строке сервера */
+  height: calc(var(--g) * 30);
+  padding-top: calc(var(--g) * 6);
   font-family: 'Minecraftia', 'Monocraft', monospace;
   font-size: calc(var(--g) * 8);
   line-height: calc(var(--g) * 10);
@@ -661,7 +663,8 @@ onBeforeUnmount(() => {
   min-width: 0;
   width: calc(var(--g) * 150);
   height: calc(var(--g) * 20);
-  padding: 0 calc(var(--g) * 4);
+  /* У Minecraftia буквы сидят высоко в строке — опускаем текст к середине кнопки, как в игре */
+  padding: calc(var(--g) * 6) calc(var(--g) * 4) 0;
   border: var(--g) solid #000;
   background: #6f6f6f;
   box-shadow:
