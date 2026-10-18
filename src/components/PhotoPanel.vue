@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref, watch, type ComponentPublicInstance } from 'vue'
 import { profile } from '@/config/profile'
+import PhotoLightbox from '@/components/PhotoLightbox.vue'
 
 const gallery = profile.gallery
 
@@ -14,6 +15,45 @@ const dropPhoto = (src: string): void => {
 
 // Своя раскладка для 1–6 фото; седьмое и дальше встают парами ниже
 const layout = computed(() => `count-${Math.min(photos.value.length, 6)}`)
+
+// Пропорции фото: просмотр ставит по ним рамку ещё до того, как картинка отрисуется
+const ratios = ref<Record<string, number>>({})
+
+const onThumbLoad = (src: string, event: Event): void => {
+  const { naturalWidth, naturalHeight } = event.target as HTMLImageElement
+  if (naturalWidth && naturalHeight) ratios.value = { ...ratios.value, [src]: naturalWidth / naturalHeight }
+}
+
+// Открытое в просмотре фото. Его плитка прячется, пока фото не долетит обратно, — будто фото
+// поднялось с плашки, а не скопировалось
+const viewing = ref<number | null>(null)
+const lifted = ref<number | null>(null)
+
+watch(viewing, (index) => {
+  if (index !== null) lifted.value = index
+})
+
+const cells: (HTMLElement | null)[] = []
+
+const setCell = (el: Element | ComponentPublicInstance | null, index: number): void => {
+  cells[index] = el instanceof HTMLElement ? el : null
+}
+
+// Где плитка на экране: фото вылетает из неё и возвращается в неё. Размер — по картинке внутри рамки
+const thumb = (index: number): { rect: DOMRect; radius: number } | null => {
+  const cell = cells[index]
+  const img = cell?.querySelector('img')
+  if (!cell || !img) return null
+  const radius = parseFloat(getComputedStyle(cell).borderTopLeftRadius) - cell.clientLeft
+  return { rect: img.getBoundingClientRect(), radius: Math.max(radius, 0) }
+}
+
+// Фокус возвращается на плитку фото, на котором закрыли, — с клавиатуры можно листать дальше.
+// Ждём перерисовки: скрытую плитку браузер сфокусировать не даст
+const onClosed = (index: number): void => {
+  lifted.value = null
+  void nextTick(() => cells[index]?.focus({ preventScroll: true }))
+}
 </script>
 
 <template>
@@ -23,22 +63,36 @@ const layout = computed(() => `count-${Math.min(photos.value.length, 6)}`)
     </header>
 
     <div class="photo-grid" :class="layout">
-      <figure
+      <button
         v-for="(src, index) in photos"
         :key="src"
+        :ref="(el) => setCell(el, index)"
+        type="button"
         class="photo-cell"
-        :class="`photo-cell-${index + 1}`"
+        :class="[`photo-cell-${index + 1}`, { 'is-lifted': lifted === index }]"
+        :aria-label="`Open photo ${index + 1} of ${photos.length}`"
+        @click="viewing = index"
       >
         <img
           class="photo-img"
           :src="src"
-          :alt="`${gallery.title} ${index + 1}`"
+          alt=""
           loading="lazy"
           decoding="async"
+          @load="onThumbLoad(src, $event)"
           @error="dropPhoto(src)"
         />
-      </figure>
+      </button>
     </div>
+
+    <PhotoLightbox
+      v-model:index="viewing"
+      :photos="photos"
+      :title="gallery.title"
+      :ratios="ratios"
+      :thumb="thumb"
+      @closed="onClosed"
+    />
   </section>
 </template>
 
@@ -123,11 +177,17 @@ const layout = computed(() => `count-${Math.min(photos.value.length, 6)}`)
 
 .photo-cell {
   position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
   margin: 0;
+  padding: 0;
   border-radius: 0.8rem;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: var(--color-background);
+  color: inherit;
+  cursor: zoom-in;
   transition:
     border-color 0.25s ease,
     box-shadow 0.25s ease,
@@ -140,6 +200,17 @@ const layout = computed(() => `count-${Math.min(photos.value.length, 6)}`)
     box-shadow: 0 0 18px var(--color-glow);
     transform: translateY(-1px);
   }
+}
+
+.photo-cell:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 18px var(--color-glow);
+}
+
+/* Фото этой плитки сейчас в просмотре */
+.photo-cell.is-lifted {
+  visibility: hidden;
 }
 
 .photo-cell-1 {
