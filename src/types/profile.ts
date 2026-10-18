@@ -202,9 +202,16 @@ export interface FeatureFlags {
   serverStatus: boolean
 }
 
+export interface GalleryPhoto {
+  src: string
+  // Текст рядом с фото в просмотре (на телефоне — под ним), переносы строк сохраняются.
+  // Пустой или без поля — фото открывается одно
+  description?: string
+}
+
 export interface GallerySettings {
   title: string
-  photos: string[]
+  photos: GalleryPhoto[]
 }
 
 export interface SetupSpecItem {

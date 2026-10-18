@@ -7,7 +7,7 @@ const gallery = profile.gallery
 
 // Фото, которое не загрузилось (файла нет), убираем — раскладка перестраивается под оставшиеся
 const missing = ref(new Set<string>())
-const photos = computed(() => gallery.photos.filter((src) => !missing.value.has(src)))
+const photos = computed(() => gallery.photos.filter((photo) => !missing.value.has(photo.src)))
 
 const dropPhoto = (src: string): void => {
   missing.value = new Set(missing.value).add(src)
@@ -64,8 +64,8 @@ const onClosed = (index: number): void => {
 
     <div class="photo-grid" :class="layout">
       <button
-        v-for="(src, index) in photos"
-        :key="src"
+        v-for="(photo, index) in photos"
+        :key="photo.src"
         :ref="(el) => setCell(el, index)"
         type="button"
         class="photo-cell"
@@ -75,12 +75,12 @@ const onClosed = (index: number): void => {
       >
         <img
           class="photo-img"
-          :src="src"
+          :src="photo.src"
           alt=""
           loading="lazy"
           decoding="async"
-          @load="onThumbLoad(src, $event)"
-          @error="dropPhoto(src)"
+          @load="onThumbLoad(photo.src, $event)"
+          @error="dropPhoto(photo.src)"
         />
       </button>
     </div>

@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { ChevronLeft, ChevronRight, X } from 'lucide-vue-next'
+import type { GalleryPhoto } from '@/types/profile'
 
 // Просмотр фото поверх страницы. Фото вылетает из своей плитки и растёт до размера экрана,
-// а при закрытии улетает в плитку того фото, на котором закрыли. Листается стрелками,
+// а при закрытии улетает в плитку того фото, на котором закрыли. Описание фото — справа от него,
+// на узком экране — под ним. Листается стрелками,
 // клавишами ← → и свайпом; закрывается крестиком, Esc, кликом мимо фото и свайпом вниз
 const props = defineProps<{
-  photos: string[]
+  photos: GalleryPhoto[]
   title: string
   // Пропорции фото (ширина / высота) по адресу — рамка встаёт по ним ещё до отрисовки картинки
   ratios: Record<string, number>
@@ -33,7 +35,9 @@ watch(index, (value) => {
   if (value !== null) shown.value = value
 })
 
-const src = computed(() => props.photos[shown.value])
+const photo = computed(() => props.photos[shown.value])
+const src = computed(() => photo.value?.src ?? '')
+const description = computed(() => photo.value?.description?.trim() ?? '')
 
 // Пропорции, которые узнали уже здесь, если плитка не успела загрузиться
 const loadedRatios = ref<Record<string, number>>({})
@@ -69,15 +73,18 @@ const onKeydown = (event: KeyboardEvent): void => {
 
 // Клик по пустому месту вокруг фото закрывает просмотр
 const onStageClick = (event: MouseEvent): void => {
-  if (!(event.target as Element).closest('.lb-img')) close()
+  if (!(event.target as Element).closest('.lb-img, .lb-caption')) close()
 }
 
-// Свайп влево-вправо листает, вниз — закрывает
-let touch: { x: number; y: number } | null = null
+// Свайп влево-вправо листает, вниз — закрывает. На описании вниз не закрывает: там длинный текст крутят
+let touch: { x: number; y: number; inCaption: boolean } | null = null
 
 const onTouchStart = (event: TouchEvent): void => {
   const point = event.touches[0]
-  touch = event.touches.length === 1 && point ? { x: point.clientX, y: point.clientY } : null
+  touch =
+    event.touches.length === 1 && point
+      ? { x: point.clientX, y: point.clientY, inCaption: !!(event.target as Element).closest('.lb-caption') }
+      : null
 }
 
 const onTouchEnd = (event: TouchEvent): void => {
@@ -85,9 +92,10 @@ const onTouchEnd = (event: TouchEvent): void => {
   if (!touch || !point) return
   const dx = point.clientX - touch.x
   const dy = point.clientY - touch.y
+  const { inCaption } = touch
   touch = null
   if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) go(dx < 0 ? 1 : -1)
-  else if (dy > 80 && dy > Math.abs(dx) * 1.5) close()
+  else if (!inCaption && dy > 80 && dy > Math.abs(dx) * 1.5) close()
 }
 
 // Пока открыт просмотр, страница под ним не крутится и не ловит фокус и клики.
@@ -166,10 +174,15 @@ const onEnter = (el: Element, done: () => void): void => {
   const root = el as HTMLElement
   const { img, thumb } = zoomTarget(root)
   const chrome = root.querySelector('.lb-bar')
+  const caption = root.querySelector('.lb-caption')
 
   entering = [
     root.querySelector('.lb-backdrop')?.animate({ opacity: [0, 1] }, { duration: DURATION, easing: EASE }),
     chrome?.animate({ opacity: [0, 1] }, { duration: 260, delay: 120, easing: 'ease', fill: 'backwards' }),
+    caption?.animate(
+      { opacity: [0, 1], transform: ['translateY(0.5rem)', 'none'] },
+      { duration: 320, delay: 160, easing: EASE, fill: 'backwards' },
+    ),
     img && thumb
       ? img.animate([thumbFrame(img, thumb), fullFrame(img)], { duration: DURATION, easing: EASE, fill: 'backwards' })
       : img?.animate(
@@ -192,12 +205,12 @@ const onLeave = (el: Element, done: () => void): void => {
 
   const root = el as HTMLElement
   const { img, thumb } = zoomTarget(root)
-  const chrome = root.querySelector('.lb-bar')
+  const chrome = root.querySelectorAll('.lb-bar, .lb-caption')
 
   settle(
     [
       root.querySelector('.lb-backdrop')?.animate({ opacity: [1, 0] }, { duration: DURATION, easing: EASE, fill: 'forwards' }),
-      chrome?.animate({ opacity: [1, 0] }, { duration: 160, easing: 'ease', fill: 'forwards' }),
+      ...[...chrome].map((part) => part.animate({ opacity: [1, 0] }, { duration: 160, easing: 'ease', fill: 'forwards' })),
       img && thumb
         ? img.animate([fullFrame(img), thumbFrame(img, thumb)], { duration: DURATION, easing: EASE, fill: 'forwards' })
         : img?.animate(
@@ -223,7 +236,7 @@ const onAfterLeave = (): void => {
 
         <div class="lb-stage" @click="onStageClick" @touchstart.passive="onTouchStart" @touchend="onTouchEnd">
           <Transition :name="`lb-swap-${direction}`" mode="out-in">
-            <figure :key="src" class="lb-figure" :style="{ '--ratio': ratio }">
+            <figure :key="src" class="lb-figure" :class="{ 'has-caption': description }" :style="{ '--ratio': ratio }">
               <img
                 class="lb-img"
                 :src="src"
@@ -231,6 +244,7 @@ const onAfterLeave = (): void => {
                 draggable="false"
                 @load="onLoad"
               />
+              <figcaption v-if="description" class="lb-caption glass-card">{{ description }}</figcaption>
             </figure>
           </Transition>
         </div>
@@ -284,19 +298,26 @@ const onAfterLeave = (): void => {
   cursor: zoom-out;
 }
 
-/* Размер фото — по его пропорциям: во всю ширину или во всю высоту, смотря что упрётся раньше */
+/* Размер фото — по его пропорциям: во всю ширину или во всю высоту, смотря что упрётся раньше.
+   С описанием на широком экране фото уступает ему место справа, на узком — снизу */
 .lb-figure {
   --max-w: calc(100vw - 10rem);
   --max-h: calc(100dvh - 6.25rem);
+  --img-w: min(var(--max-w), calc(var(--max-h) * var(--ratio)));
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   margin: 0;
+}
+
+.lb-figure.has-caption {
+  --max-h: calc(100dvh - 16rem);
 }
 
 .lb-img {
   display: block;
-  width: min(var(--max-w), calc(var(--max-h) * var(--ratio)));
+  width: var(--img-w);
   height: auto;
   aspect-ratio: var(--ratio);
   object-fit: cover;
@@ -306,6 +327,39 @@ const onAfterLeave = (): void => {
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+}
+
+.lb-caption {
+  box-sizing: border-box;
+  width: max(var(--img-w), min(18rem, var(--max-w)));
+  max-height: 9rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.9rem 1.1rem;
+  border-radius: 0.9rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-text);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  cursor: auto;
+}
+
+@media (min-width: 1024px) {
+  .lb-figure {
+    flex-direction: row;
+    gap: 1rem;
+  }
+
+  .lb-figure.has-caption {
+    --max-w: calc(100vw - 10rem - 19rem);
+    --max-h: calc(100dvh - 6.25rem);
+  }
+
+  .lb-caption {
+    width: 18rem;
+    max-height: var(--max-h);
+  }
 }
 
 /* Счётчик и кнопки. Пустое место полосы пропускает клик на сцену */
@@ -415,8 +469,10 @@ const onAfterLeave = (): void => {
   .lb-figure {
     --max-w: calc(100vw - 1.5rem);
     --max-h: calc(100dvh - 5.25rem);
-    flex-direction: column;
-    gap: 0.75rem;
+  }
+
+  .lb-figure.has-caption {
+    --max-h: calc(100dvh - 15rem);
   }
 }
 

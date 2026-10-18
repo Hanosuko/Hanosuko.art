@@ -259,6 +259,12 @@ A file in `public/photos/` also works (`photoUrl` falls back to it), but without
 
 The gallery (`profile.gallery.photos`) is a bento for up to 6 photos: the 1st is wide on top, the 2nd and 3rd are squares on the left, the 4th is tall on the right (good for a vertical photo), the 5th and 6th fill the bottom row. The layout adapts to the number of photos, and a photo whose file is missing is skipped, so there are never empty or broken cells. Two extra places are already in the config: `photo5.webp` and `photo6.webp`.
 
+A click on a photo opens it full screen: it grows out of its cell and flies back on close. Arrows, the ← → keys and swipes flip through the photos; the cross, Esc, a click outside the photo or a swipe down close it. Each photo can have a `description` — text shown to the right of the photo (below it on narrow screens); `\n` starts a new line, and an empty description shows the photo alone:
+
+```ts
+{ src: photoUrl('photo1.webp'), description: 'First line\nSecond line' },
+```
+
 The setup photo frame takes the proportions of the photo itself, so a new setup photo is never cropped.
 
 ## Optional Backend

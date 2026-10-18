@@ -279,15 +279,17 @@ export const profile: Profile = {
   // 4-е — высокое справа (под вертикальное фото), 5-е и 6-е — нижний ряд. Раскладка сама
   // подстраивается под число фото. Фото лежат в src/assets/photos/ в WebP (как пережать — в README,
   // раздел «Photos»): так они в разы легче и кешируются на год. Фото без файла просто не показывается.
+  // По клику фото открывается на весь экран. description — текст рядом с ним (перенос строки — \n),
+  // пустой — фото откроется без текста
   gallery: {
     title: 'me :]',
     photos: [
-      photoUrl('photo1.webp'),
-      photoUrl('photo2.webp'),
-      photoUrl('photo3.webp'),
-      photoUrl('photo4.webp'),
-      photoUrl('photo5.webp'),
-      photoUrl('photo6.webp'),
+      { src: photoUrl('photo1.webp'), description: '' },
+      { src: photoUrl('photo2.webp'), description: '' },
+      { src: photoUrl('photo3.webp'), description: '' },
+      { src: photoUrl('photo4.webp'), description: '' },
+      { src: photoUrl('photo5.webp'), description: '' },
+      { src: photoUrl('photo6.webp'), description: '' },
     ],
   },
 }
