@@ -284,12 +284,12 @@ export const profile: Profile = {
   gallery: {
     title: 'me :]',
     photos: [
-      { src: photoUrl('photo1.webp'), description: '' },
-      { src: photoUrl('photo2.webp'), description: '' },
-      { src: photoUrl('photo3.webp'), description: '' },
-      { src: photoUrl('photo4.webp'), description: '' },
-      { src: photoUrl('photo5.webp'), description: '' },
-      { src: photoUrl('photo6.webp'), description: '' },
+      { src: photoUrl('photo1.webp'), description: 'лучшего друга с др поздравлял' },
+      { src: photoUrl('photo2.webp'), description: 'подстригся и оч крутые волосы' },
+      { src: photoUrl('photo3.webp'), description: 'в астрахани я на рыбалке ночное фото' },
+      { src: photoUrl('photo4.webp'), description: 'с дургом из майна встретился он про' },
+      { src: photoUrl('photo5.webp'), description: 'вкусное мясо пожарил' },
+      { src: photoUrl('photo6.webp'), description: 'с любовью всей жизни едем на свадьбу мамы ^^' },
     ],
   },
 }
